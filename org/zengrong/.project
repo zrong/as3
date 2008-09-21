@@ -2,17 +2,17 @@
 <projectDescription>
 	<name>我的通用类</name>
 	<comment></comment>
-	<projects></projects>
+	<projects>
+	</projects>
 	<buildSpec>
 		<buildCommand>
 			<name>com.adobe.flexbuilder.project.flexbuilder</name>
-			<arguments></arguments>
+			<arguments>
+			</arguments>
 		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>com.adobe.flexbuilder.project.flexnature</nature>
-		<nature>
-			com.adobe.flexbuilder.project.actionscriptnature
-		</nature>
+		<nature>com.adobe.flexbuilder.project.actionscriptnature</nature>
 	</natures>
 </projectDescription>
