@@ -4,22 +4,22 @@
 package org.zengrong.media.cm
 {
 	import flash.events.Event;
-	import flash.events.IEventDispatcher;
 	import flash.events.EventDispatcher;
-	import flash.media.Microphone;
-	import flash.media.Camera;
+	import flash.events.IEventDispatcher;
 	import flash.events.StatusEvent;
+	import flash.media.Camera;
+	import flash.media.Microphone;
 	
 	public class CM implements IEventDispatcher
 	{
 		private var eventDispatcher:EventDispatcher;
-		private static var __checker:CM = null;
+		private static var CHECKER:CM = null;
 		private var cam:Camera;
 		private var mic:Microphone;
 		
 		public function CM()
 		{
-			trace("建立CM的实例");
+//			trace("建立CM的实例");
 			eventDispatcher = new EventDispatcher();
 		}
 		
@@ -29,11 +29,11 @@ package org.zengrong.media.cm
 		*/
 		public static function getInstance():CM
 		{
-			if(__checker == null)
+			if(CHECKER == null)
 			{
-				CM.__checker = new CM();
+				CHECKER = new CM();
 			}
-			return CM.__checker;
+			return CHECKER;
 		}
 		
 		/**
@@ -59,6 +59,16 @@ package org.zengrong.media.cm
 		public function get micNames():Array
 		{
 			return Microphone.names;
+		}
+		
+		//移去侦听器
+		public function reset():void
+		{
+			trace('CM中移除侦听器');
+			if(cam != null) cam.removeEventListener(StatusEvent.STATUS, camStatusHandler);
+			if(mic != null) mic.removeEventListener(StatusEvent.STATUS, micStatusHandler);
+			cam = null;
+			mic = null;
 		}
 		
 		
