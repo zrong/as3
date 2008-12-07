@@ -3,6 +3,7 @@
  */
 package org.zengrong.media.cm
 {
+	import flash.events.ActivityEvent;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
@@ -21,8 +22,7 @@ package org.zengrong.media.cm
 		{
 //			trace("建立CM的实例");
 			eventDispatcher = new EventDispatcher();
-		}
-		
+		}		
 		
 		/**
 		* 返回一个CM实例
@@ -66,6 +66,7 @@ package org.zengrong.media.cm
 		{
 			trace('CM中移除侦听器');
 			if(cam != null) cam.removeEventListener(StatusEvent.STATUS, camStatusHandler);
+			if(cam != null) cam.removeEventListener(ActivityEvent.ACTIVITY, activityHandler);
 			if(mic != null) mic.removeEventListener(StatusEvent.STATUS, micStatusHandler);
 			cam = null;
 			mic = null;
@@ -84,6 +85,7 @@ package org.zengrong.media.cm
 			}else{
 				cam = Camera.getCamera();
 				cam.addEventListener(StatusEvent.STATUS, camStatusHandler);
+				cam.addEventListener(ActivityEvent.ACTIVITY, activityHandler);
 				checkCamStatus(false);
 				//如果有多个摄像头并且当前的摄像头被禁用，就发出“多个摄像头”事件
 				if(cam.muted && (camAmount > 1))
@@ -93,6 +95,23 @@ package org.zengrong.media.cm
 				}
 			}
 			return cam;
+		}
+		
+		private function activityHandler(evt:ActivityEvent):void
+		{
+			var __cam:Camera = evt.currentTarget as Camera;
+			trace('//=================org.zengrong.media.cm.CM');
+			trace('activityHandler发生,activating:',evt.activating);
+			trace('camera name:',__cam.name);
+			trace('camera width:',__cam.width);
+			trace('camera height:',__cam.height);
+			trace('=============================//');
+			var i:CMFormat = new CMFormat(__cam, camNames);
+			var __event:CMEvent = 	evt.activating ? 
+									new CMEvent(CMEvent.ACTIVITY_START, false, true, i) :
+									new CMEvent(CMEvent.ACTIVITY_STOP, false, true, i);
+			this.dispatchEvent(__event);
+
 		}
 		
 		private function camStatusHandler(evt:StatusEvent):void
@@ -106,9 +125,11 @@ package org.zengrong.media.cm
 		 **/
 		private function checkCamStatus($isManual:Boolean):void
 		{
+			trace('//=================org.zengrong.media.cm.CM');
 			trace("执行了checkCamStatus！ manual:"+$isManual);
 			trace("摄像头是否禁用："+cam.muted);
 			trace("待发布的事件："+CMEvent.toEvent(cam));
+			trace('=============================//');
 			var i:CMFormat = new CMFormat(cam, camNames, $isManual);
 			var e:CMEvent = new CMEvent(CMEvent.toEvent(cam), false, true, i);
 			this.dispatchEvent(e); 

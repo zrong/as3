@@ -1,7 +1,6 @@
 package org.zengrong.media.cm
 {
 	import flash.events.Event;
-	import org.zengrong.media.cm.*;
 	import flash.media.Camera;
 	import flash.media.Microphone;
 
@@ -14,6 +13,9 @@ package org.zengrong.media.cm
 		public static const NO_CAMERA:String = "noCamera";	//没有摄像头
 		public static const NO_MICROPHONE:String = "noMicrophone";	//没有麦克风
 		public static const MULTI_CAMERA:String = "multiCamera";	//多个摄像头
+		
+		public static const ACTIVITY_START:String = 'activityStart'; //在摄像头开始会话时调度
+		public static const ACTIVITY_STOP:String = 'activityStop'; 	//在摄像头结束会话时调度
 		
 		public var result:CMFormat;
 
