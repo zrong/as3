@@ -100,12 +100,12 @@ package org.zengrong.media.cm
 		private function activityHandler(evt:ActivityEvent):void
 		{
 			var __cam:Camera = evt.currentTarget as Camera;
-			trace('//=================org.zengrong.media.cm.CM');
-			trace('activityHandler发生,activating:',evt.activating);
-			trace('camera name:',__cam.name);
-			trace('camera width:',__cam.width);
-			trace('camera height:',__cam.height);
-			trace('=============================//');
+//			trace('//=================org.zengrong.media.cm.CM');
+//			trace('activityHandler发生,activating:',evt.activating);
+//			trace('camera name:',__cam.name);
+//			trace('camera width:',__cam.width);
+//			trace('camera height:',__cam.height);
+//			trace('=============================//');
 			var i:CMFormat = new CMFormat(__cam, camNames);
 			var __event:CMEvent = 	evt.activating ? 
 									new CMEvent(CMEvent.ACTIVITY_START, false, true, i) :
