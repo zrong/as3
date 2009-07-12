@@ -30,5 +30,14 @@ package org.zengrong.media.cm
 			names = $camOrMicNames;
 			manual = $isManual;
 		}
+		
+		public function toString():String
+		{
+			return '[org.zengrong.media.cm:CMFormat ' +
+					'cam=' + cam +',' +
+					'mic=' + mic + ',' + 
+					'names=' + names + ',' +
+					'manual=' + manual + ']';
+		}
 	}
 }

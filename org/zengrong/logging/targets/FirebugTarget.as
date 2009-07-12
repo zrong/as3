@@ -74,10 +74,10 @@ public class FirebugTarget extends LineFormattedTarget
     	switch($level)
     	{
     		case LogEventLevel.DEBUG:
-    			Console.debug($info, $msg);
+    			AdminRoom.debug($info, $msg);
     			break;
     		case LogEventLevel.INFO:
-    			Console.info($info, $msg);
+    			AdminRoom.info($info, $msg);
     			break;
     	}
     	

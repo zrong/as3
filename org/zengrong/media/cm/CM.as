@@ -10,6 +10,7 @@ package org.zengrong.media.cm
 	import flash.events.StatusEvent;
 	import flash.media.Camera;
 	import flash.media.Microphone;
+	import flash.utils.setTimeout;
 	
 	public class CM implements IEventDispatcher
 	{
@@ -64,7 +65,7 @@ package org.zengrong.media.cm
 		//移去侦听器
 		public function reset():void
 		{
-			trace('CM中移除侦听器');
+			trace('CM重新设置');
 			if(cam != null) cam.removeEventListener(StatusEvent.STATUS, camStatusHandler);
 			if(cam != null) cam.removeEventListener(ActivityEvent.ACTIVITY, activityHandler);
 			if(mic != null) mic.removeEventListener(StatusEvent.STATUS, micStatusHandler);
@@ -86,7 +87,9 @@ package org.zengrong.media.cm
 				cam = Camera.getCamera();
 				cam.addEventListener(StatusEvent.STATUS, camStatusHandler);
 				cam.addEventListener(ActivityEvent.ACTIVITY, activityHandler);
-				checkCamStatus(false);
+				//延迟100毫秒再发布事件，这样外部就能先获得return的值，然后再收到事件。避免在获得cam之前收到cam可以事件，导致依赖cam的代码失败
+				setTimeout(checkCamStatus, 100, false);
+//				checkCamStatus(false);
 				//如果有多个摄像头并且当前的摄像头被禁用，就发出“多个摄像头”事件
 				if(cam.muted && (camAmount > 1))
 				{

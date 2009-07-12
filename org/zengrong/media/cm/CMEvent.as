@@ -59,5 +59,13 @@ package org.zengrong.media.cm
 			}
 		}
 		
+		override public function toString():String
+		{
+			return '[org.zengrong.media.cm:CMEvent ' +
+					'type=' + type + ',' +
+					'result=' + result + ']';
+					
+		}
+		
 	}
 }
