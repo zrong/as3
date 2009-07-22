@@ -5,7 +5,6 @@ package org.zengrong.rpc
 	import flash.events.NetStatusEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.net.NetConnection;
-	import flash.net.ObjectEncoding;
 	import flash.net.Responder;
 
 	public class Remoting extends NetConnection
@@ -22,14 +21,13 @@ package org.zengrong.rpc
 			this.addEventListener(NetStatusEvent.NET_STATUS, _netStatusHandler);
 			this.addEventListener(IOErrorEvent.IO_ERROR, _connError);
 			this.addEventListener(SecurityErrorEvent.SECURITY_ERROR, _connError);
-			this.objectEncoding = ObjectEncoding.AMF0;
 			this.connect(gateway);
 			trace('remoting connect',$gateway, $service);
 		}
 		
 		private function _netStatusHandler(evt:NetStatusEvent):void
 		{
-			trace('remoting状态：', evt.info.toString());
+			trace('remoting状态：', evt.info.code);
 			switch(evt.info.code) {
 				case "NetConnection.Connect.Failed":
 					dispatchEvent(new Event(CONNECT_ERROR));
