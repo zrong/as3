@@ -6,7 +6,7 @@ package org.zengrong.events
 	{
 		public var info:*;
 		
-		public function InfoEvent($type:String, $info:*, $bubbles:Boolean=false, $cancelable:Boolean=false)
+		public function InfoEvent($type:String, $info:*=null, $bubbles:Boolean=false, $cancelable:Boolean=false)
 		{
 			//TODO: implement function
 			super($type, $bubbles, $cancelable);
