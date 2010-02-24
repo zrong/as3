@@ -2,5 +2,7 @@
 <flexLibProperties includeAllClasses="true" version="3">
   <includeClasses/>
   <includeResources/>
-  <namespaceManifests/>
+  <namespaceManifests>
+    <namespaceManifestEntry manifest="manifest.xml" namespace="http://www.zengrong.org"/>
+  </namespaceManifests>
 </flexLibProperties>
