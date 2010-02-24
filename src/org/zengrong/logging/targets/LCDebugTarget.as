@@ -10,6 +10,8 @@ import mx.logging.LogEvent;
 import mx.logging.LogEventLevel;
 import mx.logging.targets.LineFormattedTarget;
 
+import org.zengrong.utils.TimeUtil;
+
 use namespace mx_internal;
 
 /**
@@ -114,10 +116,10 @@ public class LCDebugTarget extends LineFormattedTarget
     private static function statusHandler(evt:StatusEvent):void {
 		switch (evt.level) {
 			case "status":
-				trace(Util.getTime(), "Debug message send succeeded");
+				trace(TimeUtil.getTime(), "Debug message send succeeded");
 				break;
 			case "error":
-				trace(Util.getTime(), "Debug message send failed");
+				trace(TimeUtil.getTime(), "Debug message send failed");
 				break;
 		}
 	}

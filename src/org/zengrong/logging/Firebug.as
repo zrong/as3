@@ -43,6 +43,10 @@ package org.zengrong.logging{
 		public static function error(...rest):void{
 			send("error",rest);
 		}
+		
+		public static function fatal(...rest):void{
+			send("fatal",rest);
+		}
 		/**
 		 * Tests that an expression is true. 
 		 * If not, it will write a message to the console and throw an exception.

@@ -7,6 +7,8 @@ import mx.logging.LogEvent;
 import mx.logging.LogEventLevel;
 import mx.logging.targets.LineFormattedTarget;
 
+import org.zengrong.logging.Firebug;
+
 use namespace mx_internal;
 
 /**
@@ -74,10 +76,10 @@ public class FirebugTarget extends LineFormattedTarget
     	switch($level)
     	{
     		case LogEventLevel.DEBUG:
-    			AdminRoom.debug($info, $msg);
+    			Firebug.debug($info, $msg);
     			break;
     		case LogEventLevel.INFO:
-    			AdminRoom.info($info, $msg);
+    			Firebug.info($info, $msg);
     			break;
     	}
     	

@@ -33,7 +33,7 @@ package org.zengrong.logging
 		
 		public function warn(...parameters):void
 		{
-			Firebug.info.warn(null, parameters);
+			Firebug.info.apply(null, parameters);
 		}
 	}
 }
