@@ -1,6 +1,0 @@
-#Sat Aug 16 09:54:28 CST 2008
-DELEGATES_PREFERENCE=delegateValidatorList
-USER_BUILD_PREFERENCE=enabledBuildValidatorListorg.eclipse.wst.html.internal.validation.HTMLValidator\:org.eclipse.php.core.phpsource;
-USER_MANUAL_PREFERENCE=enabledManualValidatorListorg.eclipse.wst.html.internal.validation.HTMLValidator\:org.eclipse.php.core.phpsource;
-USER_PREFERENCE=overrideGlobalPreferencesfalse
-eclipse.preferences.version=1
