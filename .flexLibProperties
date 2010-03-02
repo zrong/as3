@@ -1,6 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <flexLibProperties version="3">
-<includeClasses/>
+<includeClasses>
+<classEntry path="org.zengrong.controls.Button"/>
+<classEntry path="org.zengrong.controls.ColoredDataGrid"/>
+<classEntry path="org.zengrong.controls.Loader"/>
+<classEntry path="org.zengrong.events.InfoEvent"/>
+<classEntry path="org.zengrong.logging.Firebug"/>
+<classEntry path="org.zengrong.logging.FirebugLogger"/>
+<classEntry path="org.zengrong.logging.Logger"/>
+<classEntry path="org.zengrong.logging.targets.FirebugTarget"/>
+<classEntry path="org.zengrong.logging.targets.LCDebugTarget"/>
+<classEntry path="org.zengrong.media.NCType"/>
+<classEntry path="org.zengrong.media.NSType"/>
+<classEntry path="org.zengrong.media.SoundLoader"/>
+<classEntry path="org.zengrong.media.VideoDisplay"/>
+<classEntry path="org.zengrong.media.cm.CM"/>
+<classEntry path="org.zengrong.media.cm.CMEvent"/>
+<classEntry path="org.zengrong.media.cm.CMFormat"/>
+<classEntry path="org.zengrong.rpc.FaultEvent"/>
+<classEntry path="org.zengrong.rpc.Operation"/>
+<classEntry path="org.zengrong.rpc.OperationPool"/>
+<classEntry path="org.zengrong.rpc.Remoting"/>
+<classEntry path="org.zengrong.rpc.ResultEvent"/>
+<classEntry path="org.zengrong.rpc.ServiceProxy"/>
+<classEntry path="org.zengrong.utils.Dialog"/>
+<classEntry path="org.zengrong.utils.JS"/>
+<classEntry path="org.zengrong.utils.TimeUtil"/>
+</includeClasses>
 <includeResources/>
 <namespaceManifests>
 <namespaceManifestEntry manifest="manifest.xml" namespace="http://www.zengrong.org"/>

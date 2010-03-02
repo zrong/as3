@@ -1,8 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <componentPackage>
   <component id="Button" class="org.zengrong.controls.Button" />
-  <component id="ColoredDataGrid" class="org.zengrong.controls.ColoredDataGrid" />
-  <component id="InfoEvent" class="org.zengrong.events.InfoEvent" />
+  <component id="ColoredDataGrid" class="org.zengrong.controls.ColoredDataGrid" /><component
+  	id="Loader" class="org.zengrong.controls.Loader">
+</component>
+	<component id="InfoEvent" class="org.zengrong.events.InfoEvent" />
   <component id="Firebug" class="org.zengrong.logging.Firebug" />
   <component id="FirebugLogger" class="org.zengrong.logging.FirebugLogger" />
   <component id="Logger" class="org.zengrong.logging.Logger" />
