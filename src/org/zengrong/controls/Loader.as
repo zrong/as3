@@ -1,6 +1,5 @@
 package org.zengrong.controls
 {
-	import flash.display.AVM1Movie;
 	import flash.display.DisplayObject;
 	import flash.display.Loader;
 	import flash.display.LoaderInfo;
@@ -23,10 +22,21 @@ package org.zengrong.controls
 			buildLoader();	
 		}
 		
+		public function get contentWidth():Number
+		{
+			return _loader.contentLoaderInfo.content.width;
+		}
+		
+		public function get contentHeight():Number
+		{
+			return _loader.contentLoaderInfo.content.height;
+		}
+		
 		private function buildLoader():void
 		{
 			_loader = new flash.display.Loader();
 			_loader.contentLoaderInfo.addEventListener(Event.INIT, loader_initHandler);
+			_loader.addEventListener('quit', quit_handler);
 			
 			addEventListener(FlexEvent.ADD, add_handler);
 			addEventListener(FlexEvent.REMOVE, remove_handler);
@@ -42,9 +52,7 @@ package org.zengrong.controls
 		private function remove_handler(evt:FlexEvent):void
 		{
 			trace('Loader removed');
-		}
-		
-		
+		}		
 		
 		protected override function createChildren(): void 
 		{
@@ -56,10 +64,17 @@ package org.zengrong.controls
 		{
 			//不能直接设置Loader的大小，否则会导致载入的内容不能显示。应该在Loader载入成功后设置其内容的大小。
 			var __li:LoaderInfo = evt.currentTarget as LoaderInfo;
-			var __loader:DisplayObject = __li.content as DisplayObject; 
-			trace('loaderContent:', __loader.width, __loader.height);
+			var __loader:DisplayObject = __li.content as DisplayObject; 			
+			trace('loaderContent:', contentWidth, contentHeight, __li.actionScriptVersion);
+			
 			if(this.width!=0) __loader.width = this.width;
 			if(this.height!=0) __loader.height = this.height;
+		}
+		
+		private function quit_handler(evt:Event):void
+		{
+			_loader.unload();
+			trace('收到魔法表情发来的推出信息');
 		}
 		
 		public function load($url:String):void
