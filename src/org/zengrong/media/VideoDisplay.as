@@ -9,7 +9,8 @@ package org.zengrong.media
 	
 	import mx.core.UIComponent;
 	
-	[Event('close')]
+	[Event(name='close', type='flash.events.Event')]
+	[Event(name='complete', type='flash.events.Event')]
 	
 	//
 	[Bindable]
@@ -84,14 +85,22 @@ package org.zengrong.media
 		
 		public function attachURIStream($serverURI:String, $streamName:String, $param:*=null):void
 		{
-			if(type != null) throw new Error('VideoDisplay已經被用於URIStream視訊！');
-			if( ($serverURI == _serverURI) || ($streamName == _streamName) ) return;
-			_type = URISTREAM;
-			_serverURI = $serverURI;
-			_streamName = $streamName;
-			initnc();
-			_nc.connect(_serverURI, $param);
-			_video.visible = true;
+			var __streamNameArr:Array = $streamName.split('.');
+			//如果当前类型为空，就初始化
+			if(type == null || type == URISTREAM) 
+			{
+				_serverURI = $serverURI;
+				//将streamName变成需要的形式
+				_streamName = __streamNameArr[1] + ':' + __streamNameArr[0];
+				initnc();
+				_nc.connect(_serverURI, $param);
+				_video.visible = true;
+				_type = URISTREAM;	
+			}	
+			else
+			{
+				throw new Error('VideoDisplay已經被用於其它視訊！');		
+			}
 		}
 		
 		private function initnc():void
@@ -105,7 +114,7 @@ package org.zengrong.media
 			{
 				if(_nc.connected)
 				{
-					throw new Error('視訊連接已經建立，必須先關閉，然後重新連接。');
+					close();
 				}
 			}
 		}
@@ -119,10 +128,12 @@ package org.zengrong.media
 					if(_ns == null)
 					{
 						_ns = new NetStream(_nc);
-						_ns.addEventListener(NetStatusEvent.NET_STATUS, nsStatus_Handler);						
+						_ns.addEventListener(NetStatusEvent.NET_STATUS, nsStatus_Handler);
+						_ns.client = new StreamClient(this);
 					}
 					_ns.play(_streamName);
 					_video.attachNetStream(_ns);
+					trace('nc success， uri:', _nc.uri, ' streamName:', _streamName);
 					break;
 				case NCType.CLOSED:
 					if(_ns != null)
@@ -131,8 +142,6 @@ package org.zengrong.media
 						_ns.removeEventListener(NetStatusEvent.NET_STATUS, nsStatus_Handler);
 						_ns = null;
 					}
-					_streamName = null;
-					_serverURI = null;
 					dispatchEvent(new Event(Event.CLOSE));
 					break;
 			}
@@ -183,5 +192,31 @@ package org.zengrong.media
 //			trace(Util.getTime(), "_video.width,height:",_video.width,_video.height);
 //			trace(Util.getTime(), "this.width,height:",this.width,this.height);
 		}
+	}
+}
+
+import org.zengrong.media.VideoDisplay;
+import flash.events.Event;
+class StreamClient
+{
+	private var _videoDisplay:VideoDisplay;
+	
+	public function StreamClient($video:VideoDisplay)
+	{
+		_videoDisplay = $video;
+	} 
+
+	public function onPlayStatus($obj:Object):void
+	{
+		trace('NetStream.onPlayStatus:', $obj.code);
+		if($obj.code == 'NetStream.Play.Complete')
+		{
+			_videoDisplay.dispatchEvent(new Event(Event.COMPLETE));
+		}
+	}
+	
+	public function onMetaData($obj:Object):void
+	{
+		trace($obj);
 	}
 }
