@@ -16,6 +16,10 @@ package org.zengrong.media
 	[Bindable]
 	public class VideoDisplay extends UIComponent
 	{
+		public static const URISTREAM:String = 'uristream'
+		public static const NETSTREAM:String = 'netstream';
+		public static const CAMERA:String = 'camera';
+		
 		private var _video:Video;
 		private var _type:String;
 		private var _playing:Boolean = false;
@@ -24,9 +28,10 @@ package org.zengrong.media
 		private var _nc:NetConnection;
 		private var _ns:NetStream;
 		
-		public static const URISTREAM:String = 'uristream'
-		public static const NETSTREAM:String = 'netstream';
-		public static const CAMERA:String = 'camera';
+		private var _videoWidth:Number;
+		private var _videoHeight:Number;
+		private var _maintainAspectRatio:Boolean;
+		private var _muted:Boolean;
 		
 		public function VideoDisplay($width:int=320, $height:int=240)
 		{
@@ -42,6 +47,46 @@ package org.zengrong.media
 		public function get playing():Boolean
 		{
 			return _playing;
+		}
+		
+		public function get videoWidth():Number
+		{
+			return _videoWidth;
+		}
+		
+		public function set videoWidth($num:Number):void
+		{
+			_videoWidth = $num;
+		}
+		
+		public function get videoHeight():Number
+		{
+			return _videoHeight;
+		}
+		
+		public function set videoHeight($num:Number):void
+		{
+			_videoHeight = $num;
+		}
+		
+		public function get muted():Boolean
+		{
+			return _muted;
+		}
+		
+		public function set muted($muted:Boolean):void
+		{
+			_muted = $muted;
+		}
+		
+		public function get maintainAspectRatio():Boolean
+		{
+			return _maintainAspectRatio;
+		}
+		
+		public function set maintainAspectRatio($maintainAspectRatio:Boolean):void
+		{
+			_maintainAspectRatio = $maintainAspectRatio;
 		}
 		
 		protected override function createChildren(): void 
@@ -121,7 +166,7 @@ package org.zengrong.media
 		
 		private function ncStatus_Handler(evt:NetStatusEvent):void
 		{
-			trace('VideoDisplay,nc statue:', evt.info.code);
+//			trace('VideoDisplay,nc statue:', evt.info.code);
 			switch(evt.info.code)
 			{
 				case NCType.SUCCESS:
@@ -130,6 +175,7 @@ package org.zengrong.media
 						_ns = new NetStream(_nc);
 						_ns.addEventListener(NetStatusEvent.NET_STATUS, nsStatus_Handler);
 						_ns.client = new StreamClient(this);
+						if(muted) _ns.soundTransform.volume = 0;
 					}
 					_ns.play(_streamName);
 					_video.attachNetStream(_ns);
@@ -149,7 +195,7 @@ package org.zengrong.media
 		
 		private function nsStatus_Handler(evt:NetStatusEvent):void
 		{
-			trace('VideoDisplay,ns statue:', evt.info.code);
+//			trace('VideoDisplay,ns statue:', evt.info.code);
 		}
 		
 		public function clear():void
@@ -184,6 +230,15 @@ package org.zengrong.media
 		
 		protected override function updateDisplayList(unscaledWidth: Number, unscaledHeight:Number):void 
 		{
+/* 			var __width:Number = unscaledWidth;
+			var __height:Number = unscaledHeight;
+			if(maintainAspectRatio && isNaN(videoWidth) && isNaN(videoHeight))
+			{
+				if(__width > __height)
+				{
+					__width = 
+				}				
+			} */
 			super.updateDisplayList(unscaledWidth, unscaledHeight);
 //			trace(Util.getTime(), "VideoDisaplay中的updateDisplayList运行,type:", type, ",unscaledWidth:",unscaledWidth,",unscaledHeight:",unscaledHeight);
 			_video.width = unscaledWidth;
@@ -217,6 +272,8 @@ class StreamClient
 	
 	public function onMetaData($obj:Object):void
 	{
-		trace($obj);
+		trace('NetStream.onMetaData(width,height):', $obj.width, $obj.height);
+		_videoDisplay.videoWidth = $obj.width;
+		_videoDisplay.videoHeight = $obj.height;
 	}
 }
