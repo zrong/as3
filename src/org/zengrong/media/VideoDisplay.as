@@ -3,6 +3,7 @@ package org.zengrong.media
 	import flash.events.Event;
 	import flash.events.NetStatusEvent;
 	import flash.media.Camera;
+	import flash.media.SoundTransform;
 	import flash.media.Video;
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
@@ -77,6 +78,7 @@ package org.zengrong.media
 		public function set muted($muted:Boolean):void
 		{
 			_muted = $muted;
+			setMuted();			
 		}
 		
 		public function get maintainAspectRatio():Boolean
@@ -175,7 +177,8 @@ package org.zengrong.media
 						_ns = new NetStream(_nc);
 						_ns.addEventListener(NetStatusEvent.NET_STATUS, nsStatus_Handler);
 						_ns.client = new StreamClient(this);
-						if(muted) _ns.soundTransform.volume = 0;
+						setMuted();
+						trace('_ns.soundTransform.volume:', _ns.soundTransform.volume);
 					}
 					_ns.play(_streamName);
 					_video.attachNetStream(_ns);
@@ -191,6 +194,14 @@ package org.zengrong.media
 					dispatchEvent(new Event(Event.CLOSE));
 					break;
 			}
+		}
+		
+		private function setMuted():void
+		{
+			if(_ns == null) return;
+			var __st:SoundTransform = _ns.soundTransform;
+			__st.volume = muted ? 0 : 1;
+			_ns.soundTransform = __st;
 		}
 		
 		private function nsStatus_Handler(evt:NetStatusEvent):void
