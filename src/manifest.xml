@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <componentPackage>
   <component id="Button" class="org.zengrong.controls.Button" />
-  <component id="ColoredDataGrid" class="org.zengrong.controls.ColoredDataGrid" /><component
-  	id="Loader" class="org.zengrong.controls.Loader">
-</component>
-	<component id="InfoEvent" class="org.zengrong.events.InfoEvent" />
+  <component id="ImageButton" class="org.zengrong.controls.ImageButton" />
+  <component id="ColoredDataGrid" class="org.zengrong.controls.ColoredDataGrid" />
+  <component id="Loader" class="org.zengrong.controls.Loader" />
+  <component id="InfoEvent" class="org.zengrong.events.InfoEvent" />
   <component id="Firebug" class="org.zengrong.logging.Firebug" />
   <component id="FirebugLogger" class="org.zengrong.logging.FirebugLogger" />
   <component id="Logger" class="org.zengrong.logging.Logger" />
@@ -23,6 +23,7 @@
   <component id="Remoting" class="org.zengrong.rpc.Remoting" />
   <component id="ResultEvent" class="org.zengrong.rpc.ResultEvent" />
   <component id="ServiceProxy" class="org.zengrong.rpc.ServiceProxy" />
+  <component id="ImageButtonSkin" class="org.zengrong.skins.ImageButtonSkin" />
   <component id="Dialog" class="org.zengrong.utils.Dialog" />
   <component id="JS" class="org.zengrong.utils.JS" />
   <component id="TimeUtil" class="org.zengrong.utils.TimeUtil" />

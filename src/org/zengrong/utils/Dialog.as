@@ -4,13 +4,15 @@ package org.zengrong.utils
 	
 	import mx.controls.Alert;
 	import mx.core.Application;
+	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
 	
 	public class Dialog
 	{
-		public static function alert($info:String, $title:String=''):void
+		public static function alert($info:String, $title:String='', $parent:Sprite=null):void
 		{
-			Alert.show($info, $title, 4, Application.application as Sprite);
+			var __parent:Sprite = $parent ? $parent : FlexGlobals.topLevelApplication as Sprite;
+			Alert.show($info, $title, 4, __parent);
 		}
 		
 		/**
@@ -18,13 +20,14 @@ package org.zengrong.utils
 		* @param $s	要显示的信息
 		* @param $closeFun 关闭确认对话框时调用的函数
 		*/
-		public static function confirm($s:String, $closeFun:Function):void
+		public static function confirm($s:String, $closeFun:Function, $title:String='', $parent:Sprite=null):void
 		{
 			var __fun:Function = function(evt:CloseEvent):void
 			{
 				$closeFun(evt.detail == Alert.YES);
 			}
-			Alert.show($s, '', Alert.YES|Alert.NO, Application.application as Sprite, __fun);
+			var __parent:Sprite = $parent ? $parent : FlexGlobals.topLevelApplication as Sprite;
+			Alert.show($s, '', Alert.YES|Alert.NO, __parent, __fun);
 		}
 	}
 }
