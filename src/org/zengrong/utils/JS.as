@@ -4,7 +4,7 @@ package org.zengrong.utils
 	import flash.external.ExternalInterface;
 	
 	import mx.controls.Alert;
-	import mx.core.Application;
+	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
 	
 	//
@@ -27,7 +27,7 @@ package org.zengrong.utils
 			}
 			else
 			{
-				Alert.show($info, $title, 4, Application.application as Sprite);
+				Alert.show($info, $title, 4, FlexGlobals.topLevelApplication as Sprite);
 			}
 		}
 		
@@ -56,7 +56,7 @@ package org.zengrong.utils
 		* @param $s	要显示的信息
 		* @param $closeFun 关闭确认对话框时调用的函数
 		*/
-		public static function confirm($s:String, $closeFun:Function):void
+		public static function confirm($s:String, $closeFun:Function, $title:String=''):void
 		{
 			var __fun:Function = function(evt:CloseEvent):void
 			{
@@ -76,7 +76,7 @@ package org.zengrong.utils
 			}
 			else
 			{
-				Alert.show($s, '', Alert.YES|Alert.NO, Application.application as Sprite, __fun);
+				Alert.show($s, $title, Alert.YES|Alert.NO, FlexGlobals.topLevelApplication as Sprite, __fun);
 			}	
 		}
 	}
