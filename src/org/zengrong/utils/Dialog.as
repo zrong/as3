@@ -27,7 +27,7 @@ package org.zengrong.utils
 				$closeFun(evt.detail == Alert.YES);
 			}
 			var __parent:Sprite = $parent ? $parent : FlexGlobals.topLevelApplication as Sprite;
-			Alert.show($s, '', Alert.YES|Alert.NO, __parent, __fun);
+			Alert.show($s, $title, Alert.YES|Alert.NO, __parent, __fun);
 		}
 	}
 }
