@@ -27,6 +27,7 @@
     <classEntry path="org.zengrong.utils.JS"/>
     <classEntry path="org.zengrong.utils.TimeUtil"/>
     <classEntry path="org.zengrong.controls.ImageButton"/>
+    <classEntry path="org.zengrong.utils.ImageDecoder"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests>
