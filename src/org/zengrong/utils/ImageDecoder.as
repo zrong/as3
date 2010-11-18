@@ -2,8 +2,10 @@ package org.zengrong.utils
 {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.DisplayObject;
 	import flash.display.Loader;
 	import flash.events.Event;
+	import flash.geom.Rectangle;
 	import flash.utils.ByteArray;
 	
 	public class ImageDecoder
@@ -19,16 +21,15 @@ package org.zengrong.utils
 		public function ImageDecoder($byte:ByteArray, $callBack:Function) {
 			loading = true;
 			_loader.contentLoaderInfo.addEventListener(Event.COMPLETE,
-				function(e:Event){
-					loading = false;
-					var __bitmapData:BitmapData = Bitmap(e.target.content).bitmapData;
-					$callBack.call(null, __bitmapData);
-				});
+														function(evt:Event):void{
+															loading = false;
+															$callBack.call(null, Bitmap(evt.target.content));
+														});
 			_loader.loadBytes($byte);
 		}
 		
 		//将可视的UIComponent组件转换为ByteArray数组，我就是在UIComponent那里放了一个图片 
-		public static function BitmapDataToByteArray(target : UIComponent):ByteArray
+		public static function BitmapDataToByteArray(target:DisplayObject):ByteArray
 		{ 
 			var imageWidth:uint = target.width; 
 			var imageHeight:uint = target.height; 
