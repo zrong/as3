@@ -27,4 +27,7 @@
   <component id="Dialog" class="org.zengrong.utils.Dialog" />
   <component id="JS" class="org.zengrong.utils.JS" />
   <component id="TimeUtil" class="org.zengrong.utils.TimeUtil" />
+  <component id="JSONLoader" class="org.zengrong.utils.JSONLoader" />
+  <component id="ImageDecoder" class="org.zengrong.utils.ImageDecoder" />
+  <component id="VisualLoader" class="org.zengrong.utils.VisualLoader" />
 </componentPackage>
