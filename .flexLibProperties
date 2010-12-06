@@ -10,8 +10,6 @@
     <classEntry path="org.zengrong.logging.Logger"/>
     <classEntry path="org.zengrong.logging.targets.FirebugTarget"/>
     <classEntry path="org.zengrong.logging.targets.LCDebugTarget"/>
-    <classEntry path="org.zengrong.media.NCType"/>
-    <classEntry path="org.zengrong.media.NSType"/>
     <classEntry path="org.zengrong.media.SoundLoader"/>
     <classEntry path="org.zengrong.media.VideoDisplay"/>
     <classEntry path="org.zengrong.media.cm.CM"/>

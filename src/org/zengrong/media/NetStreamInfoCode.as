@@ -1,6 +1,17 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+//  zengrong.net
+//  创建者:	zrong
+//  最后更新时间：2010-12-06
+//
+////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.media
 {
-	public class NSType
+	/**
+	 * 保存NetStream连接时返回的字符串，这样在比对连接状态的时候就不用输入这些字符串了。
+	 * @author zrong
+	 */
+	public class NetStreamInfoCode
 	{
 		//常用的NS连接错误信息
 		public static const PUB_START:String = "NetStream.Publish.Start";
