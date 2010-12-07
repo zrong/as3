@@ -103,7 +103,10 @@ package org.zengrong.net
 			}
 			else
 			{
-				_fun_loadDone.call();
+				_fun_loadDone.call(null, config);
+				_loader.removeEventListener(IOErrorEvent.IO_ERROR, _fun_loadError);
+				_loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, _fun_loadError);
+				_loader.removeEventListener(Event.COMPLETE, handler_complete);
 			}
 		}
 		

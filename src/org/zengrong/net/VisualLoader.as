@@ -38,13 +38,18 @@ package org.zengrong.net
 		 * */
 		public static const TYPE_PNG_SLICE:String = 'pngSlice';
 		
-		/**
-		 * 载入完毕后，会发送这个事件。
-		 * */
-		public static const EVENT_COMPLETE:String = 'completeEvent';
-		
         private var _loader:Loader;
 		private var _type:String;
+		
+		public static function isPic($type:String):Boolean
+		{
+			return $type == VisualLoader.TYPE_PNG || $type == VisualLoader.TYPE_JPG || $type == VisualLoader.TYPE_PNG_SLICE;
+		}
+		
+		public static function isSwf($type:String):Boolean
+		{
+			return $type == VisualLoader.TYPE_SWF;
+		}
 		
         public function VisualLoader()
         {
@@ -146,7 +151,7 @@ package org.zengrong.net
 	                    break;
 	            }
 			}
-			else if(_type == TYPE_JPG || _type == TYPE_PNG)
+			else if(_type == TYPE_JPG || _type == TYPE_PNG || _type == TYPE_PNG_SLICE)
 			{
 				return Bitmap(_loader.content);
 			}
