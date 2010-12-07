@@ -5,7 +5,7 @@
 //  最后更新时间：2010-11-24
 //
 ////////////////////////////////////////////////////////////////////////////////
-package org.zengrong.utils
+package org.zengrong.net
 {
 	import com.adobe.serialization.json.JSON;
 	
@@ -17,8 +17,6 @@ package org.zengrong.utils
 	import flash.net.URLLoaderDataFormat;
 	import flash.net.URLRequest;
 	
-	import mx.messaging.messages.ErrorMessage;
-
 	//--------------------------------------------------------------------------
 	//
 	//  载入多个JSON配置文件

@@ -116,10 +116,10 @@ public class LCDebugTarget extends LineFormattedTarget
     private static function statusHandler(evt:StatusEvent):void {
 		switch (evt.level) {
 			case "status":
-				trace(TimeUtil.getTime(), "Debug message send succeeded");
+				trace(TimeUtil.getFormatedTime(), "Debug message send succeeded");
 				break;
 			case "error":
-				trace(TimeUtil.getTime(), "Debug message send failed");
+				trace(TimeUtil.getFormatedTime(), "Debug message send failed");
 				break;
 		}
 	}

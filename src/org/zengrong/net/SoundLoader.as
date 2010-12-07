@@ -2,7 +2,7 @@
  * 提示声音类
  * 提供一组声音的载入，并提供播放这些声音的方法
  */
-package org.zengrong.media
+package org.zengrong.net
 {
 	import flash.events.Event;
 	import flash.events.EventDispatcher;

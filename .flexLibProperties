@@ -10,8 +10,8 @@
     <classEntry path="org.zengrong.logging.Logger"/>
     <classEntry path="org.zengrong.logging.targets.FirebugTarget"/>
     <classEntry path="org.zengrong.logging.targets.LCDebugTarget"/>
-    <classEntry path="org.zengrong.media.SoundLoader"/>
-    <classEntry path="org.zengrong.media.VideoDisplay"/>
+    <classEntry path="org.zengrong.net.SoundLoader"/>
+    <classEntry path="org.zengrong.display.VideoDisplay"/>
     <classEntry path="org.zengrong.media.cm.CM"/>
     <classEntry path="org.zengrong.media.cm.CMEvent"/>
     <classEntry path="org.zengrong.media.cm.CMFormat"/>
@@ -26,6 +26,9 @@
     <classEntry path="org.zengrong.utils.TimeUtil"/>
     <classEntry path="org.zengrong.controls.ImageButton"/>
     <classEntry path="org.zengrong.utils.ImageDecoder"/>
+    <classEntry path="org.zengrong.display.BMPSlicer"/>
+    <classEntry path="org.zengrong.utils.MathUtil"/>
+    <classEntry path="org.zengrong.display.BMPText"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests>

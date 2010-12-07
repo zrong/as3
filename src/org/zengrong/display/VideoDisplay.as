@@ -1,4 +1,4 @@
-package org.zengrong.media
+package org.zengrong.display
 {
 	import flash.events.Event;
 	import flash.events.NetStatusEvent;
@@ -9,6 +9,8 @@ package org.zengrong.media
 	import flash.net.NetStream;
 	
 	import mx.core.UIComponent;
+	
+	import org.zengrong.media.NetConnectionInfoCode;
 	
 	[Event(name='close', type='flash.events.Event')]
 	[Event(name='complete', type='flash.events.Event')]
@@ -171,7 +173,7 @@ package org.zengrong.media
 //			trace('VideoDisplay,nc statue:', evt.info.code);
 			switch(evt.info.code)
 			{
-				case NCType.SUCCESS:
+				case NetConnectionInfoCode.SUCCESS:
 					if(_ns == null)
 					{
 						_ns = new NetStream(_nc);
@@ -184,7 +186,7 @@ package org.zengrong.media
 					_video.attachNetStream(_ns);
 					trace('nc success， uri:', _nc.uri, ' streamName:', _streamName);
 					break;
-				case NCType.CLOSED:
+				case NetConnectionInfoCode.CLOSED:
 					if(_ns != null)
 					{
 						_ns.close();
@@ -261,8 +263,10 @@ package org.zengrong.media
 	}
 }
 
-import org.zengrong.media.VideoDisplay;
 import flash.events.Event;
+
+import org.zengrong.display.VideoDisplay;
+
 class StreamClient
 {
 	private var _videoDisplay:VideoDisplay;

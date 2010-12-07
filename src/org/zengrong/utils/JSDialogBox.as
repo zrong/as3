@@ -10,14 +10,13 @@ package org.zengrong.utils
 	import flash.display.Sprite;
 	import flash.external.ExternalInterface;
 	
-	private static const ERROR_TXT:String = '必须在浏览器环境下才能调用。';
-	
 	/**
 	 * 使用JS的alert、confirm、close来与用户浏览器交互
 	 * @author zrong
 	 */	
 	public class JSDialogBox
 	{
+		private static const ERROR_TXT:String = '必须在浏览器环境下才能调用。';
 		/**
 		 * 弹出一个JS的Alert对话框 
 		 * @param $info 要显示的消息

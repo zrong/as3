@@ -5,7 +5,7 @@
 //  最后更新时间：2010-11-19
 //
 ////////////////////////////////////////////////////////////////////////////////
-package org.zengrong.utils
+package org.zengrong.net
 {
     import flash.display.*;
     import flash.events.*;
@@ -32,6 +32,11 @@ package org.zengrong.utils
 		 * 指示载入类型为jpeg图片的常量。
 		 * */
 		public static const TYPE_JPG:String = 'jpg';
+		
+		/**
+		 * 指示载入类型为png切片图片的常量。
+		 * */
+		public static const TYPE_PNG_SLICE:String = 'pngSlice';
 		
 		/**
 		 * 载入完毕后，会发送这个事件。
