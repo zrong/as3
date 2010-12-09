@@ -21,18 +21,29 @@ import flash.geom.Rectangle;
 public class BMPSlicer
 {
 	/**
+	 * 代表横向切割的常量 
+	 */	
+	public static const VERTICAL:String = 'vertical';
+	/**
+	 * 代表纵向切割的常量 
+	 */	
+	public static const HORIZONTAL:String = 'horizontal';
+	
+	/**
 	 * @param $bmd 要切割的BitmapData
 	 * @param $width 切片的宽度
 	 * @param $height 切片的高度
 	 * @param $transparent 切片是否透明
+	 * @param $direction 是横向切割还是纵向切割
 	 * @param $length 切片的数量
 	 */	
-	public function BMPSlicer($bmd:BitmapData=null, $width:int=-1, $height:int=-1, $transparent:Boolean=true, $length:int=-1)
+	public function BMPSlicer($bmd:BitmapData=null, $width:int=-1, $height:int=-1, $transparent:Boolean=true, $direction:String='horizontal', $length:int=-1)
 	{
 		_bmd = $bmd;
 		_width = $width;
 		_height = $height;
 		_transparent = $transparent;
+		_direction = $direction;
 		_length = $length;
 		if(_bmd && (_width>0) && (_height>0))
 			slice();
@@ -46,8 +57,9 @@ public class BMPSlicer
 	private var _bmd:BitmapData;
 	private var _width:int;
 	private var _height:int;
-	private var _length:int;
 	private var _transparent:Boolean;
+	private var _direction:String;
+	private var _length:int;
 	
 	//--------------------------------------------------------------------------
 	//
@@ -115,6 +127,11 @@ public class BMPSlicer
 		_transparent = $transparent;
 	}
 	
+	public function set direction($direction:String):void
+	{
+		_direction = $direction;
+	}
+	
 	public function set length($length:int):void
 	{
 		_length = $length;
@@ -148,7 +165,10 @@ public class BMPSlicer
 		for(var i:int=0; i<_length; i++)
 		{
 			var __newBmd:BitmapData = new BitmapData(_width, _height, _transparent);
-			__rect.x= i * _width;
+			if(_direction == HORIZONTAL)
+				__rect.x= i * _width;
+			else
+				__rect.y = i * _height;
 			__newBmd.copyPixels(_bmd, __rect, __pt);
 			_bmdList[i] = __newBmd;
 		}

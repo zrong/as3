@@ -29,9 +29,9 @@ public class BMPText extends Sprite
 	 * 如果提供的字符图片数据小于$allText的字符数量，则仅使用第一个BitmapData进行切割。<br />
 	 * 否则按照提供的参数的数据与$allText字符串中的字符进行对应。
 	 */	
-	public function BMPText($allText:String, $width:int, $height:int, $transparent:Boolean, ...$bmds:Array)
+	public function BMPText($allText:String, $width:int, $height:int, $transparent:Boolean, $direction:String, ...$bmds:Array)
 	{
-		var __args:Array = [$allText, $width, $height, $transparent];
+		var __args:Array = [$allText, $width, $height, $transparent, $direction];
 		setBMPAndText.apply(this, __args.concat($bmds));
 	}
 	
@@ -112,7 +112,7 @@ public class BMPText extends Sprite
 	/**
 	 * @copy BMPText#BMPText()
 	 */	
-	public function setBMPAndText($allText:String, $width:int, $height:int, $transparent:Boolean, ...$bmds:Array):void
+	public function setBMPAndText($allText:String, $width:int, $height:int, $transparent:Boolean, $direction:String, ...$bmds:Array):void
 	{
 		if($allText.length <= 0)
 			return;
@@ -130,7 +130,7 @@ public class BMPText extends Sprite
 			var __bmd1:BitmapData = BitmapData($bmds[0]);
 			if(__bmd1.width < _allTextLength*_bmpWidth)
 				throw new RangeError('提供的BitmapData的宽度不够切割成'+_allTextLength+'块！');
-			_slice = new BMPSlicer(__bmd1, _bmpWidth, _bmpHeight, $transparent, _allTextLength);
+			_slice = new BMPSlicer(__bmd1, _bmpWidth, _bmpHeight, $transparent, $direction, _allTextLength);
 			_bmdList = _slice.slicedBitmapDataList;
 			for(var i:int=0; i<_allTextLength; i++)
 			{
