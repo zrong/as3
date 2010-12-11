@@ -29,6 +29,7 @@
     <classEntry path="org.zengrong.display.BMPSlicer"/>
     <classEntry path="org.zengrong.utils.MathUtil"/>
     <classEntry path="org.zengrong.display.BMPText"/>
+    <classEntry path="org.zengrong.net.Packet"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests>

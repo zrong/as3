@@ -9,6 +9,7 @@ package org.zengrong.display
 {
 import flash.display.Bitmap;
 import flash.display.BitmapData;
+import flash.display.DisplayObject;
 import flash.display.Sprite;
 
 
@@ -70,6 +71,11 @@ public class BMPText extends Sprite
 		return _allText;
 	}
 	
+	public function get gap():int
+	{
+		return _gap;
+	}
+	
 	//----------------------------------
 	//  setter方法
 	//----------------------------------
@@ -80,6 +86,14 @@ public class BMPText extends Sprite
 	public function set gap($gap:int):void
 	{
 		_gap = $gap;
+		var __child:int = numChildren;
+		for(var i:int=0; i<__child; i++)
+		{
+			var __dis:DisplayObject = getChildAt(i);
+			__dis.x = i * _bmpWidth;
+			if(i > 0)
+				__dis.x += i*_gap;
+		}
 	}
 	
 	/**
