@@ -40,7 +40,12 @@ public class Packet
 	 */	
 	public function get isIntact():Boolean
 	{
-		return _messageByte != null;
+		return _messageByte == null;
+	}
+	
+	public function get message():String
+	{
+		return _msg;
 	}
 	
 	/**
@@ -52,6 +57,7 @@ public class Packet
 	 */		
 	public function getMessage($data:ByteArray):Array
 	{
+		_messages = [];
 		$data.position = 0;
 		_msg = $data.readUTFBytes($data.bytesAvailable);
 		_packetLength = $data.length;
@@ -63,9 +69,10 @@ public class Packet
 			{
 				while(_msg.indexOf(EOF) != -1)
 				{
-					var __cutPoint:int = _msg.indexOf(EOF);
+					//字符串的切割点，是第一次找到EOF的索引加上EOF的长度。因为索引是以EOF的第一个字符的位置为准的
+					var __cutPoint:int = _msg.indexOf(EOF) + EOF.length;
 					_messages.push(_msg.slice(0, __cutPoint));
-					_msg = _msg.slice(__cutPoint + EOF.length);
+					_msg = _msg.slice(__cutPoint);
 				}
 				/*
 				如果_msg不为空，说明合成的信息中的最后一条被拆包了，这时就需要把剩下的信息写入_messageByte暂存等待下一条信息进行组合
@@ -102,9 +109,7 @@ public class Packet
 			//重新解析拼好的messageByte
 			_messages = getMessage(_messageByte);
 		}
-		var __messages:Array = _messages.concat();
-		_messages = [];
-		return __messages;
+		return _messages.concat();
 	}
 	
 	//确定消息中间部分是否包含开头字符，开头字符是第一个字符则不算。
