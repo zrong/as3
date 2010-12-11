@@ -30,10 +30,13 @@ public class BMPText extends Sprite
 	 * 如果提供的字符图片数据小于$allText的字符数量，则仅使用第一个BitmapData进行切割。<br />
 	 * 否则按照提供的参数的数据与$allText字符串中的字符进行对应。
 	 */	
-	public function BMPText($allText:String, $width:int, $height:int, $transparent:Boolean, $direction:String, ...$bmds:Array)
+	public function BMPText($allText:String='', $width:int=-1, $height:int=-1, $transparent:Boolean=false, $direction:String='horizontal', ...$bmds:Array)
 	{
-		var __args:Array = [$allText, $width, $height, $transparent, $direction];
-		setBMPAndText.apply(this, __args.concat($bmds));
+		if($allText && $width>0 && $height>0 && $bmds.length>0)
+		{
+			var __args:Array = [$allText, $width, $height, $transparent, $direction];
+			setBMPAndText.apply(this, __args.concat($bmds));
+		}
 	}
 	
 	private var _text:String;		//当前正在显示的字符
@@ -42,6 +45,8 @@ public class BMPText extends Sprite
 	private var _allTextLength:int;	//支持显示的所有字符的数量
 	private var _bmpWidth:int;		//一个文字位图的宽度
 	private var _bmpHeight:int;		//一个文字位图的高度
+	private var _transparent:Boolean;	//是否透明
+	private var _direction:String;		//切割方向
 	private var _slice:BMPSlicer;	//用来对长的位图进行切片
 	private var _bmdList:Vector.<BitmapData>;	//支持显示的所有字符对应的BitmapData列表
 	private var _textIndex:Object;			//保存每个文字的索引
@@ -136,6 +141,8 @@ public class BMPText extends Sprite
 		_allTextLength = _allText.length;
 		_bmpWidth = $width;
 		_bmpHeight = $height;
+		_transparent = $transparent;
+		_direction = $direction;
 		
 		_textIndex = {};
 		//如果提供的BitmapData的数量小于文本数量，就用第一个BitmapData进行分割
@@ -163,6 +170,19 @@ public class BMPText extends Sprite
 				_textIndex[_allText.charAt(j)] = j;
 			}
 		}
+	}
+	
+	/**
+	 * 使用当前的数据复制一个BMPText
+	 */	
+	public function duplicate():BMPText
+	{
+		var __bmpt:BMPText = new BMPText();
+		var __param:Array = [_allText, _bmpWidth, _bmpHeight, _transparent, _direction];
+		__bmpt.setBMPAndText.apply(__bmpt, __param.concat(_bmdList));
+		__bmpt.gap = _gap;
+		__bmpt.text = _text;
+		return __bmpt;
 	}
 	
 	private function getTextBMP($txt:String):Bitmap
