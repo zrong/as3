@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <componentPackage>
   <component id="Button" class="org.zengrong.controls.Button" />
-  <component id="ImageButton" class="org.zengrong.controls.ImageButton" />
-  <component id="ColoredDataGrid" class="org.zengrong.controls.ColoredDataGrid" />
-  <component id="Loader" class="org.zengrong.controls.Loader" />
   <component id="InfoEvent" class="org.zengrong.events.InfoEvent" />
   <component id="Firebug" class="org.zengrong.logging.Firebug" />
   <component id="FirebugLogger" class="org.zengrong.logging.FirebugLogger" />
@@ -21,9 +18,6 @@
   <component id="Remoting" class="org.zengrong.rpc.Remoting" />
   <component id="ResultEvent" class="org.zengrong.rpc.ResultEvent" />
   <component id="ServiceProxy" class="org.zengrong.rpc.ServiceProxy" />
-  <component id="ImageButtonSkin" class="org.zengrong.skins.ImageButtonSkin" />
-  <component id="Dialog" class="org.zengrong.utils.Dialog" />
-  <component id="JS" class="org.zengrong.utils.JS" />
   <component id="TimeUtil" class="org.zengrong.utils.TimeUtil" />
   <component id="ImageDecoder" class="org.zengrong.utils.ImageDecoder" />
   <component id="VisualLoader" class="org.zengrong.net.VisualLoader" />
@@ -32,4 +26,12 @@
   <component id="VideoDisplay" class="org.zengrong.display.VideoDisplay" />
   <component id="BMPSlicer" class="org.zengrong.display.BMPSlicer" />
   <component id="BMPText" class="org.zengrong.display.BMPText" />
+  <component id="Dialog" class="org.zengrong.flex.utils.Dialog" />
+  <component id="ColoredDataGrid" class="org.zengrong.flex.controls.ColoredDataGrid" />
+  <component id="Loader" class="org.zengrong.flex.controls.Loader" />
+  <component id="VideoComponent" class="org.zengrong.flex.controls.VideoComponent" />
+  <component id="ImageButton" class="org.zengrong.flex.controls.ImageButton" />
+  <component id="ImageButtonSkin" class="org.zengrong.flex.skins.ImageButtonSkin" />
+  <component id="JS" class="org.zengrong.flex.utils.JS" />
+  <component id="Updater" class="org.zengrong.air.utils.Updater" />
 </componentPackage>

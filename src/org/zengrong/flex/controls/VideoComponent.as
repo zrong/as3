@@ -1,4 +1,4 @@
-package org.zengrong.controls
+package org.zengrong.flex.controls
 {
 	import flash.events.Event;
 	import flash.events.NetStatusEvent;
@@ -267,13 +267,13 @@ package org.zengrong.controls
 
 import flash.events.Event;
 
-import org.zengrong.controls.VideoComponent;
+import org.zengrong.flex.controls.VideoComponent;
 
 class StreamClient
 {
 	private var _videoDisplay:VideoComponent;
 	
-	public function StreamClient($video:VideoComponent)
+	public function StreamClient($video:org.zengrong.flex.controls.VideoComponent)
 	{
 		_videoDisplay = $video;
 	} 
