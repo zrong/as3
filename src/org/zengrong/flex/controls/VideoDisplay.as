@@ -1,4 +1,4 @@
-package org.zengrong.display
+package org.zengrong.flex.controls
 {
 	import flash.events.Event;
 	import flash.events.NetStatusEvent;
@@ -265,7 +265,7 @@ package org.zengrong.display
 
 import flash.events.Event;
 
-import org.zengrong.display.VideoDisplay;
+import org.zengrong.flex.controls.VideoDisplay;
 
 class StreamClient
 {

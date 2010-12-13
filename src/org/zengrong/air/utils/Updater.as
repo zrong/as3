@@ -1,4 +1,4 @@
-package org.zengrong.utils
+package org.zengrong.air.utils
 {
 	import air.update.ApplicationUpdater;
 	import air.update.events.DownloadErrorEvent;

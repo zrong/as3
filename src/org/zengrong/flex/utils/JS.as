@@ -1,4 +1,4 @@
-package org.zengrong.utils
+package org.zengrong.flex.utils
 {
 	import flash.display.Sprite;
 	import flash.external.ExternalInterface;

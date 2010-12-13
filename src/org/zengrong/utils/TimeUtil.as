@@ -10,6 +10,11 @@ package org.zengrong.utils
 public class TimeUtil
 {
 	/**
+	 * 基准日期。可用于所有需要基准日起的方法。例如：getTimestamp 
+	 */	
+	public static var baseDate:Date;
+	
+	/**
 	 * 获取当前的时间，并格式化后作为字符串返回
 	 * @param $separator 分隔符
 	 * @param $date 传递一个date用于格式化
@@ -75,7 +80,7 @@ public class TimeUtil
 	  */	 
 	 public static function getTimestamp($oldDate:Date=null):uint
 	 {
-		 var __oldDate:Date = $oldDate ? $oldDate : new Date(2010, 9, 1);
+		 var __oldDate:Date = $oldDate ? $oldDate : ( baseDate ? baseDate : (baseDate = new Date(2010, 9, 1)));
 		 return uint((new Date()).time - __oldDate.time);
 	 }
 }

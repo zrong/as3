@@ -1,7 +1,7 @@
 /**
  * 继承DataGrid,为其添加行背景色功能
  */
-package org.zengrong.controls
+package org.zengrong.flex.controls
 {
 	import mx.controls.DataGrid;
 	import flash.display.Sprite;

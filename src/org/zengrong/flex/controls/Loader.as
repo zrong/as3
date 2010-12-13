@@ -1,4 +1,4 @@
-package org.zengrong.controls
+package org.zengrong.flex.controls
 {
 	import flash.display.DisplayObject;
 	import flash.display.Loader;
