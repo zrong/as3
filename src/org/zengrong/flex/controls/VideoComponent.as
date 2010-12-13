@@ -1,4 +1,4 @@
-package org.zengrong.flex.controls
+package org.zengrong.controls
 {
 	import flash.events.Event;
 	import flash.events.NetStatusEvent;
@@ -11,13 +11,15 @@ package org.zengrong.flex.controls
 	import mx.core.UIComponent;
 	
 	import org.zengrong.media.NetConnectionInfoCode;
-	
+
 	[Event(name='close', type='flash.events.Event')]
 	[Event(name='complete', type='flash.events.Event')]
 	
-	//
+	/**
+	 * 与org.zengrong.display.VideoDisplay基本相同，只是用于Flex框架。 
+	 */	
 	[Bindable]
-	public class VideoDisplay extends UIComponent
+	public class VideoComponent extends UIComponent
 	{
 		public static const URISTREAM:String = 'uristream'
 		public static const NETSTREAM:String = 'netstream';
@@ -36,7 +38,7 @@ package org.zengrong.flex.controls
 		private var _maintainAspectRatio:Boolean;
 		private var _muted:Boolean;
 		
-		public function VideoDisplay($width:int=320, $height:int=240)
+		public function VideoComponent($width:int=320, $height:int=240)
 		{
 			this.width = $width;
 			this.height = $height;
@@ -265,13 +267,13 @@ package org.zengrong.flex.controls
 
 import flash.events.Event;
 
-import org.zengrong.flex.controls.VideoDisplay;
+import org.zengrong.controls.VideoComponent;
 
 class StreamClient
 {
-	private var _videoDisplay:VideoDisplay;
+	private var _videoDisplay:VideoComponent;
 	
-	public function StreamClient($video:VideoDisplay)
+	public function StreamClient($video:VideoComponent)
 	{
 		_videoDisplay = $video;
 	} 
