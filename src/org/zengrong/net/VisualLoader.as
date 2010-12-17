@@ -40,17 +40,24 @@ public class VisualLoader extends EventDispatcher
 	public static const TYPE_BMP_TEXT:String = 'bmpText';
 	
 	/**
-	 * 指示载入类型为png切片图片的常量。此种类型的外部图片应该采用BMPSlicer来处理。
+	 * 指示载入类型为png切片图片的常量，每个切片的大小应该相同。此种类型的外部图片应该采用BMPSlicer来处理。
 	 * @see org.zengrong.display.BMPSlicer
 	 * */
 	public static const TYPE_PNG_SLICE:String = 'pngSlice';
+	
+	/**
+	 * 指示载入类型为png不同大小切片图片的常量。此种类型的外部图片应该采用BMPSlicer来处理。<br />
+	 * 这种类型与pngSlice的区别是，每个切片的大小都可能不同。
+	 * @see org.zengrong.display.BMPSlicer
+	 * */
+	public static const TYPE_PNG_DIVERSE_SLICE:String = 'pngDiverseSlice';
 	
     private var _loader:Loader;
 	private var _type:String;
 	
 	public static function isPic($type:String):Boolean
 	{
-		return $type == VisualLoader.TYPE_PNG || $type == VisualLoader.TYPE_JPG || $type == VisualLoader.TYPE_BMP_TEXT || TYPE_PNG_SLICE;
+		return $type == VisualLoader.TYPE_PNG || $type == VisualLoader.TYPE_JPG || $type == VisualLoader.TYPE_BMP_TEXT || TYPE_PNG_SLICE || TYPE_PNG_DIVERSE_SLICE;
 	}
 	
 	public static function isSwf($type:String):Boolean
@@ -158,7 +165,7 @@ public class VisualLoader extends EventDispatcher
                     break;
             }
 		}
-		else if(_type == TYPE_JPG || _type == TYPE_PNG || _type == TYPE_BMP_TEXT || _type == TYPE_PNG_SLICE)
+		else if(_type == TYPE_JPG || _type == TYPE_PNG || _type == TYPE_BMP_TEXT || _type == TYPE_PNG_SLICE || TYPE_PNG_DIVERSE_SLICE)
 		{
 			return Bitmap(_loader.content);
 		}

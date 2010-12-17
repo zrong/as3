@@ -104,21 +104,23 @@ public class ImageButton extends Component
 	
 	override protected function addChildren():void
 	{
+		//如果没有设定over和down状态，就是用up状态代替
 		_upBmp = new Bitmap(_upBmd, PixelSnapping.AUTO, true);
 		addChild(_upBmp);
+		
 		if(_overBmd)
-		{
 			_overBmp = new Bitmap(_overBmd, PixelSnapping.AUTO, true);
-			_overBmp.visible = false;
-			addChild(_overBmp);
-		}
+		else
+			_overBmp = new Bitmap(_upBmd, PixelSnapping.AUTO, true);
+		_overBmp.visible = false;
+		addChild(_overBmp);
 		
 		if(_downBmd)
-		{
 			_downBmp = new Bitmap(_downBmd, PixelSnapping.AUTO, true);
-			_downBmp.visible = false;
-			addChild(_downBmp);
-		}
+		else
+			_downBmp = new Bitmap(_upBmd, PixelSnapping.AUTO, true);
+		_downBmp.visible = false;
+		addChild(_downBmp);
 		
 		addEventListener(MouseEvent.MOUSE_DOWN, onMouseGoDown);
 		addEventListener(MouseEvent.ROLL_OVER, onMouseOver);

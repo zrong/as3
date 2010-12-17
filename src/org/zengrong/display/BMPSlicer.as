@@ -16,7 +16,6 @@ import flash.geom.Rectangle;
  * 用于将一行宽度相同的连续位图按照固定的宽度和高度切成单独的块。
  * 例如：要使用0-9的数字图片，一个个载入比较浪费，可以将0-9拼在一张长条形的图片中，然后使用BMPSlicer来切割。
  * @author zrong
- * 
  */
 public class BMPSlicer
 {
@@ -28,6 +27,10 @@ public class BMPSlicer
 	 * 代表纵向切割的常量 
 	 */	
 	public static const HORIZONTAL:String = 'horizontal';
+	
+	public static const ERROR_MSG_WIDTH:String = '请先定义切片的宽度。';
+	public static const ERROR_MSG_HEIGHT:String = '请先定义切片的高度。';
+	public static const ERROR_MSG_BITMAPDATA:String = '请先提供要切割的BitmapData。';
 	
 	/**
 	 * @param $bmd 要切割的BitmapData
@@ -54,22 +57,23 @@ public class BMPSlicer
 	//  实例变量
 	//
 	//--------------------------------------------------------------------------	
-	private var _bmd:BitmapData;
-	private var _width:int;
-	private var _height:int;
-	private var _transparent:Boolean;
-	private var _direction:String;
-	private var _length:int;
+	protected var _bmd:BitmapData;
+	protected var _width:int;
+	protected var _height:int;
+	protected var _transparent:Boolean;
+	protected var _direction:String;
+	protected var _length:int;
+	
+	/**
+	 * 保存切割好的BitmapData 
+	 */	
+	protected var _bmdList:Vector.<BitmapData>;
 	
 	//--------------------------------------------------------------------------
 	//
 	//  getter方法
 	//
 	//--------------------------------------------------------------------------	
-	/**
-	 * 保存切割好的BitmapData 
-	 */	
-	private var _bmdList:Vector.<BitmapData>;
 	
 	/**
 	 * 返回切割好的BitmapData
@@ -149,11 +153,11 @@ public class BMPSlicer
 	public function slice():void
 	{
 		if(!_bmd)
-			throw new ReferenceError('请先提供要切割的BitmapData。');
+			throw new ReferenceError(ERROR_MSG_BITMAPDATA);
 		if(_width < 0)
-			throw new ReferenceError('请先定义切片的宽度。');
+			throw new ReferenceError(ERROR_MSG_WIDTH);
 		if(_height < 0)
-			throw new ReferenceError('请先定义切片的高度。');
+			throw new ReferenceError(ERROR_MSG_HEIGHT);
 		//如果没有传递$length值，就根据位图的宽度计算
 		if(_length < 0)
 			_length = int(_bmd.width / _width);

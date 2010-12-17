@@ -25,6 +25,7 @@
   <component id="SoundLoader" class="org.zengrong.net.SoundLoader" />
   <component id="VideoDisplay" class="org.zengrong.display.VideoDisplay" />
   <component id="BMPSlicer" class="org.zengrong.display.BMPSlicer" />
+  <component id="BMPDiverseSlicer" class="org.zengrong.display.BMPDiverseSlicer" />
   <component id="BMPText" class="org.zengrong.display.BMPText" />
   <component id="Dialog" class="org.zengrong.flex.utils.Dialog" />
   <component id="ColoredDataGrid" class="org.zengrong.flex.controls.ColoredDataGrid" />
