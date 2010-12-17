@@ -20,8 +20,8 @@ public class BMPDiverseSlicer extends BMPSlicer
 {
 	/**
 	 * @param $bmd 要切割的BitmapData
-	 * @param $width 切片的宽度
-	 * @param $height 切片的高度
+	 * @param $widthArray 切片的宽度数组
+	 * @param $heightArray 切片的高度数组
 	 * @param $transparent 切片是否透明
 	 * @param $direction 是横向切割还是纵向切割
 	 * @param $length 切片的数量
