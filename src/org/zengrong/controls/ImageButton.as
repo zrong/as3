@@ -13,6 +13,10 @@ import flash.display.BitmapData;
 import flash.display.DisplayObjectContainer;
 import flash.display.PixelSnapping;
 import flash.events.MouseEvent;
+import flash.filters.BevelFilter;
+import flash.filters.ColorMatrixFilter;
+
+import org.zengrong.utils.ColorMatrix;
 
 /**
  * 支持up、over、down三态，同时支持toggle和seleted的图像按钮。
@@ -20,6 +24,9 @@ import flash.events.MouseEvent;
  */
 public class ImageButton extends Component
 {
+	private static const OVER_FILTER:BevelFilter = new BevelFilter(2, 45, 0xFFFFFF, 0.5, 0x000000, 0.5, 2, 2);
+	private static const DOWN_FILTER:BevelFilter = new BevelFilter(2, 235, 0xFFFFFF, 0.5, 0x000000, 0.5, 2, 2);
+	private static const COLORLESS_FILTER:ColorMatrixFilter = new ColorMatrixFilter(ColorMatrix.COLORLESS);
 	/**
 	 * 构造函数 
 	 * @param parent ImageButton的父显示对象
@@ -51,6 +58,9 @@ public class ImageButton extends Component
 	protected var _selected:Boolean = false;
 	protected var _toggle:Boolean = false;
 	
+	//----------------------------------
+	//  getter/setter
+	//----------------------------------
 	public function set selected(value:Boolean):void
 	{
 		if(!_toggle)
@@ -78,6 +88,24 @@ public class ImageButton extends Component
 		return _toggle;
 	}
 	
+	/**
+	 * 获取当前状态的对应Bitmap
+	 */	
+	private function get curState():Bitmap
+	{
+		if(_over)
+			return _overBmp;
+		if(_down)
+			return _downBmp;
+		return _upBmp;
+	}
+	
+	override public function set enabled(value:Boolean):void
+	{
+		super.enabled = value;
+		this.filters = value ? [] : [COLORLESS_FILTER];
+	}
+	
 	override protected function init():void
 	{
 		if(_upBmd)
@@ -89,6 +117,12 @@ public class ImageButton extends Component
 		}
 	}
 	
+	/**
+	 * 重新设置按钮中的图片
+	 * @param upStateImage 		up状态的图片
+	 * @param overStateImage	over状态的图片
+	 * @param downStateImage	down状态的图片
+	 */	
 	public function setState(upStateImage:Bitmap, overStateImage:Bitmap=null, downStateImage:Bitmap=null):void
 	{
 		while(numChildren > 0)
@@ -111,14 +145,21 @@ public class ImageButton extends Component
 		if(_overBmd)
 			_overBmp = new Bitmap(_overBmd, PixelSnapping.AUTO, true);
 		else
+		{
 			_overBmp = new Bitmap(_upBmd, PixelSnapping.AUTO, true);
+			//由于over与up状态相同，在鼠标移动上去的时候没有翻转效果，在这里使用滤镜加上翻转效果
+			_overBmp.filters = [OVER_FILTER];
+		}
 		_overBmp.visible = false;
 		addChild(_overBmp);
 		
 		if(_downBmd)
 			_downBmp = new Bitmap(_downBmd, PixelSnapping.AUTO, true);
 		else
+		{
 			_downBmp = new Bitmap(_upBmd, PixelSnapping.AUTO, true);
+			_downBmp.filters = [DOWN_FILTER];
+		}
 		_downBmp.visible = false;
 		addChild(_downBmp);
 		
@@ -132,6 +173,7 @@ public class ImageButton extends Component
 	 */
 	protected function onMouseOver(event:MouseEvent):void
 	{
+		//trace('over');
 		_over = true;
 		if(_toggle && _selected)
 			return;
@@ -147,6 +189,7 @@ public class ImageButton extends Component
 	 */
 	protected function onMouseOut(event:MouseEvent):void
 	{
+		//trace('out');
 		_over = false;
 		if(!_down)
 		{
@@ -163,6 +206,7 @@ public class ImageButton extends Component
 	 */
 	protected function onMouseGoDown(event:MouseEvent):void
 	{
+		//trace('GoDown');
 		_down = true;
 		_upBmp.visible = false;
 		_overBmp.visible = false;
@@ -176,6 +220,7 @@ public class ImageButton extends Component
 	 */
 	protected function onMouseGoUp(event:MouseEvent):void
 	{
+		//trace('GoUp');
 		if(_toggle  && _over)
 		{
 			_selected = !_selected;
@@ -187,6 +232,12 @@ public class ImageButton extends Component
 		stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseGoUp);
 	}
 	
+	/**
+	 * 更新按钮中的状态图片
+	 * @param upStateImage		up状态的图片
+	 * @param overStateImage	over状态的图片
+	 * @param downStateImage	down状态的图片
+	 */	
 	private function updateStateImage(upStateImage:Bitmap, overStateImage:Bitmap=null, downStateImage:Bitmap=null):void
 	{
 		if(upStateImage)
