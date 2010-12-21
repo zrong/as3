@@ -28,6 +28,7 @@
     <classEntry path="org.zengrong.utils.MathUtil"/>
     <classEntry path="org.zengrong.display.BMPText"/>
     <classEntry path="org.zengrong.net.Packet"/>
+    <classEntry path="org.zengrong.utils.ColorMatrix"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests>
