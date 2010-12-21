@@ -83,11 +83,19 @@ public class ImageButton extends Component
 	{
 		_toggle = value;
 	}
+	
 	public function get toggle():Boolean
 	{
 		return _toggle;
 	}
 	
+	/**
+	 * 是否使用禁用按钮时候的去色效果 
+	 */	
+	public function get useColorless():Boolean
+	{
+		return true;
+	}
 	/**
 	 * 获取当前状态的对应Bitmap
 	 */	
@@ -103,7 +111,8 @@ public class ImageButton extends Component
 	override public function set enabled(value:Boolean):void
 	{
 		super.enabled = value;
-		this.filters = value ? [] : [COLORLESS_FILTER];
+		if(useColorless)
+			this.filters = value ? [] : [COLORLESS_FILTER];
 	}
 	
 	override protected function init():void

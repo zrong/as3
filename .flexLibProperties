@@ -29,6 +29,7 @@
     <classEntry path="org.zengrong.display.BMPText"/>
     <classEntry path="org.zengrong.net.Packet"/>
     <classEntry path="org.zengrong.utils.ColorMatrix"/>
+    <classEntry path="org.zengrong.controls.CDImageButton"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests>
