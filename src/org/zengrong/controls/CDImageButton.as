@@ -35,7 +35,7 @@ public class CDImageButton extends ImageButton
 		
 	//计时器的步进
 	private static const DELAY:int = 100;
-	private static const MASK_ALPHA:Number = .8;
+	private static const MASK_ALPHA:Number = .6;
 	private static const MASK_COLOR:uint = 0x000000;
 	
 	public function CDImageButton(parent:DisplayObjectContainer, upStateImage:Bitmap, coolDownTime:int=5, aniType:String='radial', defaultHandler:Function=null)
@@ -60,8 +60,8 @@ public class CDImageButton extends ImageButton
 	private var _timer:Timer;
 	private var _center:Point;
 	
-	private var _mask:Shape;		//用于覆盖在按钮上方显示半透明效果的Shape
-	private var _radialAni:Shape;	//用于显示放射状动画的Shape
+	private var _maskBody:Shape;	//用于覆盖在按钮上方显示半透明效果的Shape
+	private var _ani:Shape;			//用于显示动画的Shape
 	
 	//----------------------------------
 	//  getter/setter
@@ -108,15 +108,7 @@ public class CDImageButton extends ImageButton
 		_aniType = $type;
 		if(_aniType == ANI_LINEAR)
 		{
-			//若放射动画存在，就从显示列表移除它，并清空它的蒙版
-			if(_radialAni)
-			{
-				if(this.contains(_radialAni))
-					this.removeChild(_radialAni);
-				_radialAni.mask = null;
-			}
-			if(!this.contains(_mask))
-				this.addChild(_mask);
+			_ani.x = _ani.y = 0;
 		}
 		else if(_aniType == ANI_RADIAL)
 		{
@@ -130,6 +122,41 @@ public class CDImageButton extends ImageButton
 	override public function get useColorless():Boolean
 	{
 		return false;
+	}
+	
+	override public function get selected():Boolean
+	{
+		return false;
+	}
+	
+	override public function set selected(value:Boolean):void
+	{
+	}
+	
+	override public function get toggle():Boolean
+	{
+		return false;
+	}
+	
+	override public function set toggle(value:Boolean):void
+	{
+	}
+	
+	override public function set enabled(value:Boolean):void
+	{
+		_enabled = value;
+		mouseEnabled = mouseChildren = _enabled;
+		tabEnabled = value;
+		//如果启用按钮，就隐藏并清空蒙版，否则就初始化蒙版。
+		if(_enabled)
+		{
+			_maskBody.graphics.clear();
+			_maskBody.visible = false;
+			_ani.graphics.clear();
+			_ani.visible = false;
+		}
+		else
+			drawInitMask();
 	}
 	
 	/**
@@ -151,32 +178,10 @@ public class CDImageButton extends ImageButton
 		if(_timer.running)
 			return;
 		_timer.reset();
-		enabled = false;
 		_timer.start();
-		//线性动画，将半透明效果加入显示列表，并先绘制一个满屏的半透明效果
-		if(_aniType == ANI_LINEAR)
+		enabled = false;
+		if(_aniType == ANI_RADIAL)
 		{
-			if(!this.contains(_mask))
-				this.addChild(_mask);
-			drawLinearMask(_repeatCount, _repeatCount);
-		}
-		//放射状动画，先将_mask从显示列表移除，再将它作为_radialAni的蒙版
-		else
-		{
-			//绘制一个正圆，作为初始的效果
-			_radialAni.graphics.clear();
-			_radialAni.graphics.beginFill(MASK_COLOR, MASK_ALPHA);
-			_radialAni.graphics.drawCircle(0, 0, _radius);
-			_radialAni.graphics.endFill();
-			_radialAni.mask = _mask;
-			//绘制一个矩形作为放射动画的蒙版，因为要显示的部分就是一个矩形
-			_mask.graphics.clear();
-			_mask.graphics.beginFill(MASK_COLOR);
-			_mask.graphics.drawRect(0, 0, this.width, this.height);
-			_mask.graphics.endFill();
-			//CDImageButton独立测试的时候，不将_mask加入显示列表，可以实现mask的效果，但在项目中使用的时候，必须将mask加入显示列表才能实现遮罩效果
-			if(!this.contains(_mask))
-				addChild(_mask);
 			//复制两个绘制数据数组
 			_tmp_commands = _commands.concat();
 			_tmp_vectors = _vectors.concat();
@@ -211,7 +216,13 @@ public class CDImageButton extends ImageButton
 	override protected function addChildren():void
 	{
 		super.addChildren();
-		_mask = new Shape();
+		_maskBody = new Shape();
+		_maskBody.visible = false;
+		this.addChild(_maskBody);
+		_ani = new Shape();
+		_ani.visible = false;
+		this.addChild(_ani);
+		_maskBody.mask = _ani;
 	}
 	
 	override protected function onMouseGoUp(event:MouseEvent):void
@@ -247,9 +258,6 @@ public class CDImageButton extends ImageButton
 	private function handler_timerComplete(evt:TimerEvent):void
 	{
 		enabled = true;
-		_mask.graphics.clear();
-		if(_aniType == ANI_RADIAL)
-			_radialAni.graphics.clear();
 	}
 	
 	//----------------------------------
@@ -263,13 +271,9 @@ public class CDImageButton extends ImageButton
 	{
 		_radius = this.width;
 		
-		if(!_radialAni)
-			_radialAni = new Shape();
 		_center = new Point(this.width/2, this.height/2) 
-		_radialAni.x = _center.x;
-		_radialAni.y = _center.y;
-		if(!this.contains(_radialAni))
-			this.addChild(_radialAni);
+		_ani.x = _center.x;
+		_ani.y = _center.y;
 		
 		//初始化给出第一个坐标点，由于已经将Shape移动到了父显示对象中心点，这里就不需要moveTo命令，直接从0,0开始画
 		_commands = Vector.<int>([2]);
@@ -294,10 +298,10 @@ public class CDImageButton extends ImageButton
 	private function drawLinearMask($current:int, $total:int):void
 	{
 		var __percent:Number = $current/$total;
-		_mask.graphics.clear();
-		_mask.graphics.beginFill(MASK_COLOR, MASK_ALPHA);
-		_mask.graphics.drawRect(0, 0, width, height*__percent);
-		_mask.graphics.endFill();
+		_ani.graphics.clear();
+		_ani.graphics.beginFill(MASK_COLOR, MASK_ALPHA);
+		_ani.graphics.drawRect(0, 0, width, height*__percent);
+		_ani.graphics.endFill();
 	}
 	
 	/**
@@ -307,10 +311,36 @@ public class CDImageButton extends ImageButton
 	 */	
 	private function drawRadialMask($commands:Vector.<int>, $vectors:Vector.<Number>):void
 	{
-		_radialAni.graphics.clear();
-		_radialAni.graphics.beginFill(MASK_COLOR, MASK_ALPHA);
-		_radialAni.graphics.drawPath($commands, $vectors);
-		_radialAni.graphics.endFill();
+		_ani.graphics.clear();
+		_ani.graphics.beginFill(MASK_COLOR, MASK_ALPHA);
+		_ani.graphics.drawPath($commands, $vectors);
+		_ani.graphics.endFill();
+	}
+	
+	/**
+	 * 绘制蒙版效果的初始化状态
+	 */	
+	private function drawInitMask():void
+	{
+		_maskBody.visible = true;
+		_ani.visible = true;
+		//绘制一个矩形作为放射动画的蒙版，因为要显示的部分就是一个矩形
+		_maskBody.graphics.clear();
+		_maskBody.graphics.beginFill(MASK_COLOR, MASK_ALPHA);
+		_maskBody.graphics.drawRect(0, 0, this.width, this.height);
+		_maskBody.graphics.endFill();
+		if(_aniType == ANI_LINEAR)
+		{
+			drawLinearMask(_repeatCount, _repeatCount);
+		}
+		else
+		{
+			//绘制一个正圆，作为初始的效果
+			_ani.graphics.clear();
+			_ani.graphics.beginFill(MASK_COLOR);
+			_ani.graphics.drawCircle(0, 0, _radius);
+			_ani.graphics.endFill();
+		}
 	}
 }
 }
