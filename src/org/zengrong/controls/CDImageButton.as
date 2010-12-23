@@ -38,15 +38,17 @@ public class CDImageButton extends ImageButton
 	private static const MASK_ALPHA:Number = .6;
 	private static const MASK_COLOR:uint = 0x000000;
 	
-	public function CDImageButton(parent:DisplayObjectContainer, upStateImage:Bitmap, coolDownTime:int=5, aniType:String='radial', defaultHandler:Function=null)
+	public function CDImageButton(parent:DisplayObjectContainer, upStateImage:Bitmap, coolDownTime:int=5, aniType:String='radial', defaultHandler:Function=null, btnid:int=-1)
 	{
 		_cdt = coolDownTime;
 		_aniType = aniType;
+		_btnid = btnid;
 		//CDImageButton只是用一张图片
 		super(parent, 0, 0, upStateImage, null, null, defaultHandler);
 		init();
 	}
 	
+	private var _btnid:int;			//按钮的id
 	private var _cdt:int;			//冷却时间，单位是秒
 	private var _repeatCount:int;	//动画绘制的总次数
 	private var _radius:int;		//radial动画效果绘制半径
@@ -67,6 +69,15 @@ public class CDImageButton extends ImageButton
 	//  getter/setter
 	//----------------------------------
 	
+	public function get btnid():int
+	{
+		return _btnid;
+	}
+	
+	public function set btnid($id:int):void
+	{
+		_btnid = $id
+	}
 	/**
 	 * 当前的按钮是否处于CD动画过程中
 	 */	

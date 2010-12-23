@@ -11,27 +11,36 @@ import flash.display.*;
 import flash.events.*;
 import flash.net.*;
 import flash.utils.ByteArray;
-import flash.utils.getDefinitionByName;
 
 /**
  * 此类用于载入外部可视化资源，并转换成可以AS支持的资源的功能。
  * */
 public class VisualLoader extends EventDispatcher
 {
- 	/**
-	 * 指示载入的类型为png图片的常量。
-	 * */
-	public static const TYPE_PNG:String = 'png';
-	
 	/**
 	 * 指示在如类型为swf动画的常量。
 	 * */
 	public static const TYPE_SWF:String = 'swf';
 	
 	/**
+	 * 指示载入的类型为png图片的常量。
+	 * */
+	public static const TYPE_PNG:String = 'png';
+	
+	/**
 	 * 指示载入类型为jpeg图片的常量。
 	 * */
 	public static const TYPE_JPG:String = 'jpg';
+	
+	/**
+	 * 指示载入类型为gif静态图片的常量。
+	 * */
+	public static const TYPE_GIF:String = 'gif';
+	
+	/**
+	 * 指示载入类型为gif动画的常量。
+	 * */
+	public static const TYPE_GIF_ANI:String = 'gifAnimation';
 	
 	/**
 	 * 指示载入类型为用于位图文字的常量，其处理方式与TYPE_PNG_SLICE相同。
@@ -52,22 +61,24 @@ public class VisualLoader extends EventDispatcher
 	 * */
 	public static const TYPE_PNG_DIVERSE_SLICE:String = 'pngDiverseSlice';
 	
-    private var _loader:Loader;
-	private var _type:String;
-	
 	public static function isPic($type:String):Boolean
 	{
-		return $type == VisualLoader.TYPE_PNG || $type == VisualLoader.TYPE_JPG || $type == VisualLoader.TYPE_BMP_TEXT || TYPE_PNG_SLICE || TYPE_PNG_DIVERSE_SLICE;
+		return $type == VisualLoader.TYPE_PNG || $type == VisualLoader.TYPE_JPG || $type == VisualLoader.TYPE_GIF || $type == VisualLoader.TYPE_BMP_TEXT || TYPE_PNG_SLICE || TYPE_PNG_DIVERSE_SLICE;
 	}
 	
-	public static function isSwf($type:String):Boolean
+	public static function isAni($type:String):Boolean
 	{
-		return $type == VisualLoader.TYPE_SWF;
+		return $type == VisualLoader.TYPE_SWF || $type == VisualLoader.TYPE_GIF_ANI;
 	}
 	
     public function VisualLoader()
     {
+		_loading = false;
     }
+
+	private var _loader:Loader;
+	private var _type:String;
+	private var _loading:Boolean;
 	
 	/**
 	 * 返回当前载入的文件类型
@@ -76,10 +87,19 @@ public class VisualLoader extends EventDispatcher
 	{
 		return _type;
 	}
+	
+	/**
+	 * 返回当前是否正在载入
+	 */	
+	public function get loading():Boolean
+	{
+		return _loading;
+	}
 
     private function handler_loaded(evt:Event):void
     {
 //		trace('载入资源完成：', _loader.contentLoaderInfo.url)
+		_loading = false;
         dispatchEvent(evt);
     }
 
@@ -111,6 +131,9 @@ public class VisualLoader extends EventDispatcher
 	 * */
 	public function loadBytes($bytes:ByteArray, $type:String="png"):void
 	{
+		if(_loading)
+			return;
+		_loading = true;
 		_type = $type;
 		initLoader();
 		_loader.loadBytes($bytes);
@@ -123,6 +146,9 @@ public class VisualLoader extends EventDispatcher
 	 * */
     public function load($url:String, $type:String="png") : void
     {
+		if(_loading)
+			return;
+		_loading = true;
 		_type = $type;
 		initLoader();
         _loader.load(new URLRequest($url));
@@ -165,7 +191,7 @@ public class VisualLoader extends EventDispatcher
                     break;
             }
 		}
-		else if(_type == TYPE_JPG || _type == TYPE_PNG || _type == TYPE_BMP_TEXT || _type == TYPE_PNG_SLICE || TYPE_PNG_DIVERSE_SLICE)
+		else if(_type == TYPE_JPG || _type == TYPE_PNG || _type == TYPE_GIF || _type == TYPE_BMP_TEXT || _type == TYPE_PNG_SLICE || TYPE_PNG_DIVERSE_SLICE)
 		{
 			return Bitmap(_loader.content);
 		}

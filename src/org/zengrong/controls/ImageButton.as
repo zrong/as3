@@ -117,13 +117,9 @@ public class ImageButton extends Component
 	
 	override protected function init():void
 	{
-		if(_upBmd)
-		{
-			super.init();
-			buttonMode = true;
-			useHandCursor = true;
-			setSize(_upBmd.width, _upBmd.height);
-		}
+		super.init();
+		buttonMode = true;
+		useHandCursor = true;
 	}
 	
 	/**
@@ -149,6 +145,8 @@ public class ImageButton extends Component
 	{
 		//如果没有设定over和down状态，就是用up状态代替
 		_upBmp = new Bitmap(_upBmd, PixelSnapping.AUTO, true);
+		_upBmp.width = this.width;
+		_upBmp.height = this.height;
 		addChild(_upBmp);
 		
 		if(_overBmd)
@@ -159,6 +157,8 @@ public class ImageButton extends Component
 			//由于over与up状态相同，在鼠标移动上去的时候没有翻转效果，在这里使用滤镜加上翻转效果
 			_overBmp.filters = [OVER_FILTER];
 		}
+		_overBmp.width = this.width;
+		_overBmp.height = this.height;
 		_overBmp.visible = false;
 		addChild(_overBmp);
 		
@@ -169,6 +169,8 @@ public class ImageButton extends Component
 			_downBmp = new Bitmap(_upBmd, PixelSnapping.AUTO, true);
 			_downBmp.filters = [DOWN_FILTER];
 		}
+		_downBmp.width = this.width;
+		_downBmp.height = this.height;
 		_downBmp.visible = false;
 		addChild(_downBmp);
 		
@@ -249,8 +251,9 @@ public class ImageButton extends Component
 	 */	
 	private function updateStateImage(upStateImage:Bitmap, overStateImage:Bitmap=null, downStateImage:Bitmap=null):void
 	{
-		if(upStateImage)
-			_upBmd = upStateImage.bitmapData;
+		setSize(upStateImage.width,upStateImage.height); 
+		trace('imagebutton:', this.width, this.height);
+		_upBmd = upStateImage.bitmapData;
 		if(overStateImage)
 			_overBmd = overStateImage.bitmapData;
 		if(downStateImage)
