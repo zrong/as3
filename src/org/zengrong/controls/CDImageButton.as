@@ -16,7 +16,10 @@ import flash.events.TimerEvent;
 import flash.geom.Point;
 import flash.utils.Timer;
 
-
+/**
+ * @eventType timerComplete
+ */
+[Event(name="timerComplete",type="flash.events.TimerEvent")]
 /**
  * 用于游戏中的带有冷却功能的按钮，按下后必须经过一段冷却时间才能再次使用。
  * @author zrong
@@ -49,7 +52,7 @@ public class CDImageButton extends ImageButton
 	}
 	
 	private var _btnid:int;			//按钮的id
-	private var _cdt:int;			//冷却时间，单位是秒
+	private var _cdt:int;			//冷却时间，单位是毫秒
 	private var _repeatCount:int;	//动画绘制的总次数
 	private var _radius:int;		//radial动画效果绘制半径
 	private var _aniType:String;	//动画效果类型，值为ANI_LINEAR或ANI_RADIAL
@@ -175,7 +178,7 @@ public class CDImageButton extends ImageButton
 	 */	
 	public function getRepeatCount():int
 	{
-		return _cdt * (1000/DELAY);
+		return _cdt / DELAY;
 	}
 	
 	//----------------------------------
@@ -269,6 +272,7 @@ public class CDImageButton extends ImageButton
 	private function handler_timerComplete(evt:TimerEvent):void
 	{
 		enabled = true;
+		this.dispatchEvent(evt);
 	}
 	
 	//----------------------------------

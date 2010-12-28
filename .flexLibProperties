@@ -30,6 +30,7 @@
     <classEntry path="org.zengrong.net.Packet"/>
     <classEntry path="org.zengrong.utils.ColorMatrix"/>
     <classEntry path="org.zengrong.controls.CDImageButton"/>
+    <classEntry path="org.zengrong.display.Tooltip"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests>
