@@ -15,6 +15,7 @@ import flash.display.PixelSnapping;
 import flash.events.MouseEvent;
 import flash.filters.BevelFilter;
 import flash.filters.ColorMatrixFilter;
+import flash.filters.DropShadowFilter;
 
 import org.zengrong.utils.ColorMatrix;
 
@@ -24,8 +25,11 @@ import org.zengrong.utils.ColorMatrix;
  */
 public class ImageButton extends Component
 {
-	private static const OVER_FILTER:BevelFilter = new BevelFilter(2, 45, 0xFFFFFF, 0.5, 0x000000, 0.5, 2, 2);
-	private static const DOWN_FILTER:BevelFilter = new BevelFilter(2, 235, 0xFFFFFF, 0.5, 0x000000, 0.5, 2, 2);
+	//private static const OVER_FILTER:BevelFilter = new BevelFilter(2, 45, 0xFFFFFF, 0.5, 0x000000, 0.5, 2, 2);
+	//private static const DOWN_FILTER:BevelFilter = new BevelFilter(2, 235, 0xFFFFFF, 0.5, 0x000000, 0.5, 2, 2);
+	private static const UP_FILTER:DropShadowFilter = new DropShadowFilter(1, 45, 0x000000, 1, 2, 2);
+	private static const OVER_FILTER:DropShadowFilter = new DropShadowFilter(2, 45, 0x000000, 1, 2, 2);
+	private static const DOWN_FILTER:DropShadowFilter = new DropShadowFilter(3, 45, 0x000000, 1, 2, 2);
 	private static const COLORLESS_FILTER:ColorMatrixFilter = new ColorMatrixFilter(ColorMatrix.COLORLESS);
 	/**
 	 * 构造函数 
@@ -37,7 +41,7 @@ public class ImageButton extends Component
 	 * @param downState 按钮down状态的位图
 	 * @param defaultHandler 按钮的默认处理程序，响应click事件
 	 */	
-	public function ImageButton(parent:DisplayObjectContainer=null, xpos:Number=0, ypos:Number=0, upStateImage:Bitmap=null, overStateImage:Bitmap=null, downStateImage:Bitmap=null, defaultHandler:Function=null)
+	public function ImageButton(parent:DisplayObjectContainer=null, upStateImage:Bitmap=null, overStateImage:Bitmap=null, downStateImage:Bitmap=null, xpos:Number=0, ypos:Number=0, defaultHandler:Function=null)
 	{
 		updateStateImage(upStateImage, overStateImage, downStateImage);
 		super(parent, xpos, ypos);
@@ -147,6 +151,7 @@ public class ImageButton extends Component
 		_upBmp = new Bitmap(_upBmd, PixelSnapping.AUTO, true);
 		_upBmp.width = this.width;
 		_upBmp.height = this.height;
+		_upBmp.filters = [UP_FILTER];
 		addChild(_upBmp);
 		
 		if(_overBmd)

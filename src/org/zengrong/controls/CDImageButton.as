@@ -41,17 +41,17 @@ public class CDImageButton extends ImageButton
 	private static const MASK_ALPHA:Number = .6;
 	private static const MASK_COLOR:uint = 0x000000;
 	
-	public function CDImageButton(parent:DisplayObjectContainer, upStateImage:Bitmap, coolDownTime:int=5, aniType:String='radial', defaultHandler:Function=null, btnid:int=-1)
+	public function CDImageButton(parent:DisplayObjectContainer, upStateImage:Bitmap, coolDownTime:int=5000, aniType:String='radial', defaultHandler:Function=null, btnid:int=-1)
 	{
 		_cdt = coolDownTime;
 		_aniType = aniType;
 		_btnid = btnid;
 		//CDImageButton只是用一张图片
-		super(parent, 0, 0, upStateImage, null, null, defaultHandler);
+		super(parent, upStateImage, null, null, 0, 0, defaultHandler);
 		init();
 	}
 	
-	private var _btnid:int;			//按钮的id
+	private var _btnid:int;		//按钮的id
 	private var _cdt:int;			//冷却时间，单位是毫秒
 	private var _repeatCount:int;	//动画绘制的总次数
 	private var _radius:int;		//radial动画效果绘制半径
@@ -97,7 +97,7 @@ public class CDImageButton extends ImageButton
 	{
 		//停止目前的动画，清空蒙版效果
 		_timer.reset();
-		handler_timerComplete(null);
+		handler_timerComplete(new TimerEvent(TimerEvent.TIMER_COMPLETE));
 		if($cdt == _cdt)
 			return;
 		//重新按照cd时间计算重复次数
@@ -116,7 +116,7 @@ public class CDImageButton extends ImageButton
 	{
 		//停止目前的动画，清空半透明效果
 		_timer.reset();
-		handler_timerComplete(null);
+		handler_timerComplete(new TimerEvent(TimerEvent.TIMER_COMPLETE));
 		if($type == _aniType)
 			return;
 		_aniType = $type;
