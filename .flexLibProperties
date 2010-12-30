@@ -31,6 +31,7 @@
     <classEntry path="org.zengrong.utils.ColorMatrix"/>
     <classEntry path="org.zengrong.controls.CDImageButton"/>
     <classEntry path="org.zengrong.display.Tooltip"/>
+    <classEntry path="org.zengrong.utils.StringUtil"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests>

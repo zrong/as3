@@ -8,6 +8,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.controls
 {
+import core.player.RangedAttackPlayer;
+
 import flash.display.Bitmap;
 import flash.display.DisplayObjectContainer;
 import flash.display.Shape;
@@ -48,6 +50,8 @@ public class CDImageButton extends ImageButton
 		_btnid = btnid;
 		//CDImageButton只是用一张图片
 		super(parent, upStateImage, null, null, 0, 0, defaultHandler);
+		if(coolDownTime < DELAY)
+			throw new RangeError('冷却时间不能小于'+DELAY+'毫秒！');
 		init();
 	}
 	
@@ -95,6 +99,8 @@ public class CDImageButton extends ImageButton
 	 */	
 	public function set coolDownTime($cdt:int):void
 	{
+		if($cdt < DELAY)
+			throw new RangeError('冷却时间不能小于'+DELAY+'毫秒！');
 		//停止目前的动画，清空蒙版效果
 		_timer.reset();
 		handler_timerComplete(new TimerEvent(TimerEvent.TIMER_COMPLETE));

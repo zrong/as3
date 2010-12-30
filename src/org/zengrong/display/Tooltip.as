@@ -100,6 +100,7 @@ public class Tooltip extends Sprite
 		_tf.width = _width-8;
 		_tf.height = _height-8;
 		_tf.multiline = true;
+		_tf.wordWrap = true;
 		_tf.x = 4;
 		_tf.y = 4;
 		this.addChild(_tf);
