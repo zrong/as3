@@ -42,6 +42,15 @@ public class StringUtil
 	}
 	
 	/**
+	 * 检测一个字符串是否是[a,b]的形式，仅支持一维数组 
+	 */		
+	public static function isArray($str:String):Boolean
+	{
+		var _reg:RegExp = /^\[[^\[\]]*\]$/g;
+		return _reg.test($str);
+	}
+	
+	/**
 	 * 使用传入的各个参数替换指定的字符串内的“{n}”标记。n从0开始
 	 * @param str  要在其中进行替换的字符串。该字符串可包含 {n} 形式的特殊标记，其中 n 为从零开始的索引，它将被该索引处的其他参数（如果指定）替换。
 	 * @param rest 可在 str 参数中的每个 {n} 位置被替换的其他参数，其中 n 是一个对指定值数组的整数索引值（从 0 开始）。如果第一个参数是一个数组，则该数组将用作参数列表。
