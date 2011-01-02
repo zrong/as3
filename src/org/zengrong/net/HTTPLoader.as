@@ -16,8 +16,7 @@ import flash.net.URLRequest;
 import flash.net.URLRequestMethod;
 import flash.net.URLVariables;
 
-import mx.utils.ObjectUtil;
-
+import org.zengrong.utils.ObjectUtil;
 
 /**
  * 与服务器通信，可以传递多重资料和载入多个文件

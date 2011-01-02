@@ -32,6 +32,8 @@
     <classEntry path="org.zengrong.controls.CDImageButton"/>
     <classEntry path="org.zengrong.display.Tooltip"/>
     <classEntry path="org.zengrong.utils.StringUtil"/>
+    <classEntry path="org.zengrong.controls.ClassButton"/>
+    <classEntry path="org.zengrong.utils.ObjectUtil"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests>
