@@ -12,6 +12,10 @@ import flash.events.*;
 import flash.net.*;
 import flash.utils.ByteArray;
 
+[Event(name="complete",type="flash.events.Event")]
+[Event(name="ioError",type="flash.events.IOErrorEvent")]
+[Event(name="progress",type="flash.events.ProgressEvent")]
+
 /**
  * 此类用于载入外部可视化资源，并转换成可以AS支持的资源的功能。
  * */
