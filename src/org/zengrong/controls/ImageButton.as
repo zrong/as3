@@ -13,118 +13,41 @@ import flash.display.BitmapData;
 import flash.display.DisplayObjectContainer;
 import flash.display.PixelSnapping;
 import flash.events.MouseEvent;
-import flash.filters.BevelFilter;
 import flash.filters.ColorMatrixFilter;
 import flash.filters.DropShadowFilter;
 
+import org.zengrong.controls.supportClasses.DisplayObjectButtonBase;
+import org.zengrong.controls.supportClasses.Style;
 import org.zengrong.utils.ColorMatrix;
 
 /**
  * 支持up、over、down三态，同时支持toggle和seleted的图像按钮。
  * @author zrong
  */
-public class ImageButton extends Component
+public class ImageButton extends DisplayObjectButtonBase
 {
-	//private static const OVER_FILTER:BevelFilter = new BevelFilter(2, 45, 0xFFFFFF, 0.5, 0x000000, 0.5, 2, 2);
-	//private static const DOWN_FILTER:BevelFilter = new BevelFilter(2, 235, 0xFFFFFF, 0.5, 0x000000, 0.5, 2, 2);
-	private static const UP_FILTER:DropShadowFilter = new DropShadowFilter(1, 45, 0x000000, 1, 2, 2);
-	private static const OVER_FILTER:DropShadowFilter = new DropShadowFilter(2, 45, 0x000000, 1, 2, 2);
-	private static const DOWN_FILTER:DropShadowFilter = new DropShadowFilter(3, 45, 0x000000, 1, 2, 2);
-	private static const COLORLESS_FILTER:ColorMatrixFilter = new ColorMatrixFilter(ColorMatrix.COLORLESS);
 	/**
 	 * 构造函数 
-	 * @param parent ImageButton的父显示对象
-	 * @param xpos x坐标
-	 * @param ypos y坐标
 	 * @param upStateImage 按钮up状态的位图
 	 * @param overState 按钮over状态的位图
 	 * @param downState 按钮down状态的位图
+	 * @param parent ImageButton的父显示对象
+	 * @param xpos x坐标
+	 * @param ypos y坐标
 	 * @param defaultHandler 按钮的默认处理程序，响应click事件
 	 */	
-	public function ImageButton(parent:DisplayObjectContainer=null, upStateImage:Bitmap=null, overStateImage:Bitmap=null, downStateImage:Bitmap=null, xpos:Number=0, ypos:Number=0, defaultHandler:Function=null)
+	public function ImageButton(upStateImage:Bitmap, overStateImage:Bitmap=null, downStateImage:Bitmap=null, parent:DisplayObjectContainer=null, xpos:Number=0, ypos:Number=0, defaultHandler:Function=null)
 	{
 		updateStateImage(upStateImage, overStateImage, downStateImage);
 		super(parent, xpos, ypos);
-		if(defaultHandler is Function)
-			addEventListener(MouseEvent.CLICK, defaultHandler);
 	}
 	
 	protected var _upBmd:BitmapData;
 	protected var _overBmd:BitmapData;
 	protected var _downBmd:BitmapData;
 	
-	protected var _upBmp:Bitmap;
-	protected var _overBmp:Bitmap;
-	protected var _downBmp:Bitmap;
-	
-	protected var _over:Boolean = false;
-	protected var _down:Boolean = false;
-	protected var _selected:Boolean = false;
-	protected var _toggle:Boolean = false;
-	
-	//----------------------------------
-	//  getter/setter
-	//----------------------------------
-	public function set selected(value:Boolean):void
-	{
-		if(!_toggle)
-		{
-			value = false;
-		}
-		
-		_selected = value;
-		_down = _selected;
-		_upBmp.visible = !_selected;
-		_overBmp.visible = false;
-		_downBmp.visible = _selected;
-	}
-	public function get selected():Boolean
-	{
-		return _selected;
-	}
-	
-	public function set toggle(value:Boolean):void
-	{
-		_toggle = value;
-	}
-	
-	public function get toggle():Boolean
-	{
-		return _toggle;
-	}
-	
-	/**
-	 * 是否使用禁用按钮时候的去色效果 
-	 */	
-	public function get useColorless():Boolean
-	{
-		return true;
-	}
-	/**
-	 * 获取当前状态的对应Bitmap
-	 */	
-	private function get curState():Bitmap
-	{
-		if(_over)
-			return _overBmp;
-		if(_down)
-			return _downBmp;
-		return _upBmp;
-	}
-	
-	override public function set enabled(value:Boolean):void
-	{
-		super.enabled = value;
-		if(useColorless)
-			this.filters = value ? [] : [COLORLESS_FILTER];
-	}
-	
-	override protected function init():void
-	{
-		super.init();
-		buttonMode = true;
-		useHandCursor = true;
-	}
+	protected var _overState:Bitmap;
+	protected var _downState:Bitmap;
 	
 	/**
 	 * 重新设置按钮中的图片
@@ -135,117 +58,102 @@ public class ImageButton extends Component
 	public function setState(upStateImage:Bitmap, overStateImage:Bitmap=null, downStateImage:Bitmap=null):void
 	{
 		while(numChildren > 0)
-			removeChild(getChildAt(0));
+			removeChildAt(0);
+		_upBmd = null;
+		_overBmd = null;
+		_downBmd = null;
+		_upState = null;
+		_overState = null;
+		_downState = null;
 		updateStateImage(upStateImage, overStateImage, downStateImage);
 		addChildren();
 	}
 	
-	override public function draw():void
-	{
-		super.draw();
-	}
-	
 	override protected function addChildren():void
 	{
-		//如果没有设定over和down状态，就是用up状态代替
-		_upBmp = new Bitmap(_upBmd, PixelSnapping.AUTO, true);
-		_upBmp.width = this.width;
-		_upBmp.height = this.height;
-		_upBmp.filters = [UP_FILTER];
-		addChild(_upBmp);
+		//如果没有提供over和down状态的图片，就启用阴影效果
+		_shaow = (_overBmd == null) && (_downBmd == null);
+		_upState = new Bitmap(_upBmd, PixelSnapping.AUTO, true);
+		_upState.width = this.width;
+		_upState.height = this.height;
+		super.addChildren();
 		
-		if(_overBmd)
-			_overBmp = new Bitmap(_overBmd, PixelSnapping.AUTO, true);
-		else
-		{
-			_overBmp = new Bitmap(_upBmd, PixelSnapping.AUTO, true);
-			//由于over与up状态相同，在鼠标移动上去的时候没有翻转效果，在这里使用滤镜加上翻转效果
-			_overBmp.filters = [OVER_FILTER];
-		}
-		_overBmp.width = this.width;
-		_overBmp.height = this.height;
-		_overBmp.visible = false;
-		addChild(_overBmp);
+		_overState = createState(_overBmd);
+		addChild(_overState);
 		
-		if(_downBmd)
-			_downBmp = new Bitmap(_downBmd, PixelSnapping.AUTO, true);
-		else
-		{
-			_downBmp = new Bitmap(_upBmd, PixelSnapping.AUTO, true);
-			_downBmp.filters = [DOWN_FILTER];
-		}
-		_downBmp.width = this.width;
-		_downBmp.height = this.height;
-		_downBmp.visible = false;
-		addChild(_downBmp);
-		
-		addEventListener(MouseEvent.MOUSE_DOWN, onMouseGoDown);
-		addEventListener(MouseEvent.ROLL_OVER, onMouseOver);
+		_downState = createState(_downBmd);
+		addChild(_downState);
+	}
+	
+	//----------------------------------
+	//  事件处理器
+	//----------------------------------
+	/**
+	 * 覆盖父类的mouseOver事件
+	 */
+	override protected function onMouseOver(event:MouseEvent):void
+	{
+		super.onMouseOver(event);
+		_upState.visible = false;
+		_downState.visible = false;
+		_overState.visible = true;
 	}
 	
 	/**
-	 * Internal mouseOver handler.
-	 * @param event The MouseEvent passed by the system.
+	 * 覆盖父类的mouseOut事件
 	 */
-	protected function onMouseOver(event:MouseEvent):void
+	override protected function onMouseOut(event:MouseEvent):void
 	{
-		//trace('over');
-		_over = true;
-		if(_toggle && _selected)
-			return;
-		addEventListener(MouseEvent.ROLL_OUT, onMouseOut);
-		_upBmp.visible = false;
-		_downBmp.visible = false;
-		_overBmp.visible = true;
-	}
-	
-	/**
-	 * Internal mouseOut handler.
-	 * @param event The MouseEvent passed by the system.
-	 */
-	protected function onMouseOut(event:MouseEvent):void
-	{
-		//trace('out');
-		_over = false;
+		super.onMouseOut(event);
 		if(!_down)
 		{
-			_upBmp.visible = true;
-			_downBmp.visible = false;
-			_overBmp.visible = false;
+			_upState.visible = true;
+			_downState.visible = false;
+			_overState.visible = false;
 		}
-		removeEventListener(MouseEvent.ROLL_OUT, onMouseOut);
 	}
 	
 	/**
-	 * Internal mouseOut handler.
-	 * @param event The MouseEvent passed by the system.
+	 * 覆盖父类的onMouseGoDown事件
 	 */
-	protected function onMouseGoDown(event:MouseEvent):void
+	override protected function onMouseGoDown(event:MouseEvent):void
 	{
-		//trace('GoDown');
-		_down = true;
-		_upBmp.visible = false;
-		_overBmp.visible = false;
-		_downBmp.visible = true;
-		stage.addEventListener(MouseEvent.MOUSE_UP, onMouseGoUp);
+		super.onMouseGoDown(event);
+		_upState.visible = false;
+		_overState.visible = false;
+		_downState.visible = true;
 	}
 	
 	/**
-	 * Internal mouseUp handler.
-	 * @param event The MouseEvent passed by the system.
+	 * 覆盖父类的onMouseGoUp事件
 	 */
-	protected function onMouseGoUp(event:MouseEvent):void
+	override protected function onMouseGoUp(event:MouseEvent):void
 	{
-		//trace('GoUp');
-		if(_toggle  && _over)
-		{
-			_selected = !_selected;
-		}
-		_down = _selected;
-		_upBmp.visible = !_selected;
-		_overBmp.visible = false;
-		_downBmp.visible = _selected;
+		super.onMouseGoUp(event);
+		_upState.visible = !_selected;
+		_overState.visible = false;
+		_downState.visible = _selected;
 		stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseGoUp);
+	}
+	
+	override public function set selected(value:Boolean):void
+	{
+		super.selected = value;
+		_upState.visible = !_selected;
+		_overState.visible = false;
+		_downState.visible = _selected;
+	}
+	
+	/**
+	 * 获取当前状态的对应Bitmap
+	 */	
+	private function get curState():Bitmap
+	{
+		if(_over)
+			return _overState;
+		if(_down)
+			return _downState;
+		return Bitmap(_upState);
 	}
 	
 	/**
@@ -256,13 +164,26 @@ public class ImageButton extends Component
 	 */	
 	private function updateStateImage(upStateImage:Bitmap, overStateImage:Bitmap=null, downStateImage:Bitmap=null):void
 	{
-		setSize(upStateImage.width,upStateImage.height); 
-		trace('imagebutton:', this.width, this.height);
+		setSize(upStateImage.width, upStateImage.height); 
+		//trace('imagebutton:', this.width, this.height);
 		_upBmd = upStateImage.bitmapData;
 		if(overStateImage)
 			_overBmd = overStateImage.bitmapData;
 		if(downStateImage)
 			_downBmd = downStateImage.bitmapData;
+	}
+	
+	private function createState($bmd:BitmapData):Bitmap
+	{
+		var __bmpState:Bitmap = null;
+		if($bmd)
+			__bmpState = new Bitmap($bmd, PixelSnapping.AUTO, true);
+		else
+			__bmpState = new Bitmap(_upBmd, PixelSnapping.AUTO, true);
+		__bmpState.width = this.width;
+		__bmpState.height = this.height;
+		__bmpState.visible = false;
+		return __bmpState;
 	}
 }
 }

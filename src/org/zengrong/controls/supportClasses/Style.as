@@ -1,4 +1,13 @@
-/**
+////////////////////////////////////////////////////////////////////////////////
+//
+//  zengrong.net
+//  修改:zrong
+//	说明：本组件参照Keith Peters的Minimalcomps组件写成，修改、使用或继承Minimalcal源码
+//	修改列表：
+//		2011-01-02 加入静态的COLORLESS_FILTER变量
+//
+////////////////////////////////////////////////////////////////////////////////
+ /**
  * Style.as
  * Keith Peters
  * version 0.9.7
@@ -27,8 +36,12 @@
  * THE SOFTWARE.
  */
  
-package org.zengrong.controls
+package org.zengrong.controls.supportClasses
 {
+import flash.filters.ColorMatrixFilter;
+
+import org.zengrong.utils.ColorMatrix;
+
 	public class Style
 	{
 		public static var BACKGROUND:uint = 0xCCCCCC;
@@ -38,6 +51,7 @@ package org.zengrong.controls
 		public static var DROPSHADOW:uint = 0x000000;
 		public static var PANEL:uint = 0xF3F3F3;
 		public static var PROGRESS_BAR:uint = 0xFFFFFF;
+		public static var COLORLESS_FILTER:ColorMatrixFilter = new ColorMatrixFilter(ColorMatrix.COLORLESS);
 		
 		public static var embedFonts:Boolean = false;
 		public static var fontName:String = "simsun";

@@ -32,7 +32,7 @@ package org.zengrong.controls
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 
-	public class PushButton extends Component
+	public class ButtoBase extends Component
 	{
 		protected var _back:Sprite;
 		protected var _face:Sprite;
@@ -51,7 +51,7 @@ package org.zengrong.controls
 		 * @param label The string to use for the initial label of this component.
  		 * @param defaultHandler The event handling function to handle the default event for this component (click in this case).
 		 */
-		public function PushButton(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number =  0, label:String = "", defaultHandler:Function = null)
+		public function ButtoBase(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number =  0, label:String = "", defaultHandler:Function = null)
 		{
 			super(parent, xpos, ypos);
 			if(defaultHandler != null)

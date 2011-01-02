@@ -1,14 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////////
-//
 //  zengrong.net
 //  创建者:	zrong
 //  最后更新时间：2010-12-22
 //	说明：本组件参照Keith Peters的Minimalcomps组件写成，修改、使用或继承Minimalcal源码
-//
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.controls
 {
-import core.player.RangedAttackPlayer;
 
 import flash.display.Bitmap;
 import flash.display.DisplayObjectContainer;
@@ -17,6 +14,8 @@ import flash.events.MouseEvent;
 import flash.events.TimerEvent;
 import flash.geom.Point;
 import flash.utils.Timer;
+
+import org.zengrong.controls.supportClasses.DisplayObjectButtonBase;
 
 /**
  * @eventType timerComplete
@@ -49,10 +48,9 @@ public class CDImageButton extends ImageButton
 		_aniType = aniType;
 		_btnid = btnid;
 		//CDImageButton只是用一张图片
-		super(parent, upStateImage, null, null, 0, 0, defaultHandler);
+		super(upStateImage, null, null, parent, 0, 0, defaultHandler);
 		if(coolDownTime < DELAY)
 			throw new RangeError('冷却时间不能小于'+DELAY+'毫秒！');
-		init();
 	}
 	
 	private var _btnid:int;		//按钮的id
@@ -137,13 +135,8 @@ public class CDImageButton extends ImageButton
 	}
 	
 	/**
-	 * CDImageButton按钮不使用去色效果 
+	 * 不支持selected
 	 */	
-	override public function get useColorless():Boolean
-	{
-		return false;
-	}
-	
 	override public function get selected():Boolean
 	{
 		return false;
@@ -153,6 +146,9 @@ public class CDImageButton extends ImageButton
 	{
 	}
 	
+	/**
+	 * 不支持toggle
+	 */	
 	override public function get toggle():Boolean
 	{
 		return false;

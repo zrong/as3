@@ -40,6 +40,7 @@ package org.zengrong.controls
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.filters.DropShadowFilter;
+	import org.zengrong.controls.supportClasses.Style;
 
 	[Event(name="resize", type="flash.events.Event")]
 	[Event(name="draw", type="flash.events.Event")]

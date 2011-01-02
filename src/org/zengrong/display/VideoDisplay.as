@@ -33,12 +33,9 @@ public class VideoDisplay extends Sprite
 	
 	public function VideoDisplay($width:int=320, $height:int=240)
 	{
-		_videoWidth = $width;
-		_videoHeight = $height;
-		_video = new Video(_videoWidth, _videoHeight);
-		_video.visible = false;
-		this.addChild(_video);
-		
+		_width = $width;
+		_height = $height;
+		init();
 	}
 	
 	//--------------------------------------------------------------------------
@@ -55,8 +52,8 @@ public class VideoDisplay extends Sprite
 	private var _nc:NetConnection;
 	private var _ns:NetStream;
 	
-	private var _videoWidth:Number;
-	private var _videoHeight:Number;
+	private var _width:Number;
+	private var _height:Number;
 	private var _maintainAspectRatio:Boolean;
 	private var _muted:Boolean;
 	
@@ -79,16 +76,6 @@ public class VideoDisplay extends Sprite
 		return _playing;
 	}
 	
-	public function get videoWidth():Number
-	{
-		return _videoWidth;
-	}
-	
-	public function get videoHeight():Number
-	{
-		return _videoHeight;
-	}
-	
 	public function get muted():Boolean
 	{
 		return _muted;
@@ -99,6 +86,16 @@ public class VideoDisplay extends Sprite
 		return _maintainAspectRatio;
 	}
 	
+	override public function get width():Number
+	{
+		return _width;
+	}
+	
+	override public function get height():Number
+	{
+		return _height;
+	}
+	
 	//----------------------------------
 	//  setter方法
 	//----------------------------------
@@ -107,20 +104,26 @@ public class VideoDisplay extends Sprite
 		_maintainAspectRatio = $maintainAspectRatio;
 	}
 	
-	public function set videoHeight($num:Number):void
-	{
-		_videoHeight = $num;
-	}
-	
 	public function set muted($muted:Boolean):void
 	{
 		_muted = $muted;
 		setMuted();	
 	}
 	
-	public function set videoWidth($num:Number):void
+	override public function set width(value:Number):void
 	{
-		_videoWidth = $num;
+		trace('set video width', value);
+		_width = value;
+		_video.width = _width;
+		draw();
+	}
+	
+	override public function set height(value:Number):void
+	{
+		trace('set video height', value);
+		_height = value;
+		_video.height = _height;
+		draw();
 	}
 	
 	/**
@@ -130,10 +133,8 @@ public class VideoDisplay extends Sprite
 	 */	
 	public function setSize($width:int, $height:int): void 
 	{
-		_videoWidth = $width;
-		_videoHeight = $height;
-		_video.width = _videoWidth;
-		_video.height = _videoHeight;
+		width = $width;
+		height = $height;
 //		trace('VideoDisplay.setSize,width:',_videoWidth,',height:', _videoHeight);
 	}
 	
@@ -234,6 +235,33 @@ public class VideoDisplay extends Sprite
 			if(_nc.connected) _nc.close();
 		}
 		_type = null;
+	}
+	
+	//--------------------------------------------------------------------------
+	//
+	//  保护方法
+	//
+	//--------------------------------------------------------------------------
+	
+	protected function init():void
+	{
+		addChildren();
+		draw();
+	}
+	
+	protected function addChildren():void
+	{
+		_video = new Video(_width, _height);
+		_video.visible = false;
+		this.addChild(_video);
+	}
+	
+	protected function draw():void
+	{
+		this.graphics.clear();
+		this.graphics.beginFill(0x0000000);
+		this.graphics.drawRect(0, 0, _width, _height);
+		this.graphics.endFill();
 	}
 	
 	//--------------------------------------------------------------------------
@@ -342,7 +370,7 @@ class StreamClient
 	public function onMetaData($obj:Object):void
 	{
 		trace('NetStream.onMetaData(width,height):', $obj.width, $obj.height);
-		_videoDisplay.videoWidth = $obj.width;
-		_videoDisplay.videoHeight = $obj.height;
+		_videoDisplay.width = $obj.width;
+		_videoDisplay.height = $obj.height;
 	}
 }
