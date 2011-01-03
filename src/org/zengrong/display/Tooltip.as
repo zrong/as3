@@ -84,7 +84,7 @@ public class Tooltip extends Sprite
 	{
 		this.graphics.clear();
 //		this.graphics.lineStyle(1, 0x000000);
-		this.graphics.beginFill(_bgColor, .8);
+		this.graphics.beginFill(_bgColor);
 		this.graphics.drawRoundRect(0,  0, _width, _height, 8, 8);
 		this.graphics.endFill();
 		addChildren();
@@ -140,7 +140,8 @@ public class Tooltip extends Sprite
 		this.x = _reference.x;
 		this.y = _reference.y - _height;
 		_reference.addEventListener(MouseEvent.ROLL_OVER, handler_rollOver);
-		_reference.addEventListener(Event.ENTER_FRAME, handler_enterFrame);
+		if(_ignoreMouse)
+			_reference.addEventListener(Event.ENTER_FRAME, handler_enterFrame);
 	}
 	
 	private function removeListener():void

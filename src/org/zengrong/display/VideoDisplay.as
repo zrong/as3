@@ -112,7 +112,7 @@ public class VideoDisplay extends Sprite
 	
 	override public function set width(value:Number):void
 	{
-		trace('set video width', value);
+		//trace('set video width', value);
 		_width = value;
 		_video.width = _width;
 		draw();
@@ -120,7 +120,7 @@ public class VideoDisplay extends Sprite
 	
 	override public function set height(value:Number):void
 	{
-		trace('set video height', value);
+		//trace('set video height', value);
 		_height = value;
 		_video.height = _height;
 		draw();
@@ -135,7 +135,6 @@ public class VideoDisplay extends Sprite
 	{
 		width = $width;
 		height = $height;
-//		trace('VideoDisplay.setSize,width:',_videoWidth,',height:', _videoHeight);
 	}
 	
 	//----------------------------------

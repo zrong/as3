@@ -39,7 +39,7 @@ public class ImageButton extends DisplayObjectButtonBase
 	public function ImageButton(upStateImage:Bitmap, overStateImage:Bitmap=null, downStateImage:Bitmap=null, parent:DisplayObjectContainer=null, xpos:Number=0, ypos:Number=0, defaultHandler:Function=null)
 	{
 		updateStateImage(upStateImage, overStateImage, downStateImage);
-		super(parent, xpos, ypos);
+		super(parent, xpos, ypos, defaultHandler);
 	}
 	
 	protected var _upBmd:BitmapData;
