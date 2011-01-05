@@ -36,7 +36,7 @@ package org.zengrong.utils
 		/**
 		 * 计算站位的列数
 		 */		
-		public static var COLUNM:int = 4;
+		public static var COLUMN:int = 4;
 		
 		/**
 		 * 每个人站位坐标的横向间距，间距自动计算
@@ -67,7 +67,7 @@ package org.zengrong.utils
 				throw new Error('要生成站位坐标，必须首先提供初始坐标！');
 			_basePoint = $point;
 			_isLeft = $left;
-			H_GAP = WIDTH / COLUNM;
+			H_GAP = WIDTH / COLUMN;
 			_points = new Object();
 			_pointUse = new Object();
 			var __direction:int = _isLeft ? -1 : 1;
@@ -171,18 +171,18 @@ package org.zengrong.utils
 			//垂直分隔的值根据行数来确定
 			V_GAP = HEIGHT / $row;
 			//计算“这次”生成一共有几个坐标
-			var __count:int = COLUNM*$row;
+			var __count:int = COLUMN*$row;
 			var __points:Array = [];
 			for(var i:int=0; i<__count; i++)
 			{
 				//列索引，以站在右边的一方为例。左边第1列为0，第2列为1，以此类推。
-				var __c:int = int(i%COLUNM);
+				var __c:int = int(i%COLUMN);
 				//行索引，0代表这一列中站立的第1个人的坐标，1代表这一列中站立的第2个人的坐标，以此类推。
-				var __r:int = int(i/COLUNM);
+				var __r:int = int(i/COLUMN);
 				
 				/*基于基准站位点计算坐标。
-				如果本方站在右边，基准站位点是位于本方站位方块左上角的那一点。
-				如果本方站在左边，基准站位点就是位于本方站位方块右上角的那一点*/
+				如果本方站在右边，基准站位点是位于本方站位方块左上角的那一点。因为右边的x偏移值是整数
+				如果本方站在左边，基准站位点就是位于本方站位方块右上角的那一点。因为左边的x偏移值是负数*/
 				var __x:Number = _basePoint.x + $direction*(H_GAP/2 + H_GAP*__c);
 				var __y:Number = _basePoint.y + getOffsetY($row, __r);
 				
