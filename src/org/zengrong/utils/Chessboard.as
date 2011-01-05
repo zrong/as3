@@ -1,27 +1,54 @@
-/**
- * 保存战斗场景中的棋盘状站位
- * */
+////////////////////////////////////////////////////////////////////////////////
+//  zengrong.net
+//  创建者:	zrong
+//  创建时间：2011-01-05
+////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.utils
 {
-	import com.adobe.serialization.json.JSON;
-	
 	import flash.geom.Point;
 	import flash.text.TextField;
 	
-	import mx.utils.ObjectUtil;
-	
+	/**
+	 * 计算战斗场景中的棋盘状站位，保存站位坐标的位置和使用情况。
+	 * 在游戏的战斗场景中，经常需要计算如何站位。这个类根据提供的宽、高、行、列自动计算对应人数的站位坐标。
+	 * 例如，2行4列的一个棋盘状站位，一共会计算12个坐标。这中间不仅有8个人的站位，还有当某一列仅出现1个人时的站位。
+	 * 因为这1个人不应站在8个人位置中的某一个位置，而应该站在2行的中间，因此有独立的坐标。
+	 * 这个类，只会计算战斗的一方的站位，如果需要两方的站位，就需要这个类的两个对象。
+	 * 使用isLeft属性来确认这个站位属于哪一方。
+	 * */
 	public class Chessboard
 	{
+		/**
+		 * 计算站位的总宽度
+		 */		
 		public static var WIDTH:int = 432;
+		
+		/**
+		 *计算站位的总高度 
+		 */
 		public static var HEIGHT:int = 400;
 		
+		/**
+		 * 计算站位的行数
+		 */		
 		public static var ROW:int = 3;
+		
+		/**
+		 * 计算站位的列数
+		 */		
 		public static var COLUNM:int = 4;
 		
+		/**
+		 * 每个人站位坐标的横向间距，间距自动计算
+		 */		
 		private static var H_GAP:int = 100;
+		
+		/**
+		 * 每个人站位坐标的纵向间距，间距自动计算
+		 */		
 		private static var V_GAP:int = 130;
 		
-		private var _points:Object;		//保存坐标
+		private var _points:Object;	//保存坐标
 		private var _pointUse:Object;	//保存坐标是否被使用
 		
 		private var _basePoint:Point;
@@ -49,8 +76,6 @@ package org.zengrong.utils
 			{
 				drawPoint(i, __direction);
 			}
-			//drawPoint(ROW, __direction);
-//			trace(ObjectUtil.toString(_points));
 		}
 		
 		public function get isLeft():Boolean
@@ -128,55 +153,53 @@ package org.zengrong.utils
 			return _points[$index];
 		}
 		
-		public function getPointsJSON():String
-		{
-			throwJSONError(_points);
-			return JSON.encode(_points);
-		}
-		
-		public function getPointUsedJSON():String
-		{
-			throwJSONError(_pointUse);
-			return JSON.encode(_pointUse);
-		}
-		
-		private function throwJSONError($jsonSource:Object):void
-		{
-			if(!$jsonSource)
-				throw new Error('没有站位数据！');
-		}
-		
 		private function throwIndexError($length:int):void
 		{
 			if($length != 3)
 				throw new Error('站位索引必须为3位数！');
 		}
 		
-		//$direction，x计算方向，-1为从右到左，1为从左到右
+		/**
+		 * 计算“一批”站位坐标
+		 * 如果总站位有2行，那么drawPoint会被调用2次，如果有3行，则会调用3次。每次调用，都会生成对应的行数的所有坐标。
+		 * 以2行4列为例，第1次调用，会生成每列只有1人的时候的4个坐标；第2次调用，会生成每列有2个人的时候的8个坐标。
+		 * @param $row 当前正在计算的行索引
+		 * @param $direction x计算方向，-1为从右到左，1为从左到右
+		 */		
 		private function drawPoint($row:int, $direction:int=1):void
 		{
 			//垂直分隔的值根据行数来确定
 			V_GAP = HEIGHT / $row;
+			//计算“这次”生成一共有几个坐标
+			var __count:int = COLUNM*$row;
 			var __points:Array = [];
-			var __color:Number = Math.random()*0xfffff;
-			for(var i:int=0; i<COLUNM*$row; i++)
+			for(var i:int=0; i<__count; i++)
 			{
-				//列索引
+				//列索引，以站在右边的一方为例。左边第1列为0，第2列为1，以此类推。
 				var __c:int = int(i%COLUNM);
-				//行索引
+				//行索引，0代表这一列中站立的第1个人的坐标，1代表这一列中站立的第2个人的坐标，以此类推。
 				var __r:int = int(i/COLUNM);
 				
+				/*基于基准站位点计算坐标。
+				如果本方站在右边，基准站位点是位于本方站位方块左上角的那一点。
+				如果本方站在左边，基准站位点就是位于本方站位方块右上角的那一点*/
 				var __x:Number = _basePoint.x + $direction*(H_GAP/2 + H_GAP*__c);
 				var __y:Number = _basePoint.y + getOffsetY($row, __r);
 				
 				var __point:Point = new Point(__x, __y);
+				//生成一个3位的坐标索引值，第1位是当前计算的这一批坐标的行数量。第2、3位详见__c和__r的注释
 				var __pointKey:String = $row + '' + __c + '' + __r; 
 				_points[__pointKey] = __point;
+				//默认所有的站位点都没有被使用
 				_pointUse[__pointKey] = false;
-				
 			}
 		}
-			
+		
+		/**
+		 * 计算坐标的y值偏移量
+		 * @param $row 行索引
+		 * @param $rowIndex 一行中站立的人的索引，详见drawPoint中的__r注释
+		 */		
 		private function getOffsetY($row:int, $rowIndex:int):Number
 		{
 			var __isOddLine:Boolean = Boolean($row%2);
