@@ -23,6 +23,8 @@ import org.zengrong.utils.ObjectUtil;
  * */
 public class HTTPLoader
 {
+	public static const METHOD:String = 'GET';
+	
 	public function HTTPLoader($done:Function, $error:Function)
 	{
 		init();
@@ -151,7 +153,7 @@ public class HTTPLoader
 				_curReturnVar = $var;
 		}
 		var __request:URLRequest = new URLRequest(_curUrl);
-		__request.method = URLRequestMethod.POST;
+		__request.method = METHOD;
 		if(_curSubmitVar)
 			__request.data = _curSubmitVar; 
 		_loader.load(__request);
