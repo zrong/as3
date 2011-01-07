@@ -168,8 +168,8 @@ public class HTTPLoader
 	
 	protected function removeEvent():void
 	{
-		_loader.removeEventListener(IOErrorEvent.IO_ERROR, _fun_loadError);
-		_loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, _fun_loadError);
+		_loader.removeEventListener(IOErrorEvent.IO_ERROR, handler_error);
+		_loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, handler_error);
 		_loader.removeEventListener(Event.COMPLETE, handler_complete);
 	}
 	

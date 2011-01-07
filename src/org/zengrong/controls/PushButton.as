@@ -32,7 +32,7 @@ package org.zengrong.controls
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 
-	public class ButtoBase extends Component
+	public class PushButton extends Component
 	{
 		protected var _back:Sprite;
 		protected var _face:Sprite;
