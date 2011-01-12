@@ -155,6 +155,11 @@ public class Vec2D
 		return this.cross($vec) >= 0 ? true : false;
 	}
 	
+	public function isLeft2($vec:Vec2D):Boolean
+	{
+		return x < $vec.x;
+	}
+	
     public function cross($vec:Vec2D) : Number
     {
         return this.x * $vec.y - this.y * $vec.x;

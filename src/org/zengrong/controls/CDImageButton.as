@@ -15,8 +15,6 @@ import flash.events.TimerEvent;
 import flash.geom.Point;
 import flash.utils.Timer;
 
-import org.zengrong.controls.supportClasses.DisplayObjectButtonBase;
-
 /**
  * @eventType timerComplete
  */
@@ -39,8 +37,9 @@ public class CDImageButton extends ImageButton
 		
 	//计时器的步进
 	private static const DELAY:int = 100;
-	private static const MASK_ALPHA:Number = .6;
+	private static const MASK_ALPHA:Number = .2;
 	private static const MASK_COLOR:uint = 0x000000;
+	private static const ENABLED_MASK_ALPHA:Number = .3;
 	
 	public function CDImageButton(parent:DisplayObjectContainer, upStateImage:Bitmap, coolDownTime:int=5000, aniType:String='radial', defaultHandler:Function=null, btnid:int=-1)
 	{
@@ -59,16 +58,53 @@ public class CDImageButton extends ImageButton
 	private var _radius:int;		//radial动画效果绘制半径
 	private var _aniType:String;	//动画效果类型，值为ANI_LINEAR或ANI_RADIAL
 	
-	private var _commands:Vector.<int>;			//绘制radial类型的动画的命令数组
+	private var _commands:Vector.<int>;		//绘制radial类型的动画的命令数组
 	private var _vectors:Vector.<Number>;		//绘制radial类型的的动画的坐标数组
-	private var _tmp_commands:Vector.<int>;		//绘制过程中需要的临时命令数组
+	private var _tmp_commands:Vector.<int>;	//绘制过程中需要的临时命令数组
 	private var _tmp_vectors:Vector.<Number>;	//绘制过程中需要的临时坐标数组
 	
 	private var _timer:Timer;
 	private var _center:Point;
 	
-	private var _maskBody:Shape;	//用于覆盖在按钮上方显示半透明效果的Shape
-	private var _ani:Shape;			//用于显示动画的Shape
+	private var _cdMask:Shape;		//用于覆盖在按钮上方显示半透明CD效果的Shape
+	private var _cdAni:Shape;		//用于显示CD动画的Shape
+	private var _enabledMask:Shape;	//用于显示禁用和启用效果的Shape
+	
+	//----------------------------------
+	//  初始化的方法
+	//----------------------------------
+	override protected function init():void
+	{
+		super.init();
+		
+		_repeatCount = getRepeatCount(); 
+		
+		_timer = new Timer(DELAY, _repeatCount);
+		_timer.addEventListener(TimerEvent.TIMER, handler_timer);
+		_timer.addEventListener(TimerEvent.TIMER_COMPLETE, handler_timerComplete);
+		
+		if(_aniType == ANI_RADIAL)
+			initRadial();
+	}
+	
+	override protected function addChildren():void
+	{
+		super.addChildren();
+		_cdMask = new Shape();
+		_cdMask.visible = false;
+		this.addChild(_cdMask);
+		_cdAni = new Shape();
+		_cdAni.visible = false;
+		this.addChild(_cdAni);
+		_cdMask.mask = _cdAni;
+		//启用禁用效果的shape，这个初始化一次就可以了
+		_enabledMask = new Shape();
+		_enabledMask.graphics.beginFill(MASK_COLOR, ENABLED_MASK_ALPHA);
+		_enabledMask.graphics.drawRect(0, 0, this.width, this.height);
+		_enabledMask.graphics.endFill();
+		_enabledMask.visible = false;
+		this.addChild(_enabledMask);
+	}
 	
 	//----------------------------------
 	//  getter/setter
@@ -81,7 +117,7 @@ public class CDImageButton extends ImageButton
 	
 	public function set btnid($id:int):void
 	{
-		_btnid = $id
+		_btnid = $id;
 	}
 	/**
 	 * 当前的按钮是否处于CD动画过程中
@@ -126,7 +162,7 @@ public class CDImageButton extends ImageButton
 		_aniType = $type;
 		if(_aniType == ANI_LINEAR)
 		{
-			_ani.x = _ani.y = 0;
+			_cdAni.x = _cdAni.y = 0;
 		}
 		else if(_aniType == ANI_RADIAL)
 		{
@@ -160,19 +196,20 @@ public class CDImageButton extends ImageButton
 	
 	override public function set enabled(value:Boolean):void
 	{
-		_enabled = value;
-		mouseEnabled = mouseChildren = _enabled;
-		tabEnabled = value;
 		//如果启用按钮，就隐藏并清空蒙版，否则就初始化蒙版。
-		if(_enabled)
+		if(value)
 		{
-			_maskBody.graphics.clear();
-			_maskBody.visible = false;
-			_ani.graphics.clear();
-			_ani.visible = false;
+			_enabledMask.visible = false;
+			//CD运行过程中，仅取消蒙版显示，但不处理启用按钮的操作
+			if(running)
+				return;
 		}
 		else
-			drawInitMask();
+		{
+			_enabledMask.visible = true;
+		}
+		trace(btnid, '启用：', value);
+		setInteract(value);
 	}
 	
 	/**
@@ -191,11 +228,12 @@ public class CDImageButton extends ImageButton
 	 */	
 	public function start():void
 	{
-		if(_timer.running)
+		if(running)
 			return;
 		_timer.reset();
 		_timer.start();
-		enabled = false;
+		setInteract(false);
+		drawCDMask();
 		if(_aniType == ANI_RADIAL)
 		{
 			//复制两个绘制数据数组
@@ -210,36 +248,24 @@ public class CDImageButton extends ImageButton
 	public function stop():void
 	{
 		_timer.reset();
+		clear();
+	}
+	
+	public function clear():void
+	{
+		trace('clear调用');
+		_cdMask.graphics.clear();
+		_cdMask.visible = false;
+		_cdAni.graphics.clear();
+		_cdAni.visible = false;
+		//检测禁用蒙版是否显示，如果没有显示就说明在CD过程中，没有设置过enable = false，就可以启用按钮的交互
+		if(!_enabledMask.visible)
+			setInteract(true);
 	}
 	
 	//----------------------------------
-	//  覆盖父类的方法
+	//  handler
 	//----------------------------------
-	override protected function init():void
-	{
-		super.init();
-		
-		_repeatCount = getRepeatCount(); 
-		
-		_timer = new Timer(DELAY, _repeatCount);
-		_timer.addEventListener(TimerEvent.TIMER, handler_timer);
-		_timer.addEventListener(TimerEvent.TIMER_COMPLETE, handler_timerComplete);
-		
-		if(_aniType == ANI_RADIAL)
-			initRadial();
-	}
-	
-	override protected function addChildren():void
-	{
-		super.addChildren();
-		_maskBody = new Shape();
-		_maskBody.visible = false;
-		this.addChild(_maskBody);
-		_ani = new Shape();
-		_ani.visible = false;
-		this.addChild(_ani);
-		_maskBody.mask = _ani;
-	}
 	
 	override protected function onMouseGoUp(event:MouseEvent):void
 	{
@@ -247,9 +273,6 @@ public class CDImageButton extends ImageButton
 		start();
 	}
 	
-	//----------------------------------
-	//  handler
-	//----------------------------------
 	/**
 	 * 绘制冷却动画效果 
 	 */	
@@ -273,7 +296,8 @@ public class CDImageButton extends ImageButton
 	 */	
 	private function handler_timerComplete(evt:TimerEvent):void
 	{
-		enabled = true;
+		//清空CD效果蒙版
+		clear();
 		this.dispatchEvent(evt);
 	}
 	
@@ -289,8 +313,8 @@ public class CDImageButton extends ImageButton
 		_radius = this.width;
 		
 		_center = new Point(this.width/2, this.height/2) 
-		_ani.x = _center.x;
-		_ani.y = _center.y;
+		_cdAni.x = _center.x;
+		_cdAni.y = _center.y;
 		
 		//初始化给出第一个坐标点，由于已经将Shape移动到了父显示对象中心点，这里就不需要moveTo命令，直接从0,0开始画
 		_commands = Vector.<int>([2]);
@@ -315,10 +339,10 @@ public class CDImageButton extends ImageButton
 	private function drawLinearMask($current:int, $total:int):void
 	{
 		var __percent:Number = $current/$total;
-		_ani.graphics.clear();
-		_ani.graphics.beginFill(MASK_COLOR, MASK_ALPHA);
-		_ani.graphics.drawRect(0, 0, width, height*__percent);
-		_ani.graphics.endFill();
+		_cdAni.graphics.clear();
+		_cdAni.graphics.beginFill(MASK_COLOR, MASK_ALPHA);
+		_cdAni.graphics.drawRect(0, 0, width, height*__percent);
+		_cdAni.graphics.endFill();
 	}
 	
 	/**
@@ -328,24 +352,24 @@ public class CDImageButton extends ImageButton
 	 */	
 	private function drawRadialMask($commands:Vector.<int>, $vectors:Vector.<Number>):void
 	{
-		_ani.graphics.clear();
-		_ani.graphics.beginFill(MASK_COLOR, MASK_ALPHA);
-		_ani.graphics.drawPath($commands, $vectors);
-		_ani.graphics.endFill();
+		_cdAni.graphics.clear();
+		_cdAni.graphics.beginFill(MASK_COLOR, MASK_ALPHA);
+		_cdAni.graphics.drawPath($commands, $vectors);
+		_cdAni.graphics.endFill();
 	}
 	
 	/**
-	 * 绘制蒙版效果的初始化状态
+	 * 绘制CD蒙版效果的初始化状态
 	 */	
-	private function drawInitMask():void
+	private function drawCDMask():void
 	{
-		_maskBody.visible = true;
-		_ani.visible = true;
+		_cdMask.visible = true;
+		_cdAni.visible = true;
 		//绘制一个矩形作为放射动画的蒙版，因为要显示的部分就是一个矩形
-		_maskBody.graphics.clear();
-		_maskBody.graphics.beginFill(MASK_COLOR, MASK_ALPHA);
-		_maskBody.graphics.drawRect(0, 0, this.width, this.height);
-		_maskBody.graphics.endFill();
+		_cdMask.graphics.clear();
+		_cdMask.graphics.beginFill(MASK_COLOR, MASK_ALPHA);
+		_cdMask.graphics.drawRect(0, 0, this.width, this.height);
+		_cdMask.graphics.endFill();
 		if(_aniType == ANI_LINEAR)
 		{
 			drawLinearMask(_repeatCount, _repeatCount);
@@ -353,11 +377,21 @@ public class CDImageButton extends ImageButton
 		else
 		{
 			//绘制一个正圆，作为初始的效果
-			_ani.graphics.clear();
-			_ani.graphics.beginFill(MASK_COLOR);
-			_ani.graphics.drawCircle(0, 0, _radius);
-			_ani.graphics.endFill();
+			_cdAni.graphics.clear();
+			_cdAni.graphics.beginFill(MASK_COLOR);
+			_cdAni.graphics.drawCircle(0, 0, _radius);
+			_cdAni.graphics.endFill();
 		}
+	}
+	
+	/**
+	 * 设置实际的按钮交互可用性。set enabled要修改按钮的禁用可用的外观，同时还要调用本方法。 
+	 * @param $enabled 按钮是否可用
+	 */	
+	private function setInteract($enabled:Boolean):void
+	{
+		_enabled = $enabled;
+		this.mouseEnabled = this.mouseChildren = this.tabEnabled = _enabled;
 	}
 }
 }
