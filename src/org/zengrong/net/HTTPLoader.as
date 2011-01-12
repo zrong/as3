@@ -23,7 +23,7 @@ import org.zengrong.utils.ObjectUtil;
  * */
 public class HTTPLoader
 {
-	public static const METHOD:String = 'GET';
+	public static var METHOD:String = 'GET';
 	
 	public function HTTPLoader($done:Function, $error:Function)
 	{
