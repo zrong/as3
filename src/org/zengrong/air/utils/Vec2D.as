@@ -152,7 +152,7 @@ public class Vec2D
 	//----------------------------------
 	public function isLeft($vec:Vec2D) : Boolean
 	{
-		return this.cross($vec) >= 0 ? true : false;
+		return this.cross($vec) >= 0;
 	}
 	
 	public function isLeft2($vec:Vec2D):Boolean
