@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <componentPackage>
+<!-- 组件介绍 -->
   <component id="Button" class="org.zengrong.controls.Button" />
   <component id="InfoEvent" class="org.zengrong.events.InfoEvent" />
   <component id="Firebug" class="org.zengrong.logging.Firebug" />
