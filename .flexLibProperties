@@ -37,7 +37,5 @@
     <classEntry path="org.zengrong.air.utils.Vec2D"/>
   </includeClasses>
   <includeResources/>
-  <namespaceManifests>
-    <namespaceManifestEntry manifest="manifest.xml" namespace="http://www.zengrong.org"/>
-  </namespaceManifests>
+  <namespaceManifests/>
 </flexLibProperties>

@@ -89,8 +89,8 @@ package org.zengrong.controls
 			_list.autoHideScrollBar = true;
 			_list.addEventListener(Event.SELECT, onSelect);
 			
-			_labelButton = new PushButton(this, 0, 0, "", onDropDown);
-			_dropDownButton = new PushButton(this, 0, 0, "+", onDropDown);
+			_labelButton = new PushButton("", this, 0, 0,onDropDown);
+			_dropDownButton = new PushButton("+", this, 0, 0,  onDropDown);
 		}
 		
 		/**
