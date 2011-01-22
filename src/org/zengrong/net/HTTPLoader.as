@@ -23,8 +23,6 @@ import org.zengrong.utils.ObjectUtil;
  * */
 public class HTTPLoader
 {
-	public static var METHOD:String = 'GET';
-	
 	public function HTTPLoader($done:Function, $error:Function)
 	{
 		init();
@@ -42,6 +40,8 @@ public class HTTPLoader
 	 * */
 	protected var _fun_loadError:Function;
 	
+	protected var _method:String = 'GET';
+	
 	private var _loading:Boolean;			//是否正在载入。这个变量保证同一时间只能有一次或者一组载入。
 	private var _multi:Boolean;			//是否是多文件载入
 	
@@ -56,6 +56,10 @@ public class HTTPLoader
 	private var _submitVars:Array;			//如果是多文件载入，这个变量保存每次提交的时候需要返回的参数。所有的多重载入提供的参数都将统一视为需要返回的参数
 	private var _results:Array;			//保存多文件载入时候返回的值
 	
+	public function set method($method:String):void
+	{
+		_method = $method;
+	}
 	/**
 	 * <p>通过这个方法加入的参数，不仅会传给服务端，同时也会在返回的时候提供。</p>
 	 * <p>如果使用的是多重载入，那么使用此方法添加的参数，在每次提交和返回的时候都会提供。</p>
@@ -153,7 +157,7 @@ public class HTTPLoader
 				_curReturnVar = $var;
 		}
 		var __request:URLRequest = new URLRequest(_curUrl);
-		__request.method = METHOD;
+		__request.method = _method;
 		if(_curSubmitVar)
 			__request.data = _curSubmitVar; 
 		_loader.load(__request);
