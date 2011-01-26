@@ -89,7 +89,7 @@ public class HTTPLoader
 	/**
 	 * 开始载入。
 	 * @param $url 要载入的地址。地址可以是String或者包含字符串的Array。如果是String，将其作为载入URL对待；如果是Array，将其作为包含需要批量载入的URL对待。
-	 * @param args 载入时要传递的参数。参数可以是Object或者Array。如果$url是Array，则这里也必须提供与$url元素相同的Array，Array的每个元素应该是Object。载入的时候，将传递Object中包含的键和值。
+	 * @param $requestVar 载入时要传递的参数。参数可以是Object或者Array。如果$url是Array，则这里也必须提供与$url元素相同的Array，Array的每个元素应该是Object。载入的时候，将传递Object中包含的键和值。
 	 */	
 	public function load($url:* , $requestVar:*=null):void
 	{
@@ -184,7 +184,8 @@ public class HTTPLoader
 		__result.returnData = createReturnData();
 		__result.message = '载入【'+_curUrl+'】失败，错误信息：'+evt.toString();
 		_fun_loadError.call(null, __result);
-		//对于多重载入，即使载入错误，依然要继续载入。但检测的时候，不将返回输入加入数组中。也就是说最终返回的结果数组，将不包含这次载入错误的数据。
+		//对于多重载入，即使载入错误，依然要继续载入。但检测的时候，不将返回输入加入数组中。
+		//也就是说最终返回的结果数组，将不包含这次载入错误的数据。
 		if(_multi)
 			checkLoadDone(false);
 	}
@@ -202,7 +203,8 @@ public class HTTPLoader
 			var __result:Object = {};
 			__result.returnData = createReturnData();
 			__result.resultData = _loader.data;
-			
+			//提交的url地址
+			__result.url = _curUrl;
 			_fun_loadDone.call(null, __result);
 			clearVar();
 		}
@@ -247,6 +249,8 @@ public class HTTPLoader
 			__result.returnData = createReturnData();
 			//真实的返回值
 			__result.resultData = _loader.data;
+			//提交的url地址
+			__result.url = _curUrl;
 			//将返回的值加入数组
 			_results.push(__result);
 		}
