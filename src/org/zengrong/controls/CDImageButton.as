@@ -85,6 +85,7 @@ public class CDImageButton extends ImageButton
 		
 		if(_aniType == ANI_RADIAL)
 			initRadial();
+		this.addEventListener(MouseEvent.CLICK, onMouseClick);
 	}
 	
 	override protected function addChildren():void
@@ -267,9 +268,8 @@ public class CDImageButton extends ImageButton
 	//  handler
 	//----------------------------------
 	
-	override protected function onMouseGoUp(event:MouseEvent):void
+	protected function onMouseClick(event:MouseEvent):void
 	{
-		super.onMouseGoUp(event);
 		start();
 	}
 	
