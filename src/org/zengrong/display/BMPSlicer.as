@@ -93,7 +93,10 @@ public class BMPSlicer
 	 */	
 	public function getSlice($index:int):BitmapData
 	{
-		return _bmdList[$index];
+		var __bmd:BitmapData = _bmdList[$index];
+		if(!__bmd)
+			throw new RangeError('无法找到索引为【'+$index+'】的BitmapData');
+		return __bmd;
 	}
 
 	/**

@@ -112,6 +112,7 @@ public class Tooltip extends Sprite
 	
 	private function handler_rollOver(evt:MouseEvent):void
 	{
+		move();	
 		this.visible = true;
 		_reference.addEventListener(MouseEvent.ROLL_OUT, handler_rollOut);
 	}
@@ -129,16 +130,24 @@ public class Tooltip extends Sprite
 			var __rootMouse:Point = this.localToGlobal(new Point(this.mouseX, this.mouseY));
 //			trace('测试鼠标位置：', __rootMouse, _reference.hitTestPoint(__rootMouse.x, __rootMouse.y));
 			if(_reference.hitTestPoint(__rootMouse.x, __rootMouse.y, true))
+			{
 				this.visible = true;
+				move();	
+			}
 			else
 				this.visible = false;
 		}
 	}
 	
-	private function addListener():void
+	private function move():void
 	{
 		this.x = _reference.x;
 		this.y = _reference.y - _height;
+	}
+	
+	private function addListener():void
+	{
+		move();
 		_reference.addEventListener(MouseEvent.ROLL_OVER, handler_rollOver);
 		if(_ignoreMouse)
 			_reference.addEventListener(Event.ENTER_FRAME, handler_enterFrame);
