@@ -1,4 +1,4 @@
-package org.zengrong.air.utils
+package org.zengrong.utils
 {
 import flash.geom.Point;
 

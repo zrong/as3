@@ -34,7 +34,7 @@
     <classEntry path="org.zengrong.controls.ClassButton"/>
     <classEntry path="org.zengrong.utils.Chessboard"/>
     <classEntry path="org.zengrong.utils.ObjectUtil"/>
-    <classEntry path="org.zengrong.air.utils.Vec2D"/>
+    <classEntry path="org.zengrong.utils.Vec2D"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
