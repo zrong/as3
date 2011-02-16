@@ -202,27 +202,40 @@ public class Vec2D
 	//----------------------------------
 	//  num四则运送人，修改自身
 	//----------------------------------
-	//将当前保存的值与参数相加并保存
+	/**
+	 * 将当前保存的值与参数相加并保存
+	 * @param $num 要增加的数字 
+	 */	
 	public function addN($num:Number) : void
 	{
 		this.x = this.x + $num;
 		this.y = this.y + $num;
 	}
 	
-	//将当前保存的值减去参数并保存
+	/**
+	 * 将当前保存的值减去参数并保存
+	 * @param $num 要减去的数字
+	 */	
 	public function subN($num:Number) : void
 	{
 		this.x = this.x - $num;
 		this.y = this.y - $num;
 	}
 	
-	//将当前保存的值乘以一个数字并更新
+	/**
+	 * 将当前保存的值乘以一个数字并更新
+	 * @param $num 要相乘的数字
+	 */	
     public function mulN($num:Number) : void
     {
         this.x = this.x * $num;
         this.y = this.y * $num;
     }
 	
+	/**
+	 * 将当前保存的值除以一个数字并更新
+	 * @param $num 要作为除数的数字
+	 */	
 	public function divN($num:Number) : void
 	{
 		this.x = this.x / $num;
@@ -232,21 +245,37 @@ public class Vec2D
 	//----------------------------------
 	//  Num四则运算，返回一个新的Vec2D
 	//----------------------------------
+	/**
+	 * 将当前保存的值与参数相加，并返回一个新的Vec2D
+	 * @param $num 要增加的数字 
+	 */	
 	public function addNum($num:Number) : Vec2D
 	{
 		return new Vec2D(this.x + $num, this.y + $num);
 	}
 	
+	/**
+	 * 将当前保存的值减去参数并返回一个新的Vec2D
+	 * @param $num 要减去的数字
+	 */		
 	public function subNum($num:Number) : Vec2D
 	{
 		return new Vec2D(this.x - $num, this.y - $num);
 	}
 	
+	/**
+	 * 将当前保存的值乘以一个数字并更新
+	 * @param $num 要相乘的数字
+	 */	
 	public function mulNum($num:Number) : Vec2D
 	{
 		return new Vec2D(this.x * $num, this.y * $num);
 	}
 	
+	/**
+	 * 将当前保存的值除以一个数字并返回一个新的Vec2D
+	 * @param $num 要作为除数的数字
+	 */	
 	public function divNum($num:Number) : Vec2D
 	{
 		return new Vec2D(this.x / $num, this.y / $num);
@@ -255,24 +284,40 @@ public class Vec2D
 	//----------------------------------
 	//  对vec进行处理的四则运算，修改自身
 	//----------------------------------
+	/**
+	 * 将当前保存的值与参数相加并保存
+	 * @param $vec 要增加的Vec2D
+	 */	
     public function addV($vec:Vec2D) : void
     {
         this.x = this.x + $vec.x;
         this.y = this.y + $vec.y;
     }
 
+	/**
+	 * 将当前保存的值减去参数并保存
+	 * @param $vec 要减去的Vec2D
+	 */	
     public function subV($vec:Vec2D) : void
     {
         this.x = this.x - $vec.x;
         this.y = this.y - $vec.y;
     }
 	
+	/**
+	 * 将当前保存的值乘以参数并更新
+	 * @param $num 要相乘Vec2D
+	 */	
 	public function mulV($vec:Vec2D) : void
 	{
 		this.x = this.x * $vec.x;
 		this.y = this.y * $vec.y;
 	}
 	
+	/**
+	 * 将当前保存的值除以参数并更新
+	 * @param $num 要作为除数的Vec2D
+	 */	
 	public function divV($vec:Vec2D) : void
 	{
 		this.x = this.x / $vec.x;

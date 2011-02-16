@@ -16,6 +16,8 @@ public class MathUtil
 	 */	
 	public static function getRandom($max:int, $min:int=0):int
 	{
+		if($max === $min)
+			return $max;
 		return $min + Math.round(Math.random()*($max-$min));
 	}
 }
