@@ -35,11 +35,29 @@ public class CDImageButton extends ImageButton
 	 */	
 	public static const ANI_RADIAL : String = "radial"
 		
+	
+	/**
+	 * CD效果蒙版的透明度
+	 */		
+	public static var MASK_ALPHA:Number = .2;
+	
+	/**
+	 * CD效果蒙版的颜色
+	 */	
+	public static var MASK_COLOR:uint = 0x000000;
+	
+	/**
+	 * 禁用效果蒙版的颜色
+	 */	
+	public static var ENABLED_MASK_COLOR:uint = 0x000000;
+	
+	/**
+	 * 禁用效果蒙版的透明度
+	 */	
+	public static var ENABLED_MASK_ALPHA:Number = .3;
+		
 	//计时器的步进
 	private static const DELAY:int = 100;
-	private static const MASK_ALPHA:Number = .2;
-	private static const MASK_COLOR:uint = 0x000000;
-	private static const ENABLED_MASK_ALPHA:Number = .3;
 	
 	public function CDImageButton(parent:DisplayObjectContainer, upStateImage:Bitmap, coolDownTime:int=5000, aniType:String='radial', defaultHandler:Function=null, btnid:int=-1)
 	{
@@ -100,7 +118,7 @@ public class CDImageButton extends ImageButton
 		_cdMask.mask = _cdAni;
 		//启用禁用效果的shape，这个初始化一次就可以了
 		_enabledMask = new Shape();
-		_enabledMask.graphics.beginFill(MASK_COLOR, ENABLED_MASK_ALPHA);
+		_enabledMask.graphics.beginFill(ENABLED_MASK_COLOR, ENABLED_MASK_ALPHA);
 		_enabledMask.graphics.drawRect(0, 0, this.width, this.height);
 		_enabledMask.graphics.endFill();
 		_enabledMask.visible = false;

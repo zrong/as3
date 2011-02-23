@@ -264,7 +264,7 @@ public class Vec2D
 	}
 	
 	/**
-	 * 将当前保存的值乘以一个数字并更新
+	 * 将当前保存的值乘以一个数字并返回一个新的Vec2D
 	 * @param $num 要相乘的数字
 	 */	
 	public function mulNum($num:Number) : Vec2D
