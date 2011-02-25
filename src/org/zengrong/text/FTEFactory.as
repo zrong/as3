@@ -7,6 +7,7 @@ package org.zengrong.text
 {
 import flash.text.engine.ElementFormat;
 import flash.text.engine.FontDescription;
+import flash.text.engine.TextBaseline;
 import flash.text.engine.TextBlock;
 import flash.text.engine.TextElement;
 import flash.text.engine.TextLine;
@@ -23,11 +24,13 @@ public class FTEFactory
 	 * @param $width 文本宽度
 	 * @return 单行的TextLine
 	 */	
-	public static function createSingleTextLine($str:String, $width:Number, $font:FontDescription=null):TextLine
+	public static function createSingleTextLine($str:String, $width:Number, $color:uint=0x000000, $size:int=12, $font:FontDescription=null):TextLine
 	{
 		if(!$font)
 			$font = new FontDescription('Microsoft YaHei', 'bold');
 		var __ef:ElementFormat = new ElementFormat($font);
+		__ef.color = $color;
+		__ef.fontSize = $size;
 		var __tb:TextBlock = new TextBlock(new TextElement($str, __ef));
 		return __tb.createTextLine(null, $width);
 	}
