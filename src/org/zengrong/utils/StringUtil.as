@@ -16,37 +16,6 @@ public class StringUtil
 {
 
 	/**
-	 * 将对象转换成字符串形式
-	 * @param $obj 要转换的对象
-	 * @param $delim1 键值之间的定界符
-	 * @param $delim2 每对值之间的定界符
-	 * @param $pref 显示的前缀
-	 * @return 结果字符串
-	 */	
-	public static function toString($obj:*, $delim1:String=':', $delim2:String=', ', $pref:String=''):String
-	{
-		var __str:String = '{';
-		for(var __key:String in $obj)
-		{
-			__str += __key + $delim1 + $obj[__key] + $delim2;
-		}
-		return delEndDelimiter(__str, $delim2) + '}';
-	}
-	
-	/**
-	 * 删除末尾的定界符
-	 */	
-	public static function delEndDelimiter($str:String, $del:String=', '):String
-	{
-		//如果能搜索到定界符
-		if($str.lastIndexOf($del) == $str.length-$del.length)
-		{
-			return $str.slice(0, $str.length - $del.length);
-		}
-		return $str;
-	}
-
-	/**
 	 * 使用$value数组中的键值替换指定字符串内的“{key}”标记。key的值来自于$key数组
 	 * @param $str 要在其中进行替换的字符串。该字符串可包含 {key} 形式的特殊标记，其中key的值与$key数组中的元素相同，它将被$value中相同索引的元素替换。
 	 * @param $key 要替换的键名数组
