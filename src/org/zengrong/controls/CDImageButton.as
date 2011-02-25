@@ -59,11 +59,22 @@ public class CDImageButton extends ImageButton
 	//计时器的步进
 	private static const DELAY:int = 100;
 	
-	public function CDImageButton(parent:DisplayObjectContainer, upStateImage:Bitmap, coolDownTime:int=5000, aniType:String='radial', defaultHandler:Function=null, btnid:int=-1)
+	/**
+	 * 构造函数
+	 * @param parent			父显示对象，若提供则将按钮直接加入其中，不提供可传递null
+	 * @param upStateImage		按钮up状态的Bitmap
+	 * @param coolDownTime		按钮的冷却时间，单位毫秒
+	 * @param aniType			按钮冷却效果动画，值为linear或radial，默认为radial
+	 * @param defaultHandler	按钮的事件处理器
+	 * @param clickStart 		是否在按钮上单击鼠标的时候，自动开始CD
+	 * @param btnid				按钮的id
+	 */	
+	public function CDImageButton(parent:DisplayObjectContainer, upStateImage:Bitmap, coolDownTime:int=5000, aniType:String='radial', defaultHandler:Function=null, clickStart:Boolean=true, btnid:int=-1)
 	{
 		_cdt = coolDownTime;
 		_aniType = aniType;
 		_btnid = btnid;
+		_clickStart = clickStart;
 		//CDImageButton只是用一张图片
 		super(upStateImage, null, null, parent, 0, 0, defaultHandler);
 		if(coolDownTime < DELAY)
@@ -75,6 +86,7 @@ public class CDImageButton extends ImageButton
 	private var _repeatCount:int;	//动画绘制的总次数
 	private var _radius:int;		//radial动画效果绘制半径
 	private var _aniType:String;	//动画效果类型，值为ANI_LINEAR或ANI_RADIAL
+	private var _clickStart:Boolean;	//是否在按钮上单击鼠标的时候，自动开始CD
 	
 	private var _commands:Vector.<int>;		//绘制radial类型的动画的命令数组
 	private var _vectors:Vector.<Number>;		//绘制radial类型的的动画的坐标数组
@@ -190,6 +202,15 @@ public class CDImageButton extends ImageButton
 	}
 	
 	/**
+	 * 设置按钮是否在单击的时候自动启动CD动画效果
+	 * @param $isClick
+	 */	
+	public function set clickStart($isClick:Boolean):void
+	{
+		_clickStart = $isClick;
+	}
+	
+	/**
 	 * 不支持selected
 	 */	
 	override public function get selected():Boolean
@@ -288,7 +309,10 @@ public class CDImageButton extends ImageButton
 	
 	protected function onMouseClick(event:MouseEvent):void
 	{
-		start();
+		if(_clickStart)
+			start();
+		else
+			enabled = false;
 	}
 	
 	/**
