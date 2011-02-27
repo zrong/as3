@@ -12,7 +12,6 @@
     <classEntry path="org.zengrong.net.SoundLoader"/>
     <classEntry path="org.zengrong.media.cm.CM"/>
     <classEntry path="org.zengrong.media.cm.CMEvent"/>
-    <classEntry path="org.zengrong.media.cm.CMFormat"/>
     <classEntry path="org.zengrong.rpc.FaultEvent"/>
     <classEntry path="org.zengrong.rpc.Operation"/>
     <classEntry path="org.zengrong.rpc.OperationPool"/>
