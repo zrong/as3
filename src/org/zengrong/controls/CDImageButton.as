@@ -366,6 +366,8 @@ public class CDImageButton extends ImageButton
 		{
 			//var __radian:Number = (i/repeatCount*360)*Math.PI/180;
 			var __radian:Number = i/_repeatCount*Math.PI*2;
+			//从12点开始绘制
+			//var __radian:Number = i/_repeatCount*Math.PI;
 			var __x:Number = Math.sin(__radian)*_radius;
 			var __y:Number = Math.cos(__radian)*_radius;
 			_commands.push(2);
