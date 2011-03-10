@@ -23,6 +23,12 @@ import org.zengrong.utils.ObjectUtil;
  * */
 public class HTTPLoader
 {
+	/**
+	 * 构造函数，提供两个Function参数供Load成功或者失败的时候调用
+	 * @param $done 载入成功的时候调用的Function，必须接受一个Object或Array参数。参数的类型取决于是单载入还是多重载入。Object的结构{returnData:提交的时候要求返回的数据,resultData:载入成功数据,url:载入的URL地址}
+	 * @param $error 载入错误的时候调用的Function，必须接受一个Object参数。Object结构为：{returnData:提交的时候要求返回的数据,message:错误信息}
+	 * 
+	 */	
 	public function HTTPLoader($done:Function, $error:Function)
 	{
 		init();
