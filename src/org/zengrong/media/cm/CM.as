@@ -50,7 +50,7 @@ public class CM extends EventDispatcher
 		return _cam;
 	}
 	
-	private function get mic():Microphone
+	public function get mic():Microphone
 	{
 		return _mic;
 	}
