@@ -298,11 +298,11 @@ public class VideoDisplay extends Sprite
 					_ns.addEventListener(NetStatusEvent.NET_STATUS, handler_nsStatus);
 					_ns.client = new StreamClient(this);
 					setMuted();
-					trace('_ns.soundTransform.volume:', _ns.soundTransform.volume);
+					trace('VideoDisplay._ns.soundTransform.volume:', _ns.soundTransform.volume);
 				}
 				_ns.play(_streamName);
 				_video.attachNetStream(_ns);
-				trace('nc success， uri:', _nc.uri, ' streamName:', _streamName);
+				trace('VideoDisplay.nc success， uri:', _nc.uri, ' streamName:', _streamName);
 				break;
 			case NetConnectionInfoCode.CLOSED:
 				if(_ns != null)
@@ -355,7 +355,7 @@ class StreamClient
 	 */
 	public function onPlayStatus($obj:Object):void
 	{
-		trace('NetStream.onPlayStatus:', $obj.code);
+		trace('VideoDisplay.NetStream.onPlayStatus:', $obj.code);
 		if($obj.code == NetStreamInfoCode.PLAY_COMPLETE)
 		{
 			_videoDisplay.dispatchEvent(new Event(Event.COMPLETE));
@@ -368,7 +368,7 @@ class StreamClient
 	 */	
 	public function onMetaData($obj:Object):void
 	{
-		trace('NetStream.onMetaData(width,height):', $obj.width, $obj.height);
+		trace('VideoDisplay.NetStream.onMetaData(width,height):', $obj.width, $obj.height);
 		_videoDisplay.width = $obj.width;
 		_videoDisplay.height = $obj.height;
 	}
