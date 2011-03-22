@@ -21,6 +21,11 @@ public class MovableSprite extends Sprite
     }
 	
 	/**
+	 * 半径，主要用于计算碰撞
+	 */	
+	public var radius:int = 0;
+	
+	/**
 	* 速度
 	*/		
 	public var vel:Number = 0;
@@ -39,8 +44,6 @@ public class MovableSprite extends Sprite
 	 * 转向加速度
 	 */		
 	public var angAcc:Number = 0;
-	
-	public var point:Boolean = true;
 	
 	/**
 	 * 当前向右
@@ -62,6 +65,11 @@ public class MovableSprite extends Sprite
 	 * 例如，垂直向下的运动，则moveV的x值应为0或无限接近与0，y则是一个大于0的数。
 	 */		
 	public var moveV:Vec2D;
+	
+	/**
+	 * 保存要移动到的点位置
+	 */	
+	public var targetV:Vec2D;
 	
 	/**
 	 * 运动摩擦力
@@ -97,7 +105,8 @@ public class MovableSprite extends Sprite
 	 */		
     public function moveTo($x:Number, $y:Number) : void
     {
-        var __vec:Vec2D = (new Vec2D($x, $y)).subVec(posV);
+		targetV = new Vec2D($x, $y);
+        var __vec:Vec2D = targetV.subVec(posV);
 		var __radian:Number = __vec.radian;
         moveV.radian = __radian;
     }
