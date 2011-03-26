@@ -101,18 +101,11 @@ package org.zengrong.utils
 		public function setPoints($point:Object):void
 		{
 			_points = {};
+			_pointUse = {};
 			for(var __key:String in $point)
 			{
 				_points[__key] = new Point($point[__key].x, $point[__key].y);
-			}
-		}
-		
-		public function setPointUse($pointUse:Object):void
-		{
-			_pointUse = {};
-			for(var __key:String in $pointUse)
-			{
-				_pointUse[__key] = $pointUse[__key];
+				_pointUse[__key] = false;
 			}
 		}
 		

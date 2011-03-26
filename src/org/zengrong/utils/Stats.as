@@ -47,8 +47,8 @@ package org.zengrong.utils
 
 	public class Stats extends Sprite
 	{	
-		protected const WIDTH : uint = 70;
-		protected const HEIGHT : uint = 100;
+		protected var WIDTH : uint = 70;
+		protected var HEIGHT : uint = 100;
 		
 		protected var xml : XML;
 
@@ -69,14 +69,19 @@ package org.zengrong.utils
 		protected var mem_graph : uint;
 		protected var mem_max_graph : uint;
 		
-		protected var theme : Object = { bg: 0x000033, fps: 0xffff00, ms: 0x00ff00, mem: 0x00ffff, memmax: 0xff0070 }; 
+		protected var theme : Object = { bg: 0x000033, fps: 0xffff00, ms: 0x00ff00, mem: 0x00ffff, memmax: 0xff0070 };
+		
+		//是否显示背景色
+		private var _showBackground:Boolean;
+		//是否显示轨迹
+		private var _showFooter:Boolean;
 
 		/**
 		 * <b>Stats</b> FPS, MS and MEM, all in one.
 		 * 
 		 * @param _theme         Example: { bg: 0x202020, fps: 0xC0C0C0, ms: 0x505050, mem: 0x707070, memmax: 0xA0A0A0 } 
 		 */
-		public function Stats( _theme : Object = null ) : void
+		public function Stats( _theme : Object = null, $showBackground:Boolean=true, $showFooter:Boolean=true, $width:int=70, $height:int=100) : void
 		{
 			if (_theme)
 			{
@@ -86,6 +91,11 @@ package org.zengrong.utils
 				if (_theme.mem != null) theme.mem = _theme.mem;
 				if (_theme.memmax != null) theme.memmax = _theme.memmax;
 			}
+			
+			_showBackground = $showBackground;
+			_showFooter = $showFooter;
+			WIDTH = $width;
+			HEIGHT = $height;
 			
 			mem_max = 0;
 
@@ -106,8 +116,11 @@ package org.zengrong.utils
 			text.selectable = false;
 			text.mouseEnabled = false;
 			
-			graph = new Bitmap();
-			graph.y = 50;
+			if(_showFooter)
+			{
+				graph = new Bitmap();
+				graph.y = 50;
+			}
 			
 			rectangle = new Rectangle( WIDTH - 1, 0, 1, HEIGHT - 50 );			
 			
@@ -117,14 +130,20 @@ package org.zengrong.utils
 
 		private function init(e : Event) : void
 		{
-			graphics.beginFill(theme.bg);
-			graphics.drawRect(0, 0, WIDTH, HEIGHT);
-			graphics.endFill();
+			if(_showBackground)
+			{
+				graphics.beginFill(theme.bg);
+				graphics.drawRect(0, 0, WIDTH, HEIGHT);
+				graphics.endFill();
+			}
 
 			addChild(text);
 			
-			graph.bitmapData = new BitmapData(WIDTH, HEIGHT - 50, false, theme.bg);
-			addChild(graph);
+			if(_showFooter)
+			{
+				graph.bitmapData = new BitmapData(WIDTH, HEIGHT - 50, false, theme.bg);
+				addChild(graph);
+			}
 			
 			addEventListener(MouseEvent.CLICK, onClick);
 			addEventListener(Event.ENTER_FRAME, update);
@@ -153,17 +172,20 @@ package org.zengrong.utils
 				mem = Number((System.totalMemory * 0.000000954).toFixed(3));
 				mem_max = mem_max > mem ? mem_max : mem;
 				
-				fps_graph = Math.min( graph.height, ( fps / stage.frameRate ) * graph.height );
-				mem_graph =  Math.min( graph.height, Math.sqrt( Math.sqrt( mem * 5000 ) ) ) - 2;
-				mem_max_graph =  Math.min( graph.height, Math.sqrt( Math.sqrt( mem_max * 5000 ) ) ) - 2;
-				
-				graph.bitmapData.scroll( -1, 0 );
-				
-				graph.bitmapData.fillRect( rectangle , theme.bg );
-				graph.bitmapData.setPixel( graph.width - 1, graph.height - fps_graph, theme.fps);
-				graph.bitmapData.setPixel( graph.width - 1, graph.height - ( ( timer - ms ) >> 1 ), theme.ms );
-				graph.bitmapData.setPixel( graph.width - 1, graph.height - mem_graph, theme.mem);
-				graph.bitmapData.setPixel( graph.width - 1, graph.height - mem_max_graph, theme.memmax);
+				if(_showFooter)
+				{
+					fps_graph = Math.min( graph.height, ( fps / stage.frameRate ) * graph.height );
+					mem_graph =  Math.min( graph.height, Math.sqrt( Math.sqrt( mem * 5000 ) ) ) - 2;
+					mem_max_graph =  Math.min( graph.height, Math.sqrt( Math.sqrt( mem_max * 5000 ) ) ) - 2;
+					
+					graph.bitmapData.scroll( -1, 0 );
+					
+					graph.bitmapData.fillRect( rectangle , theme.bg );
+					graph.bitmapData.setPixel( graph.width - 1, graph.height - fps_graph, theme.fps);
+					graph.bitmapData.setPixel( graph.width - 1, graph.height - ( ( timer - ms ) >> 1 ), theme.ms );
+					graph.bitmapData.setPixel( graph.width - 1, graph.height - mem_graph, theme.mem);
+					graph.bitmapData.setPixel( graph.width - 1, graph.height - mem_max_graph, theme.memmax);
+				}
 				
 				xml.fps = "FPS: " + fps + " / " + stage.frameRate;
 				xml.mem = "MEM: " + mem;
