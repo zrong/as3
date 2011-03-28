@@ -359,15 +359,17 @@ public class CDImageButton extends ImageButton
 		_cdAni.y = _center.y;
 		
 		//初始化给出第一个坐标点，由于已经将Shape移动到了父显示对象中心点，这里就不需要moveTo命令，直接从0,0开始画
+		//设定lineTo命令
 		_commands = Vector.<int>([2]);
-		_vectors = Vector.<Number>([0, _radius]);
+		//设定第一个点，12点位置的顶端坐标就是0,radius*-1
+		_vectors = Vector.<Number>([0, _radius*-1]);
 		//根据计时器的次数计算绘制过程中需要的所有坐标
 		for(var i:int=1; i<=_repeatCount; i++)
 		{
-			//var __radian:Number = (i/repeatCount*360)*Math.PI/180;
-			var __radian:Number = i/_repeatCount*Math.PI*2;
-			//从12点开始绘制
-			//var __radian:Number = i/_repeatCount*Math.PI;
+			//根据循环的次数将一个圆周分成等份，然后计算等份的坐标，下面这个计算会从圆周的6点钟开始绘制CD效果
+			//var __radian:Number = i/_repeatCount*(Math.PI*2);
+			//下面的计算从12点开始绘制CD效果
+			var __radian:Number = (i/_repeatCount)*(Math.PI*2)+Math.PI;
 			var __x:Number = Math.sin(__radian)*_radius;
 			var __y:Number = Math.cos(__radian)*_radius;
 			_commands.push(2);

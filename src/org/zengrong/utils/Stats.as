@@ -156,7 +156,10 @@ package org.zengrong.utils
 			while(numChildren > 0)
 				removeChildAt(0);			
 			
-			graph.bitmapData.dispose();
+			if(_showFooter)
+			{
+				graph.bitmapData.dispose();
+			}
 			
 			removeEventListener(MouseEvent.CLICK, onClick);
 			removeEventListener(Event.ENTER_FRAME, update);
