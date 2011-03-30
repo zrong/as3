@@ -114,6 +114,7 @@ public class VisualLoader extends EventDispatcher
 	
 	private function handler_ioError(evt:IOErrorEvent):void
 	{
+		_loading = false;
 		dispatchEvent(evt);
 	}
 	
