@@ -74,7 +74,7 @@ public class Tooltip extends Sprite
 		addListener();
 	}
 	
-	public function destory():void
+	public function destroy():void
 	{
 		removeListener();
 		_reference = null;

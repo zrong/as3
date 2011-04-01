@@ -303,6 +303,33 @@ public class CDImageButton extends ImageButton
 			setInteract(true);
 	}
 	
+	override public function destroy():void
+	{
+		super.destroy();
+		_timer.removeEventListener(TimerEvent.TIMER, handler_timer);
+		_timer.removeEventListener(TimerEvent.TIMER_COMPLETE, handler_timerComplete);
+		_timer.reset();
+		_timer = null;
+		
+		_btnid = -1;
+		_cdt = -1;
+		_repeatCount = -1;
+		_radius = -1;
+		_aniType = null;
+		_clickStart = false;
+		
+		_commands = null;
+		_vectors = null;
+		_tmp_commands = null;
+		_tmp_vectors = null;
+		
+		_center = null;
+		
+		_cdMask = null;
+		_cdAni = null;
+		_enabledMask = null;
+	}
+	
 	//----------------------------------
 	//  handler
 	//----------------------------------

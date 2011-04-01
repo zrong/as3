@@ -136,6 +136,14 @@ public class HTTPLoader
 		_loading = true;
 	}
 	
+	public function destroy():void
+	{
+		clearVar();
+		_loader = null;
+		_fun_loadDone = null;
+		_fun_loadError = null;
+	}
+	
 	protected function perform($url:String, $var:Object=null):void
 	{
 		_curUrl = $url;

@@ -57,6 +57,13 @@ public class ImageButton extends DisplayObjectButtonBase
 	 */	
 	public function setState(upStateImage:Bitmap, overStateImage:Bitmap=null, downStateImage:Bitmap=null):void
 	{
+		destroy();
+		updateStateImage(upStateImage, overStateImage, downStateImage);
+		addChildren();
+	}
+	
+	public function destroy():void
+	{
 		while(numChildren > 0)
 			removeChildAt(0);
 		_upBmd = null;
@@ -65,8 +72,6 @@ public class ImageButton extends DisplayObjectButtonBase
 		_upState = null;
 		_overState = null;
 		_downState = null;
-		updateStateImage(upStateImage, overStateImage, downStateImage);
-		addChildren();
 	}
 	
 	override protected function addChildren():void

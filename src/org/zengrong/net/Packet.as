@@ -157,5 +157,12 @@ public class Packet
 	{
 		return $msg.slice(8, $msg.length-4);
 	}
+	
+	public function destroy():void
+	{
+		_messageByte = null;
+		_msg = null;
+		_messages = null;
+	}
 }
 }

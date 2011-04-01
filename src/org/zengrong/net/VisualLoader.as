@@ -158,6 +158,17 @@ public class VisualLoader extends EventDispatcher
 		initLoader();
         _loader.load(new URLRequest($url));
     }
+	
+	public function destroy():void
+	{
+		if(_loader)
+		{
+			_loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, handler_loaded);
+			_loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, handler_ioError);
+			_loader.contentLoaderInfo.removeEventListener(ProgressEvent.PROGRESS, handler_progress);
+			_loader = null;
+		}
+	}
 
 	public function getClass($className:String):Class
 	{
