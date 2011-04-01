@@ -126,12 +126,12 @@ public class CM extends EventDispatcher
 	private function handler_activity(evt:ActivityEvent):void
 	{
 		var __cam:Camera = evt.currentTarget as Camera;
-		trace('//=================org.zengrong.media.cm.CM');
+/*		trace('//=================org.zengrong.media.cm.CM');
 		trace('activityHandler发生,activating:',evt.activating);
 		trace('camera name:',__cam.name);
 		trace('camera width:',__cam.width);
 		trace('camera height:',__cam.height);
-		trace('=============================//');
+		trace('=============================//');*/
 		var __vo:CMVO = new CMVO(__cam, camNames);
 		var __event:CMEvent = 	evt.activating ? 
 								new CMEvent(CMEvent.ACTIVITY_START, __vo) :
