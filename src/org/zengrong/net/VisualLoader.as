@@ -22,6 +22,16 @@ import flash.utils.ByteArray;
 public class VisualLoader extends EventDispatcher
 {
 	/**
+	 * 指示以可视对象方式载入（使用Loader类）的常量
+	 */	
+	public static const FILE_VISUAL:String = 'fileVisual';
+	
+	/**
+	 * 指示以二进制文件方式载入（使用URLStream）的常量 
+	 */	
+	public static const FILE_BINARY:String = 'fileBinary';
+	
+	/**
 	 * 指示在如类型为swf动画的常量。
 	 * */
 	public static const TYPE_SWF:String = 'swf';
@@ -65,12 +75,12 @@ public class VisualLoader extends EventDispatcher
 	 * */
 	public static const TYPE_PNG_DIVERSE_SLICE:String = 'pngDiverseSlice';
 	
-	public static function isPic($type:String):Boolean
+	public function isPic($type:String):Boolean
 	{
 		return $type == VisualLoader.TYPE_PNG || $type == VisualLoader.TYPE_JPG || $type == VisualLoader.TYPE_GIF || $type == VisualLoader.TYPE_BMP_TEXT || TYPE_PNG_SLICE || TYPE_PNG_DIVERSE_SLICE;
 	}
 	
-	public static function isAni($type:String):Boolean
+	public function isAni($type:String):Boolean
 	{
 		return $type == VisualLoader.TYPE_SWF || $type == VisualLoader.TYPE_GIF_ANI;
 	}
@@ -80,9 +90,20 @@ public class VisualLoader extends EventDispatcher
 		_loading = false;
     }
 
-	private var _loader:Loader;
-	private var _type:String;
-	private var _loading:Boolean;
+	protected var _loader:Loader;
+	protected var _stream:URLStream;
+	
+	/**
+	 * 当前载入的可视对象的类型 
+	 */	
+	protected var _type:String;
+	
+	/**
+	 * 当前载入的文件类型，值为
+	 */	
+	protected var _fileType:String;
+	
+	protected var _loading:Boolean;
 	
 	/**
 	 * 返回当前载入的文件类型
@@ -100,25 +121,40 @@ public class VisualLoader extends EventDispatcher
 		return _loading;
 	}
 
-    private function handler_loaded(evt:Event):void
+    protected function handler_loaded(evt:Event):void
     {
 //		trace('载入资源完成：', _loader.contentLoaderInfo.url)
-		_loading = false;
-        dispatchEvent(evt);
+		//如果载入的是可视资源，就发布载入成功消息
+		if(_fileType == FILE_VISUAL)
+		{
+			_loading = false;
+	        dispatchEvent(evt);
+		}
+		//载入的是二进制流，就需要重新再使用Loader载入一遍
+		else
+		{
+			var __ba:ByteArray = new ByteArray();
+			_stream.readBytes(__ba);
+			loadBytes(__ba, _type);
+		}
+		
     }
 
-    private function handler_progress(evt:ProgressEvent):void
+	protected function handler_progress(evt:ProgressEvent):void
     {
         dispatchEvent(evt);
     }
 	
-	private function handler_ioError(evt:IOErrorEvent):void
+	protected function handler_ioError(evt:IOErrorEvent):void
 	{
 		_loading = false;
 		dispatchEvent(evt);
 	}
 	
-	private function initLoader():void
+	/**
+	 * 初始化载入可视对象的Loader
+	 */	
+	protected function initLoader():void
 	{
 		if (_loader == null)
 		{
@@ -126,6 +162,20 @@ public class VisualLoader extends EventDispatcher
 			_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handler_loaded);
 			_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, handler_ioError);
 			_loader.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, handler_progress);
+		}
+	}
+	
+	/**
+	 * 初始化载入二进制流对象的URLStream
+	 */	
+	protected function initBinaryLoader():void
+	{
+		if (_stream == null)
+		{
+			_stream = new URLStream();
+			_stream.addEventListener(Event.COMPLETE, handler_loaded);
+			_stream.addEventListener(IOErrorEvent.IO_ERROR, handler_ioError);
+			_stream.addEventListener(ProgressEvent.PROGRESS, handler_progress);
 		}
 	}
 	
@@ -138,6 +188,7 @@ public class VisualLoader extends EventDispatcher
 	{
 		if(_loading)
 			return;
+		_fileType = FILE_VISUAL;
 		_loading = true;
 		_type = $type;
 		initLoader();
@@ -145,7 +196,7 @@ public class VisualLoader extends EventDispatcher
 	}
 
 	/**
-	 * 从外部URL载入可视对象，可是对象必须是swf、png或者jpg类型。
+	 * 从外部URL载入可视对象，可视对象必须是swf、png或者jpg类型。
 	 * @param $bytes 要载入的字节数组
 	 * @param $type 要载入的字节数组的类型
 	 * */
@@ -153,11 +204,28 @@ public class VisualLoader extends EventDispatcher
     {
 		if(_loading)
 			return;
+		_fileType = FILE_VISUAL;
 		_loading = true;
 		_type = $type;
 		initLoader();
         _loader.load(new URLRequest($url));
     }
+	
+	/**
+	 * 从外部URL载入二进制文件
+	 * @param $url
+	 * @param $type
+	 */	
+	public function loadBinary($url:String, $type:String="png"):void
+	{
+		if(_loading)
+			return;
+		_fileType = FILE_BINARY;
+		_loading = true;
+		_type = $type;
+		initBinaryLoader();
+		_stream.load(new URLRequest($url));
+	}
 	
 	public function destroy():void
 	{
@@ -167,6 +235,13 @@ public class VisualLoader extends EventDispatcher
 			_loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, handler_ioError);
 			_loader.contentLoaderInfo.removeEventListener(ProgressEvent.PROGRESS, handler_progress);
 			_loader = null;
+		}
+		if(_stream)
+		{
+			_stream.removeEventListener(Event.COMPLETE, handler_loaded);
+			_stream.removeEventListener(IOErrorEvent.IO_ERROR, handler_ioError);
+			_stream.removeEventListener(ProgressEvent.PROGRESS, handler_progress);
+			_stream = null;
 		}
 	}
 
@@ -207,7 +282,7 @@ public class VisualLoader extends EventDispatcher
                     break;
             }
 		}
-		else if(_type == TYPE_JPG || _type == TYPE_PNG || _type == TYPE_GIF || _type == TYPE_BMP_TEXT || _type == TYPE_PNG_SLICE || TYPE_PNG_DIVERSE_SLICE)
+		else if(isPic(_type))
 		{
 			return Bitmap(_loader.content);
 		}
