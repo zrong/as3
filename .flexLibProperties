@@ -36,6 +36,10 @@
     <classEntry path="org.zengrong.utils.Vec2D"/>
     <classEntry path="org.zengrong.text.FTEFactory"/>
     <classEntry path="org.zengrong.utils.SOUtil"/>
+    <classEntry path="org.zengrong.display.spritesheet.SpriteSheetType"/>
+    <classEntry path="org.zengrong.display.spritesheet.SpriteSheetMetadata"/>
+    <classEntry path="org.zengrong.display.spritesheet.BMPSprite"/>
+    <classEntry path="org.zengrong.display.spritesheet.BMPMovieClip"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
