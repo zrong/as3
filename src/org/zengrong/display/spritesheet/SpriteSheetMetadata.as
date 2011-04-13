@@ -71,6 +71,15 @@ public class SpriteSheetMetadata
 	public var labelsFrame:Object;
 	
 	/**
+	 * 根据当前设置的Sheet大小和Frame大小，判断每行最多可以放几个Frame。只有当isEqualSize为true的时候，值才大于0
+	 */	
+	public function get column():int
+	{
+		if(frameCount == -1 || !frameSize || !frameSizeRect)
+			throw new RangeError('请先执行setup设置！');
+		return isEqualSize ? frameSize[0] : -1;
+	}
+	/**
 	 * 销毁整个对象
 	 */	
 	public function destroy():void
@@ -150,8 +159,6 @@ public class SpriteSheetMetadata
 		frameSize[1] = $w;
 		frameSize[2] = $h;
 		writeEqualFrame();
-		trace('frameSize:', frameSize);
-		trace('frameSizeRect:', frameSizeRect);
 	}
 	
 	/**
