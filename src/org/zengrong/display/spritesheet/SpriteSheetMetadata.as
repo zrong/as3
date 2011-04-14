@@ -41,9 +41,9 @@ public class SpriteSheetMetadata
 	public var isLabel:Boolean;
 	
 	/**
-	 * 是否包含Mask，MASK信息只能存在于JPG文件中
+	 * mask的类型，详见org.zengrong.display.spritesheet.MaskType。mask信息只能存在于JPG文件中
 	 */	
-	public var isMask:Boolean;
+	public var maskType:int;
 	
 	/**
 	 * Sheet的帧数
@@ -88,7 +88,7 @@ public class SpriteSheetMetadata
 		type = null;
 		isEqualSize = false;
 		isLabel = false;
-		isMask = false;
+		maskType = 0;
 		frameCount = -1;
 		frameSize = null;
 		frameSizeRect = null;
@@ -107,7 +107,7 @@ public class SpriteSheetMetadata
 			type = byteArray.readUTF();
 			isEqualSize = byteArray.readBoolean();
 			isLabel = byteArray.readBoolean();
-			isMask = byteArray.readBoolean();
+			maskType = byteArray.readByte();
 			frameCount = byteArray.readShort();
 			setup();
 			if(isEqualSize)
@@ -124,7 +124,19 @@ public class SpriteSheetMetadata
 	 */	
 	public function setup($frameCount:int=-1, $isEqual:Boolean=false):void
 	{
-		frameCount = $frameCount;
+		//如果使用Label，总帧数根据每个Label的帧数之和计算
+		if(isLabel)
+		{
+			frameCount = 0;
+			for each(var __labelFrame:Array in labelsFrame)
+			{
+				frameCount += __labelFrame[1];
+			}
+		}
+		else
+		{
+			frameCount = $frameCount;
+		}
 		isEqualSize = $isEqual;
 		if(frameCount == -1)
 			throw new RangeError('帧数量还未设定！');
@@ -132,6 +144,33 @@ public class SpriteSheetMetadata
 		frameSizeRect = new Vector.<Rectangle>(frameCount, true);
 	}
 	
+	/**
+	 * 设置Label的属性
+	 * @param $isLabel	是否使用了Label
+	 * @param $items	Label的数组
+	 * 
+	 */	
+	public function setLabels($isLabel:Boolean, $items:Array=null):void
+	{
+		//必须传递可用的$items才算是使用了Label，否则都算没有Label
+		if($isLabel && $items && $items.length>0)
+		{
+			isLabel = true;
+			labels = new Vector.<String>($items.length, true);
+			labelsFrame = {};
+			for(var i:int=0; i<$items.length; i++)
+			{
+				labels[i] = $items[i].label;
+				labelsFrame[labels[i]] = [$items[i].first, $items[i].total];
+			}
+		}
+		else
+		{
+			isLabel = false;
+			labels = null;
+			labelsFrame = null;
+		}
+	}
 	/**
 	 * 从外部向数组中添加不相等的帧，一般在循环中执行
 	 */	

@@ -51,7 +51,6 @@ dynamic public class SpriteSheet
 			throw new ReferenceError('位图和(或)元数据没有设置！');
 		if(copyPixelIndex>=metaData.frameCount)
 			return;
-		
 		bitmapData.lock();
 		//从metaData中获取该图像对应的Frame的rect，转换成Point
 		var __point:Point =  new Point(metaData.frameSizeRect[copyPixelIndex].x, metaData.frameSizeRect[copyPixelIndex].y);

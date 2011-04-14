@@ -40,6 +40,7 @@
     <classEntry path="org.zengrong.display.spritesheet.SpriteSheetMetadata"/>
     <classEntry path="org.zengrong.display.spritesheet.BMPSprite"/>
     <classEntry path="org.zengrong.display.spritesheet.BMPMovieClip"/>
+    <classEntry path="org.zengrong.display.spritesheet.MaskType"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
