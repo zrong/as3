@@ -85,7 +85,7 @@ public class BMPSprite
 		return _curFrame;
 	}
 	
-	public function get count():int
+	public function get totalFrames():int
 	{
 		return _bmds.length;
 	}
@@ -127,7 +127,7 @@ public class BMPSprite
 	 */	
 	public function next():BitmapData
 	{
-		if(++_curFrame >= _bmds.length-1)
+		if(++_curFrame >= _bmds.length)
 		{
 			_curFrame = isRepeat ? 0 : _bmds.length - 1;
 		}
@@ -141,7 +141,10 @@ public class BMPSprite
 	 */	
 	public function goto($frame:int):BitmapData
 	{
-		_curFrame = $frame;
+		if($frame >= _bmds.length)
+			_curFrame = isRepeat ? 0 : _bmds.length - -1;
+		else
+			_curFrame = $frame;
 		bitmapData = _bmds[_curFrame];
 		return bitmapData; 
 	}

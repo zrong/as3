@@ -140,8 +140,8 @@ public class SpriteSheetMetadata
 		isEqualSize = $isEqual;
 		if(frameCount == -1)
 			throw new RangeError('帧数量还未设定！');
-		frameSize = isEqualSize ? new Vector.<int>(3, true) : new Vector.<int>(frameCount*4, true);
-		frameSizeRect = new Vector.<Rectangle>(frameCount, true);
+		frameSize = isEqualSize ? new Vector.<int>(3, true) : new Vector.<int>();
+		frameSizeRect = new Vector.<Rectangle>();
 	}
 	
 	/**
@@ -176,8 +176,8 @@ public class SpriteSheetMetadata
 	 */	
 	public function addUnequalFrameSize($rect:Rectangle):void
 	{
-		if(frameSizeRect.length>=frameCount)
-			return;
+//		if(frameSizeRect.length>=frameCount)
+//			return;
 		if(frameCount == -1 || !frameSize || !frameSizeRect)
 			throw new RangeError('请先执行setup设置！');
 		writeUnequalFrame($rect);

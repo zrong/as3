@@ -25,5 +25,15 @@ public class MaskType
 	 * 纵向MASK
 	 */	
 	public static const VER_MASK:int = 2;
+	
+	public static function isMaskType($type:int):Boolean
+	{
+		return $type == NO_MASK || $type == HOR_MASK || $type == VER_MASK;
+	}
+	
+	public static function useMask($type:int):Boolean
+	{
+		return $type == HOR_MASK || $type == VER_MASK;
+	}
 }
 }
