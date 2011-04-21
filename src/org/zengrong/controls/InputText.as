@@ -33,7 +33,6 @@ package org.zengrong.controls
 	import flash.text.TextFieldType;
 	import flash.text.TextFormat;
 	
-	import org.zengrong.controls.supportClasses.Style;
 	
 	public class InputText extends Component
 	{

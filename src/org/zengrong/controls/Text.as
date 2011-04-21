@@ -34,7 +34,6 @@ package org.zengrong.controls
 	import flash.text.TextFieldType;
 	import flash.text.TextFormat;
 	
-	import org.zengrong.controls.supportClasses.Style;
 	
 	[Event(name="change", type="flash.events.Event")]
 	public class Text extends Component

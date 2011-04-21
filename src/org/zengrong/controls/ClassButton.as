@@ -11,7 +11,6 @@ package org.zengrong.controls
 import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
 
-import org.zengrong.controls.supportClasses.DisplayObjectButtonBase;
 
 /**
  * 根据提供的Class生成按钮。提供的Class必须是显示对象的Class，例如嵌入的图像文件、MovieClip等等。 

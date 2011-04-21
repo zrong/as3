@@ -16,8 +16,6 @@ import flash.events.MouseEvent;
 import flash.filters.ColorMatrixFilter;
 import flash.filters.DropShadowFilter;
 
-import org.zengrong.controls.supportClasses.DisplayObjectButtonBase;
-import org.zengrong.controls.supportClasses.Style;
 import org.zengrong.utils.ColorMatrix;
 
 /**

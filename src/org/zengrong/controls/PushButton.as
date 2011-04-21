@@ -31,7 +31,6 @@ package org.zengrong.controls
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
-	import org.zengrong.controls.supportClasses.Style;
 
 	public class PushButton extends Component
 	{

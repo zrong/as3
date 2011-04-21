@@ -31,7 +31,6 @@ package org.zengrong.controls
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	
-	import org.zengrong.controls.supportClasses.Style;
 	
 	public class Panel extends Component
 	{

@@ -34,7 +34,6 @@ package org.zengrong.controls
 	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
 	
-	import org.zengrong.controls.supportClasses.Style;
 	
 	[Event(name="change", type="flash.events.Event")]
 	public class Slider extends Component

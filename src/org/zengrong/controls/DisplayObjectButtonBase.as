@@ -5,7 +5,7 @@
 //	说明：本组件参照Keith Peters的Minimalcomps组件写成，修改、使用或继承Minimalcal源码
 ////////////////////////////////////////////////////////////////////////////////
  
-package org.zengrong.controls.supportClasses
+package org.zengrong.controls
 {
 import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
@@ -13,7 +13,6 @@ import flash.display.Sprite;
 import flash.events.MouseEvent;
 import flash.filters.DropShadowFilter;
 
-import org.zengrong.controls.Component;	
 
 /**
  * 所有使用显示对象用作按钮的状态的按钮类的基类。ImageButton、ClassButton是它的子类
