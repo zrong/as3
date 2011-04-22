@@ -215,21 +215,21 @@ package org.zengrong.flex.controls
 		
 		public function clear():void
 		{
-//			trace(Util.getTime(), "//**** VideoDisplay.clear 执行****//");
+//			trace(Util.getFormatedTime(), "//**** VideoDisplay.clear 执行****//");
 			if((type==NETSTREAM) || (type==URISTREAM))
 			{
 				_video.attachNetStream(null);
-//				trace(Util.getTime(), "停止显示NetStream");
+//				trace(Util.getFormatedTime(), "停止显示NetStream");
 			}
 			else if(type == CAMERA)
 			{				
 				_video.attachCamera(null);
-//				trace(Util.getTime(), "停止显示Camera");
+//				trace(Util.getFormatedTime(), "停止显示Camera");
 			}
 			_playing = false;
 			_video.clear();
 			_video.visible = false;
-//			trace(Util.getTime(), "清除显示内容");
+//			trace(Util.getFormatedTime(), "清除显示内容");
 			
 		}
 		
@@ -255,12 +255,12 @@ package org.zengrong.flex.controls
 				}				
 			} */
 			super.updateDisplayList(unscaledWidth, unscaledHeight);
-//			trace(Util.getTime(), "VideoDisaplay中的updateDisplayList运行,type:", type, ",unscaledWidth:",unscaledWidth,",unscaledHeight:",unscaledHeight);
+//			trace(Util.getFormatedTime(), "VideoDisaplay中的updateDisplayList运行,type:", type, ",unscaledWidth:",unscaledWidth,",unscaledHeight:",unscaledHeight);
 			_video.width = unscaledWidth;
 			_video.height = unscaledHeight;
 //			_video.clear();
-//			trace(Util.getTime(), "_video.width,height:",_video.width,_video.height);
-//			trace(Util.getTime(), "this.width,height:",this.width,this.height);
+//			trace(Util.getFormatedTime(), "_video.width,height:",_video.width,_video.height);
+//			trace(Util.getFormatedTime(), "this.width,height:",this.width,this.height);
 		}
 	}
 }

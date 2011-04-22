@@ -75,28 +75,13 @@ public class BMPMovableSprite extends BMPSprite
 		return new Vec2D(x, y);
 	}
 	
-	public function get isLabel():Boolean
-	{
-		return _isLabel;
-	}
-	
-	public function get width():int
-	{
-		return bitmapData.width;
-	}
-	
-	public function get height():int
-	{
-		return bitmapData.height;
-	}
-	
 	//----------------------------------
 	//  公开方法
 	//----------------------------------
 	/**
 	 * 更新自己的位置
 	 */		
-	override public function update($stage:BitmapData, $delay:Number):void
+	override public function update($stage:BitmapData, $delay:Number=-1):void
 	{
 		moveV.angle += angVel * $delay;
 		//更新速度，如果acc为0，则vel是个恒定的值
