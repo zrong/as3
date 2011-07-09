@@ -10,7 +10,7 @@ package org.zengrong.utils
 public class TimeUtil
 {
 	/**
-	 * 基准日期。可用于所有需要基准日起的方法。例如：getFormatedTimestamp 
+	 * 基准日期。可用于所有需要基准日起的方法。例如：getTimestamp 
 	 */	
 	public static var baseDate:Date;
 	
@@ -78,7 +78,7 @@ public class TimeUtil
 	  * 获取一个时间戳，它是从过去某一个时刻到现在的毫秒数。
 	  * @param $oldDate 过去的某个时刻，默认为2010年国庆节
 	  */	 
-	 public static function getFormatedTimestamp($oldDate:Date=null):uint
+	 public static function getTimestamp($oldDate:Date=null):uint
 	 {
 		 var __oldDate:Date = $oldDate ? $oldDate : ( baseDate ? baseDate : (baseDate = new Date(2010, 9, 1)));
 		 return uint((new Date()).time - __oldDate.time);

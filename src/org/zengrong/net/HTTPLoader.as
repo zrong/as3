@@ -6,6 +6,8 @@
 package org.zengrong.net
 {
 
+import org.zengrong.utils.ObjectUtil;
+
 import flash.events.ErrorEvent;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
@@ -15,8 +17,7 @@ import flash.net.URLLoaderDataFormat;
 import flash.net.URLRequest;
 import flash.net.URLRequestMethod;
 import flash.net.URLVariables;
-
-import org.zengrong.utils.ObjectUtil;
+import flash.utils.ByteArray;
 
 /**
  * 与服务器通信，可以传递多重资料和载入多个文件
@@ -48,26 +49,61 @@ public class HTTPLoader
 	
 	protected var _method:String = 'GET';
 	
-	private var _loading:Boolean;			//是否正在载入。这个变量保证同一时间只能有一次或者一组载入。
-	private var _multi:Boolean;			//是否是多文件载入
+	protected var _loading:Boolean;			//是否正在载入。这个变量保证同一时间只能有一次或者一组载入。
+	protected var _multi:Boolean;			//是否是多文件载入
 	
-	private var _loader:URLLoader;
-	private var _submitVar:Object;			//每次提交都需要的
-	private var _returnVar:Object;			//每次提交的时候需要原样返回的参数。这些参数在服务器返回的时候会原样提供
-	private var _curSubmitVar:URLVariables;//保存当次提交的变量
-	private var _curReturnVar:Object;		//保存当次提交需要返回的参数。
-	private var _curUrl:String;			//保存当次提交的URL
+	protected var _loader:URLLoader;
+	protected var _submitVar:Object;			//每次提交都需要的
+	protected var _returnVar:Object;			//每次提交的时候需要原样返回的参数。这些参数在服务器返回的时候会原样提供
+	protected var _curSubmitVar:URLVariables;//保存当次提交的变量
+	protected var _curReturnVar:Object;		//保存当次提交需要返回的参数。
+	protected var _curUrl:String;			//保存当次提交的URL
+
+	protected var _urls:Array;				//多文件载入保存每次载入的路径
+	protected var _submitVars:Array;			//如果是多文件载入，这个变量保存每次提交的时候需要返回的参数。所有的多重载入提供的参数都将统一视为需要返回的参数
+	protected var _results:Array;			//保存多文件载入时候返回的值
 	
-	private var _urls:Array;				//多文件载入保存每次载入的路径
-	private var _submitVars:Array;			//如果是多文件载入，这个变量保存每次提交的时候需要返回的参数。所有的多重载入提供的参数都将统一视为需要返回的参数
-	private var _results:Array;			//保存多文件载入时候返回的值
-	
+
+	//----------------------------------------		
+	// init
+	//----------------------------------------
+	protected function init():void
+	{
+		_loader = new URLLoader();
+		_loader.dataFormat = URLLoaderDataFormat.TEXT;
+		_loading = false;
+		_multi = false;
+		addEvent();
+	}
+
+	//----------------------------------------
+	// getter/setter
+	//----------------------------------------
 	public function set method($method:String):void
 	{
 		_method = $method;
 	}
+
+	public function set dataFormat($format:String):void
+	{
+		_loader.dataFormat = $format;
+	}
+
+	/**
+	 * 返回需要的真实数据。返回的数据可能是各种格式，例如二进制流等等。
+	 * 子类可以覆盖这个方法，在将返回的数据保存之前处理一下，获得需要的格式。
+	 */
+	protected function get loaderData():*
+	{
+		return _loader.data;
+	}
+
+	//----------------------------------------
+	// public 
+	//----------------------------------------
 	/**
 	 * <p>通过这个方法加入的参数，不仅会传给服务端，同时也会在返回的时候提供。</p>
+	 * <p>如果使用的是单载入，那么每次载入完毕后，这些参数会被清空。</p>
 	 * <p>如果使用的是多重载入，那么使用此方法添加的参数，在每次提交和返回的时候都会提供。</p>
 	 * @param $key
 	 * @param $value
@@ -81,6 +117,7 @@ public class HTTPLoader
 	}
 	/**
 	 * <p>添加要传递给服务器的信息</p>
+	 * <p>如果使用的是单载入，那么每次载入完毕后，这些参数会被清空。</p>
 	 * <p>如果使用的是多重载入，那么使用此方法添加的参数，在每次提交的时候都会提供。</p>
 	 * @param $key
 	 * @param $value
@@ -99,19 +136,36 @@ public class HTTPLoader
 	 */	
 	public function load($url:* , $requestVar:*=null):void
 	{
-		if(_loading)
-			return;
 		if(!$url)
 			return;
+		//如果正在载入，就将要载入的url和值加入队列中，但不执行
+		if(_loading)
+		{
+			//不能确定单载入是否定义了_urls。第一次单载入的时候，肯定是没有_urls的，但单载入有可能在第一次载入没有完成的时候被连续调用
+			//因此需要初始化_urls，但如果是_multi状态的话，在loading的时候，_urls肯定是有值的
+			if(!_multi && !_urls)
+				_urls = [];
+			_urls = _urls.concat($url);
+			//这个和urls的情况类似，不过要判断$requestVar是否设置
+			if($requestVar)
+			{
+				if(!_submitVars)
+					_submitVars = [];
+				_submitVars = _submitVars.concat($requestVar);
+			}
+			return;
+		}
 		//如果提供的是地址字符串，就视为单载入
 		if($url is String)
 		{
+			_loading = true;
 			_multi = false;
 			perform($url, $requestVar);
 		}
 		//否则视为多重载入
 		else if($url is Array)
 		{
+			_loading = true;
 			_multi = true;
 			_results = [];
 			//保存提供的数组参数
@@ -127,23 +181,22 @@ public class HTTPLoader
 				perform(_urls.shift());
 			}
 		}
-		//否则就不执行
-		else
-		{
-			return;
-		}
-		addEvent();
-		_loading = true;
 	}
 	
 	public function destroy():void
 	{
 		clearVar();
+		removeEvent();
 		_loader = null;
 		_fun_loadDone = null;
 		_fun_loadError = null;
 	}
 	
+
+
+	//----------------------------------------
+	// private 
+	//----------------------------------------
 	protected function perform($url:String, $var:Object=null):void
 	{
 		_curUrl = $url;
@@ -186,50 +239,12 @@ public class HTTPLoader
 	
 	protected function removeEvent():void
 	{
-		_loader.removeEventListener(IOErrorEvent.IO_ERROR, handler_error);
-		_loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, handler_error);
-		_loader.removeEventListener(Event.COMPLETE, handler_complete);
-	}
-	
-	protected function handler_error(evt:ErrorEvent):void
-	{
-		//如果载入错误，就立即将错误返回
-		var __result:Object = {};
-		__result.returnData = createReturnData();
-		__result.message = '载入【'+_curUrl+'】失败，错误信息：'+evt.toString();
-		_fun_loadError.call(null, __result);
-		//对于多重载入，即使载入错误，依然要继续载入。但检测的时候，不将返回输入加入数组中。
-		//也就是说最终返回的结果数组，将不包含这次载入错误的数据。
-		if(_multi)
-			checkLoadDone(false);
-	}
-	
-	protected function handler_complete(evt:Event):void
-	{
-		//如果是多重载入，就是用数组保存
-		if(_multi)
+		if(_loader)
 		{
-			checkLoadDone();
+			_loader.removeEventListener(IOErrorEvent.IO_ERROR, handler_error);
+			_loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, handler_error);
+			_loader.removeEventListener(Event.COMPLETE, handler_complete);
 		}
-		//如果是单次载入，就直接返回result的值
-		else
-		{
-			var __result:Object = {};
-			__result.returnData = createReturnData();
-			__result.resultData = _loader.data;
-			//提交的url地址
-			__result.url = _curUrl;
-			_fun_loadDone.call(null, __result);
-			clearVar();
-		}
-	}
-	
-	private function init():void
-	{
-		_loader = new URLLoader();
-		_loader.dataFormat = URLLoaderDataFormat.TEXT;
-		_loading = false;
-		_multi = false;
 	}
 	
 	//创建返回的时候加入的参数
@@ -250,11 +265,69 @@ public class HTTPLoader
 		return __returnData;
 	}
 	
+	
+	private function clearVar():void
+	{
+		_curReturnVar = null;
+		_curSubmitVar = null;
+		_returnVar = null;
+		_submitVar = null;
+		_loading = false;
+		_results = null;
+	}
+
+	//----------------------------------------
+	// handler
+	//----------------------------------------
+	protected function handler_error(evt:ErrorEvent):void
+	{
+		//如果载入错误，就立即将错误返回
+		var __result:Object = {};
+		__result.returnData = createReturnData();
+		__result.message = '载入【'+_curUrl+'】失败，错误信息：'+evt.toString();
+		_fun_loadError.call(null, __result);
+		//对于多重载入，即使载入错误，依然要继续载入。但检测的时候，不将返回输入加入数组中。
+		//也就是说最终返回的结果数组，将不包含这次载入错误的数据。
+		if(_multi)
+			checkMultiLoadDone(false);
+	}
+	
+	protected function handler_complete(evt:Event):void
+	{
+		//如果是多重载入，就是用数组保存
+		if(_multi)
+		{
+			checkMultiLoadDone();
+		}
+		//如果是单次载入，就直接返回result的值
+		else
+		{
+			var __result:Object = {};
+			__result.returnData = createReturnData();
+			__result.resultData = loaderData;
+			//提交的url地址
+			__result.url = _curUrl;
+			clearVar();
+			_fun_loadDone.call(null, __result);
+			//如果在单次载入的时候队列中有值，就再次载入
+			if(_urls && _urls.length>0)
+			{
+				perform(_urls.shift(), (_submitVars && _submitVars.length>0) ? _submitVars.shift() : null);
+				//如果url列表载入完毕，就清空列表和提交变量数组
+				if(_urls.length == 0)
+				{
+					_urls = null;
+					_submitVars = null;
+				}
+			}
+		}
+	}
+
 	/**
 	 * 检测多重载入是否全部完成。
 	 * @param $addReturn 值为true，则将返回的结果加入数组；否则不加入数组。
 	 */	
-	private function checkLoadDone($addResult:Boolean=true):void
+	private function checkMultiLoadDone($addResult:Boolean=true):void
 	{
 		if($addResult)
 		{
@@ -279,20 +352,13 @@ public class HTTPLoader
 		//如果载入完毕就调用函数，传递结果数组
 		else
 		{
-			_fun_loadDone.call(null, _results);
+			//call必须最后调用，以避免call中再调用load导致不可预见的错误。所以要将_results进行复制，然后清空变量。
+			var __resultArr:Array = _results.concat();
 			clearVar();
+			_urls = null;
+			_submitVars = null;
+			_fun_loadDone.call(null, __resultArr);
 		}
-	}
-	
-	private function clearVar():void
-	{
-		_curReturnVar = null;
-		_curSubmitVar = null;
-		_returnVar = null;
-		_submitVar = null;
-		_loading = false;
-		_results = null;
-		removeEvent();
 	}
 }
 }

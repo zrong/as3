@@ -5,9 +5,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.display.spritesheet
 {
+import org.zengrong.utils.ObjectUtil;
+
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.utils.ByteArray;
+import flash.utils.flash_proxy;
 
 /**
  * 处理SpriteSheet的元数据
@@ -15,16 +18,10 @@ import flash.utils.ByteArray;
  */
 public class SpriteSheetMetadata
 {
-	public function SpriteSheetMetadata($meta:ByteArray=null)
+	public function SpriteSheetMetadata()
 	{
-		if($meta)
-		{
-			byteArray = $meta;
-			decode();
-		}
 	}
 	
-	public var byteArray:ByteArray;
 	/**
 	 * Sheet的类型，见SpriteSheetType
 	 */	
@@ -38,7 +35,12 @@ public class SpriteSheetMetadata
 	/**
 	 * 是否包含Label，Label信息用于分段动画 
 	 */	
-	public var isLabel:Boolean;
+	public var hasLabel:Boolean;
+	
+	/**
+	 * 是否包含名称信息，即对每一帧都使用了名称
+	 */	
+	public var hasName:Boolean;
 	
 	/**
 	 * mask的类型，详见org.zengrong.display.spritesheet.MaskType。mask信息只能存在于JPG文件中
@@ -48,12 +50,7 @@ public class SpriteSheetMetadata
 	/**
 	 * Sheet的帧数
 	 */	
-	public var frameCount:int=-1;
-	
-	/**
-	 * 每个帧的大小，若equalSize为真，则包含3个整型元素代表每行数量、宽、高；否则包含frameCount数量的x,y,w,h
-	 */	
-	public var frameSize:Vector.<int>;
+	public var totalFrame:int=-1;
 	
 	/**
 	 * 每个帧的Rect
@@ -71,102 +68,177 @@ public class SpriteSheetMetadata
 	public var labelsFrame:Object;
 	
 	/**
-	 * 根据当前设置的Sheet大小和Frame大小，判断每行最多可以放几个Frame。只有当isEqualSize为true的时候，值才大于0
+	 * 如果使用名称来指定每一帧，则这里保存所有名字的数组
 	 */	
-	public function get column():int
-	{
-		if(frameCount == -1 || !frameSize || !frameSizeRect)
-			throw new RangeError('请先执行setup设置！');
-		return isEqualSize ? frameSize[0] : -1;
-	}
+	public var names:Vector.<String>;
+	
+	/**
+	 * 如果使用名称来指定每一帧，则这里保存每个名称与帧的对应关系
+	 */	
+	public var namesIndex:Object;
+	
+	//----------------------------------
+	//  public
+	//----------------------------------
+	
 	/**
 	 * 销毁整个对象
 	 */	
 	public function destroy():void
 	{
-		byteArray = null;
 		type = null;
 		isEqualSize = false;
-		isLabel = false;
+		hasLabel = false;
 		maskType = 0;
-		frameCount = -1;
-		frameSize = null;
+		hasName = false;
+		totalFrame = -1;
 		frameSizeRect = null;
 		labels = null;
 		labelsFrame = null;
+		names = null;
+		namesIndex = null;
 	}
 	
 	/**
-	 * 解析MetaData
+	 * 从ByteArray解析MetaData
+	 * @param $ba 从SS格式中提取的Metadata数据
 	 */	
-	public function decode():void
+	public function decodeFromByteArray($ba:ByteArray):void
 	{
-		if(byteArray)
+		var i:int=0;
+		$ba.position = 0;
+		type = $ba.readUTF();
+		isEqualSize = $ba.readBoolean();
+		hasLabel = $ba.readBoolean();
+		hasName = $ba.readBoolean();
+		maskType = $ba.readByte();
+		totalFrame = $ba.readShort();
+		setup(totalFrame, isEqualSize);
+		for(i=0;i<totalFrame;i++)
 		{
-			byteArray.position = 0;
-			type = byteArray.readUTF();
-			isEqualSize = byteArray.readBoolean();
-			isLabel = byteArray.readBoolean();
-			maskType = byteArray.readByte();
-			frameCount = byteArray.readShort();
-			setup();
-			if(isEqualSize)
-				decodeEqualFrame();
-			else
-				decodeUnequalFrame();
-			if(isLabel)
-				parseLabels();
+			writeFrame(new Rectangle($ba.readShort(), $ba.readShort(), $ba.readShort(), $ba.readShort())); 
+		}
+		if(hasLabel)
+		{
+			var __count:int = $ba.readShort();
+			labels = new Vector.<String>(__count, true);
+			labelsFrame = {};
+			var __first:int = 0;
+			var __total:int = 0;
+			for(i=0; i<__count; i++)
+			{
+				labels[i] = $ba.readUTF();
+				__first = $ba.readShort();
+				__total = $ba.readShort();
+				if(__first<0) __first = 0;
+				labelsFrame[labels[i]] = [__first, __total];
+			}
+		}
+		if(hasName)
+		{
+			names = new Vector.<String>(totalFrame, true);
+			namesIndex = {};
+			for(i=0;i<totalFrame;i++)
+			{
+				names[i] = $ba.readUTF();
+				namesIndex[names[i]] = $ba.readShort();
+			}
+		}
+	}
+	
+	/**
+	 * 从XML文件解析Metadata数据，XML文件必须由SpriteSheetPacker生成。
+	 * @param $xml 由SpriteSheetPacker生成的XML文件，或者自行生成且符合SpriteSheetPacker格式的XML文件。
+	 */	
+	public function decodeFormXML($xml:XML):void
+	{
+		var i:int=0;
+		type = $xml.sheetType.toString();
+		isEqualSize = $xml.isEqualSize.toString() == 'true';
+		hasLabel = $xml.hasLabel.toString() == 'true';
+		hasName = $xml.hasName.toString() == 'true';
+		maskType = int($xml.maskType.toString());
+		totalFrame = int($xml.totalFrame.toString());
+		setup(totalFrame, isEqualSize);
+		var __frames:XMLList = $xml.frames.children();
+		var __frame:XML = null;
+		for(i=0;i<totalFrame;i++)
+		{
+			__frame = __frames[i];
+			writeFrame(new Rectangle(int(__frame.x.toString()), int(__frame.y.toString()), int(__frame.w.toString()), int(__frame.h.toString()))); 
+		}
+		if(hasLabel)
+		{
+			var __count:int = $xml.labels.@count;
+			var __labelsXML:XMLList = $xml.labels.children();
+			labels = new Vector.<String>(__count, true);
+			labelsFrame = {};
+			for(i=0; i<__count; i++)
+			{
+				labels[i] = XML(__labelsXML[i]).localName().toString();
+				var __labelFrame:Array = __labelsXML[i].toString().split(',');
+				//转换字符串为数字
+				for(var j:int=0;j<__labelFrame.length;j++)
+				{
+					__labelFrame[j] = int(__labelFrame[j]);
+					//处理第一帧小于0的情况
+					if(j==0 && __labelFrame[j]<0) __labelFrame[0] = 0;
+				}
+				labelsFrame[labels[i]] = __labelFrame;
+			}
+		}
+		if(hasName)
+		{
+			var __namesXML:XMLList = $xml.names.children();
+			names = new Vector.<String>(totalFrame, true);
+			namesIndex = {};
+			for(i=0;i<totalFrame;i++)
+			{
+				names[i] = __namesXML[i].localName();
+				namesIndex[names[i]] = int(__namesXML[i].toString());
+			}
 		}
 	}
 	
 	/**
 	 * 根据设置的属性初始化一些值
 	 */	
-	public function setup($frameCount:int=-1, $isEqual:Boolean=false):void
+	public function setup($totalFrame:int=-1, $isEqual:Boolean=false):void
 	{
-		//如果使用Label，总帧数根据每个Label的帧数之和计算
-		if(isLabel)
-		{
-			frameCount = 0;
-			for each(var __labelFrame:Array in labelsFrame)
-			{
-				frameCount += __labelFrame[1];
-			}
-		}
-		else
-		{
-			frameCount = $frameCount;
-		}
-		isEqualSize = $isEqual;
-		if(frameCount == -1)
+		if($totalFrame == -1)
 			throw new RangeError('帧数量还未设定！');
-		frameSize = isEqualSize ? new Vector.<int>(3, true) : new Vector.<int>();
+		isEqualSize = $isEqual;
+		totalFrame = $totalFrame;
 		frameSizeRect = new Vector.<Rectangle>();
 	}
 	
 	/**
 	 * 设置Label的属性
-	 * @param $isLabel	是否使用了Label
-	 * @param $items	Label的数组
+	 * @param $hasLabel	是否使用了Label
+	 * @param $items	Label的对象数组，每个对象格式为:{label,first,total}，其中first是1基的
 	 * 
 	 */	
-	public function setLabels($isLabel:Boolean, $items:Array=null):void
+	public function setLabels($hasLabel:Boolean, $items:Array=null):void
 	{
+		trace('SpriteSheetMetadata.setLabels:', $hasLabel, $items);
 		//必须传递可用的$items才算是使用了Label，否则都算没有Label
-		if($isLabel && $items && $items.length>0)
+		if($hasLabel && $items && $items.length>0)
 		{
-			isLabel = true;
+			hasLabel = true;
 			labels = new Vector.<String>($items.length, true);
 			labelsFrame = {};
 			for(var i:int=0; i<$items.length; i++)
 			{
 				labels[i] = $items[i].label;
-				labelsFrame[labels[i]] = [$items[i].first, $items[i].total];
+				//起始帧是1基的，要转换成0基，因此要-1
+				var __first:int = $items[i].first - 1;
+				if(__first<0) __first = 0;
+				labelsFrame[labels[i]] = [__first, $items[i].total];
 			}
 		}
 		else
 		{
-			isLabel = false;
+			hasLabel = false;
 			labels = null;
 			labelsFrame = null;
 		}
@@ -174,86 +246,35 @@ public class SpriteSheetMetadata
 	/**
 	 * 从外部向数组中添加不相等的帧，一般在循环中执行
 	 */	
-	public function addUnequalFrameSize($rect:Rectangle):void
+	public function addFrameSize($rect:Rectangle):void
 	{
 //		if(frameSizeRect.length>=frameCount)
 //			return;
-		if(frameCount == -1 || !frameSize || !frameSizeRect)
+		if(totalFrame == -1 || !frameSizeRect)
 			throw new RangeError('请先执行setup设置！');
-		writeUnequalFrame($rect);
+		writeFrame($rect);
 	}
 	
-	/**
-	 * 从外部向数组中添加大小相等的帧，仅执行一次
-	 * @param $column	有几列
-	 * @param $w		帧宽度
-	 * @param $h		帧高度
-	 * 
-	 */	
-	public function addEqualFrameSize($column:int, $w:int, $h:int):void
-	{
-		if(frameCount == -1 || !frameSize || !frameSizeRect)
-			throw new RangeError('请先执行setup设置！');
-		frameSize[0] = $column;
-		frameSize[1] = $w;
-		frameSize[2] = $h;
-		writeEqualFrame();
-	}
-	
-	/**
-	 * 将大小相等的帧的尺寸写入数组，第1项为一行中有几帧，第2项为帧宽度，第3项为帧高度 
-	 * @return 
-	 */	
-	private function decodeEqualFrame():void
-	{
-		for(var i:int=0;i<3;i++)
-		{
-			frameSize[i] = byteArray.readShort();
-		}
-		writeEqualFrame();
-	}
-	
-	private function writeEqualFrame():void
-	{
-		var __rect:Rectangle = null;
-		var __x:int=0;
-		var __y:int=0;
-		for(var i:int=0;i<frameCount;i++)
-		{
-			__x = frameSize[1] * (i%frameSize[0]);
-			__y = frameSize[2] * int(i/frameSize[0]);
-			frameSizeRect[i] = new Rectangle(__x, __y, frameSize[1], frameSize[2]);
-		}
-	}
-	
-	private function decodeUnequalFrame():void
-	{
-		var __rect:Rectangle = null;
-		for(var i:int=0;i<frameCount;i++)
-		{
-			writeUnequalFrame(new Rectangle(byteArray.readShort(), byteArray.readShort(), byteArray.readShort(), byteArray.readShort())); 
-		}
-	}
-	
-	private function writeUnequalFrame($rect:Rectangle):void
+	private function writeFrame($rect:Rectangle):void
 	{
 		frameSizeRect[frameSizeRect.length] = $rect;
-		frameSize[frameSize.length] = $rect.x;
-		frameSize[frameSize.length] = $rect.y;
-		frameSize[frameSize.length] = $rect.width;
-		frameSize[frameSize.length] = $rect.height;
 	}
 	
-	private function parseLabels():void
+	public function toString():String
 	{
-		var __count:int = byteArray.readShort();
-		labels = new Vector.<String>(__count, true);
-		labelsFrame = {};
-		for(var i:int=0; i<__count; i++)
-		{
-			labels[i] = byteArray.readUTF();
-			labelsFrame[labels[i]] = [byteArray.readShort(), byteArray.readShort()];
-		}
+		return 'org.zengrong.display.spritesheet::SpriteSheetMetadata{'+
+				'type:'+type+
+				',hasLabel:'+hasLabel+
+				',isEqualSize:'+isEqualSize+
+				',hasName:'+hasName+
+				',totalFrame:'+totalFrame+
+				',maskType:'+maskType+
+				',labels:'+ObjectUtil.ArrayToString(labels)+
+				',labelsFrame:'+ObjectUtil.ObjToString(labelsFrame)+
+				',frameSizeRect:'+ObjectUtil.ArrayToString(frameSizeRect)+
+				',names:'+ObjectUtil.ArrayToString(names)+
+				',namesIndex:'+ObjectUtil.ObjToString(namesIndex)+
+				'}';
 	}
 }
 }

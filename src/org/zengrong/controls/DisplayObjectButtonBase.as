@@ -12,7 +12,9 @@ import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
 import flash.filters.DropShadowFilter;
+import flash.filters.ColorMatrixFilter;
 
+import com.bit101.components.Components;
 
 /**
  * 所有使用显示对象用作按钮的状态的按钮类的基类。ImageButton、ClassButton是它的子类
@@ -20,6 +22,8 @@ import flash.filters.DropShadowFilter;
  */
 public class DisplayObjectButtonBase extends Component
 {
+
+	public static const COLORLESS_FILTER:ColorMatrixFilter = new ColorMatrixFilter([0.3086,0.6094,0.082,0,-25,0.3086,0.6094,0.082,0,-25,0.3086,0.6094,0.082,0,-25,0,0,0,1,0]);
 	protected var _over:Boolean = false;
 	protected var _down:Boolean = false;
 	protected var _selected:Boolean = false;
@@ -186,9 +190,9 @@ public class DisplayObjectButtonBase extends Component
 		if(_colorless)
 		{
 			if(_shaow)
-				this.filters = value ? [getShadow(1)] : [Style.COLORLESS_FILTER, getShadow(1)];
+				this.filters = value ? [getShadow(1)] : [COLORLESS_FILTER, getShadow(1)];
 			else
-				this.filters = value ? [] : [Style.COLORLESS_FILTER];
+				this.filters = value ? [] : [COLORLESS_FILTER];
 		}
 				
 	}

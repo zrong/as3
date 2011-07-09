@@ -9,7 +9,7 @@ import flash.display.BitmapData;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 
-import org.zengrong.utils.Vec2D;
+import com.youxi.utils.Vec2D;
 
 /**
  * 基于位图引擎的Sprite，并加入运动功能
@@ -17,12 +17,37 @@ import org.zengrong.utils.Vec2D;
  */
 public class BMPMovableSprite extends BMPSprite
 {
-	public function BMPMovableSprite($bmds:Vector.<BitmapData>=null)
+	public function BMPMovableSprite($bmds:Vector.<BitmapData>=null, $hasFlip:Boolean=false, $autoCenterOffset:Boolean=false)
 	{
-		moveV = new Vec2D();
-		super($bmds);
+		super($bmds, $hasFlip, $autoCenterOffset);
 	}
 	
+	/**
+	 * 是否在可视界面中横向移动
+	 * 控制x坐标是否变化。若该值为true，则x与rx一起变化。否则就只有rx变化。
+	 * 若该值一直为true，则rx与x的值是完全相同的
+	 */
+	public var isOSDMoveX:Boolean = true; 
+
+	/**
+	 * 是否在可视界面中移动
+	 * 控制y坐标是否变化。若该值为true，则y与ry一起变化。否则就只有ry变化。
+	 * 若该值一直为true，则ry与y的值是完全相同的
+	 */
+	public var isOSDMoveY:Boolean = true; 
+
+	/**
+	 * realX，sprite在地图中的x坐标，在可以卷动的地图中，这个值一直是变化的。
+	 * x在地图卷动的时候，可能是不变的。
+	 */
+	public var rx:int = 0;
+
+	/**
+	 * realY，sprite在地图中的y坐标，在可以卷动的地图中，这个值一直是变化的。
+	 * y在地图卷动的时候，可能是不变的。
+	 */
+	public var ry:int = 0;
+
 	/**
 	 * 半径，主要用于计算碰撞
 	 */	
@@ -72,24 +97,80 @@ public class BMPMovableSprite extends BMPSprite
 	 */	
 	public function get posV():Vec2D
 	{
-		return new Vec2D(x, y);
+		var __x:int = this.x;
+		var __y:int = this.y;
+		//若自动计算偏移，则加上偏移值
+	//	if( isAutoCenterOffset )
+	//	{
+	//		__x = int(__x + _centerOffset.x);
+	//		__y = int(__y + _centerOffset.y);
+	//	}
+		return new Vec2D(__x, __y);
 	}
+
+	/**
+	 * 返回Sprite在地图中的真实位置
+	 */
+	public function get realPosV():Vec2D
+	{
+		var __x:int = this.rx;
+		var __y:int = this.ry;
+		//若自动计算偏移，则加上偏移值
+	//	if( isAutoCenterOffset )
+	//	{
+	//		__x = int(__x + _centerOffset.x);
+	//		__y = int(__y + _centerOffset.y);
+	//	}
+		return new Vec2D(__x, __y);
+	}
+
+	//----------------------------------------
+	// init
+	//----------------------------------------
 	
+	override public function init():void
+	{
+		super.init();
+		moveV = new Vec2D();
+	}
 	//----------------------------------
 	//  公开方法
 	//----------------------------------
+	
+	/**
+	 * Sprite所在的位置是否包含坐标点
+	 * 这个包含关系是根据radius计算的范围
+	 * */
+	public function contain($x:int, $y:int):Boolean
+	{
+		return posV.subNum($x, $y).len2 <= radius*radius;
+	}
+
+	/**
+	 * sprite在地图上的位置是否包含坐标点
+	 */
+	public function realContain($x:int, $y:int):Boolean
+	{
+		return realPosV.subNum($x, $y).len2 <= radius*radius;
+	}
 	/**
 	 * 更新自己的位置
 	 */		
-	override public function update($stage:BitmapData, $delay:Number=-1):void
+	override public function update($stage:BitmapData, $delay:Number=0):void
 	{
 		moveV.angle += angVel * $delay;
 		//更新速度，如果acc为0，则vel是个恒定的值
 		vel += acc * $delay;
 		//最终的移动距离，根据moveV与速度计算
 		var __vec:Vec2D = moveV.mulNum(vel*$delay);
-		this.x += __vec.x;
-		this.y += __vec.y;
+		//rx和ry是始终变化的
+		rx += int(__vec.x);
+		ry += int(__vec.y);
+		//x和y的值则在可视界面中移动的时候才会变化
+		if(isOSDMoveX)
+			this.x += int(__vec.x);
+		if(isOSDMoveY)
+			this.y += int(__vec.y);
 		super.update($stage, $delay);
 	}
 	
@@ -98,12 +179,24 @@ public class BMPMovableSprite extends BMPSprite
 	 * @param $x 要移动到的位置的x坐标
 	 * @param $y 要移动到的位置的y坐标
 	 */		
-	public function moveTo($x:Number, $y:Number) : void
+	public function moveTo($x:int, $y:int) : void
 	{
 		targetV = new Vec2D($x, $y);
 		var __vec:Vec2D = targetV.subVec(posV);
 		var __radian:Number = __vec.radian;
 		moveV.radian = __radian;
 	}
+
+	/**
+	 * 与moveTo的区别在于，这里设定的目标位置点是基于地图的绝对坐标
+	 */
+	public function moveToReal($x:int, $y:int):void
+	{
+		targetV = new Vec2D($x, $y);
+		var __vec:Vec2D = targetV.subVec(realPosV);
+		var __radian:Number = __vec.radian;
+		moveV.radian = __radian;
+	}
+
 }
 }

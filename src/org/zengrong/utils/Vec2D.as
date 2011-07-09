@@ -196,50 +196,58 @@ public class Vec2D
 	
 	public function toString() : String
 	{
-		return this.x.toString() + " " + this.y.toString();
+		return 'Vec2D:('+this.x.toString() + " " + this.y.toString()+')';
 	}
 	
 	//----------------------------------
-	//  num四则运送人，修改自身
+	//  num四则运算，修改自身
 	//----------------------------------
 	/**
 	 * 将当前保存的值与参数相加并保存
 	 * @param $num 要增加的数字 
 	 */	
-	public function addN($num:Number) : void
+	public function addN($x:Number, $y:Number=NaN) : void
 	{
-		this.x = this.x + $num;
-		this.y = this.y + $num;
+		if(isNaN($y))
+			$y = $x;
+		this.x = this.x + $x;
+		this.y = this.y + $y;
 	}
 	
 	/**
 	 * 将当前保存的值减去参数并保存
 	 * @param $num 要减去的数字
 	 */	
-	public function subN($num:Number) : void
+	public function subN($x:Number, $y:Number=NaN) : void
 	{
-		this.x = this.x - $num;
-		this.y = this.y - $num;
+		if(isNaN($y))
+			$y = $x;
+		this.x = this.x - $x;
+		this.y = this.y - $y;
 	}
 	
 	/**
 	 * 将当前保存的值乘以一个数字并更新
 	 * @param $num 要相乘的数字
 	 */	
-    public function mulN($num:Number) : void
+    public function mulN($x:Number, $y:Number=NaN) : void
     {
-        this.x = this.x * $num;
-        this.y = this.y * $num;
+		if(isNaN($y))
+			$y = $x;
+        this.x = this.x * $x;
+        this.y = this.y * $y;
     }
 	
 	/**
 	 * 将当前保存的值除以一个数字并更新
 	 * @param $num 要作为除数的数字
 	 */	
-	public function divN($num:Number) : void
+	public function divN($x:Number, $y:Number=NaN) : void
 	{
-		this.x = this.x / $num;
-		this.y = this.y / $num;
+		if(isNaN($y))
+			$y = $x;
+		this.x = this.x / $x;
+		this.y = this.y / $y;
 	}
 	
 	//----------------------------------
@@ -249,36 +257,45 @@ public class Vec2D
 	 * 将当前保存的值与参数相加，并返回一个新的Vec2D
 	 * @param $num 要增加的数字 
 	 */	
-	public function addNum($num:Number) : Vec2D
+	public function addNum($x:Number, $y:Number=NaN) : Vec2D
 	{
-		return new Vec2D(this.x + $num, this.y + $num);
+		if(isNaN($y))
+			$y = $x;
+		return new Vec2D(this.x + $x, this.y + $y);
 	}
 	
 	/**
 	 * 将当前保存的值减去参数并返回一个新的Vec2D
 	 * @param $num 要减去的数字
 	 */		
-	public function subNum($num:Number) : Vec2D
+	public function subNum($x:Number, $y:Number=NaN) : Vec2D
 	{
-		return new Vec2D(this.x - $num, this.y - $num);
+		if(isNaN($y))
+			$y = $x;
+		return new Vec2D(this.x - $x, this.y - $y);
 	}
 	
 	/**
 	 * 将当前保存的值乘以一个数字并返回一个新的Vec2D
 	 * @param $num 要相乘的数字
 	 */	
-	public function mulNum($num:Number) : Vec2D
+	public function mulNum($x:Number, $y:Number=NaN) : Vec2D
 	{
-		return new Vec2D(this.x * $num, this.y * $num);
+
+		if(isNaN($y))
+			$y = $x;
+		return new Vec2D(this.x * $x, this.y * $y);
 	}
 	
 	/**
 	 * 将当前保存的值除以一个数字并返回一个新的Vec2D
 	 * @param $num 要作为除数的数字
 	 */	
-	public function divNum($num:Number) : Vec2D
+	public function divNum($x:Number, $y:Number=NaN) : Vec2D
 	{
-		return new Vec2D(this.x / $num, this.y / $num);
+		if(isNaN($y))
+			$y = $x;
+		return new Vec2D(this.x / $x, this.y / $y);
 	}
 	
 	//----------------------------------
