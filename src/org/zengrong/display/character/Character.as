@@ -1,3 +1,8 @@
+////////////////////////////////////////////////////////////////////////////////
+//  zengrong.net
+//  创建者:	zrong
+//  最后更新时间：2011-08-03
+////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.display.character
 {
 import org.zengrong.text.FTEFactory;
@@ -7,6 +12,7 @@ import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.geom.Point;
 import flash.geom.Rectangle;
+import flash.geom.Matrix;
 import flash.text.engine.TextLine;
 
 /**
@@ -40,9 +46,14 @@ public class Character extends Sprite
 	public var img:String;
 
 	/**
-	 * 角色的类型，其值见CharacterType
+	 * 角色的类型
 	 */
 	public var type:String;
+
+	/**
+	 * 单击角色的时候要执行的动作，可能是任何类型
+	 */
+	public var fun:Object;
 
 	/**
 	 * 是否自动计算z的值。如果为false，就使用固定的z值
@@ -90,6 +101,16 @@ public class Character extends Sprite
 	protected var _flip:Boolean;
 
 	/**
+	 * 用户翻转之后计算xy的偏移
+	 */
+	protected var _flipMatrix:Matrix;
+
+	/**
+	 * 当前是否为帧停止状态，值为true的时候不更新帧动画
+	 */
+	protected var _stop:Boolean;
+
+	/**
 	 * 当前播放到第几帧（0基）
 	 */	
 	protected var _curFrame:int = 0;
@@ -115,6 +136,7 @@ public class Character extends Sprite
 
 	protected function init():void
 	{
+		_flipMatrix = new Matrix(-1,0,0,1);
 		_bmp = new Bitmap();
 		this.addChild(_bmp);
 		if(_bmds) 
@@ -146,6 +168,14 @@ public class Character extends Sprite
 	//----------------------------------
 
 	/**
+	 * 当前是否正在播放帧动画
+	 */
+	public function get isPlaying():Boolean
+	{
+		return !_stop;
+	}
+
+	/**
 	 * 获取Sprite的反转状态
 	 */
 	public function get flip():Boolean
@@ -163,7 +193,7 @@ public class Character extends Sprite
 		_flip = $flip;
 		_bmp.scaleX = _flip ? -1 : 1;
 		_bmp.x = _flip ? (.5 * _bmp.width) : (-.5*_bmp.width);
-		//trace(this.name +'设置翻转, _flip:', _flip, ',bmp.x:', _bmp.x);
+		//trace(this.name ,_title, '设置翻转, _flip:', _flip, ',bmp.x:', _bmp.x, ',bmp.w:', _bmp.width);
 		moveTitle();
 	}
 
@@ -231,8 +261,8 @@ public class Character extends Sprite
 
 	public function updateFrame($elapsed:Number):void
 	{
-		//如果过去的时间大于帧间隔，就切换帧
-		if($elapsed - _lastChangeFrame >= _delay)
+		//如果过去的时间大于帧间隔，且当前处于播放状态，就切换帧
+		if(($elapsed - _lastChangeFrame >= _delay) && !_stop && _bmds)
 		{
 			//trace('Character.update:', $elapsed, _lastChangeFrame);
 			next();
@@ -246,6 +276,7 @@ public class Character extends Sprite
 	public function setFrames($bmds:Vector.<BitmapData>):void
 	{
 		_bmds = $bmds;
+		goto(0);
 	}
 
 	/**
@@ -299,7 +330,7 @@ public class Character extends Sprite
 	public function goto($frame:int):BitmapData
 	{
 		if($frame >= _bmds.length)
-			_curFrame = isRepeat ? 0 : _bmds.length - -1;
+			_curFrame = isRepeat ? 0 : _bmds.length - 1;
 		else
 			_curFrame = $frame;
 		_bmp.bitmapData = getFrame(_curFrame);
@@ -308,14 +339,29 @@ public class Character extends Sprite
 	}
 
 	/**
+	 * 开始播放帧动画
+	 */
+	public function play():void
+	{
+		_stop = false;
+	}
+
+	/**
+	 * 停止播放帧动画，形象将停止在当前帧
+	 */
+	public function stop():void
+	{
+		_stop = true;
+	}
+
+	/**
 	 * 确定角色的中心点位置，默认的位置为底边中点
 	 */
 	public function center($offsetX:int=0, $offsetY:int=0):void
 	{
 		_bmp.x = _flip ? (.5*_bmp.width+$offsetX) : (-.5*_bmp.width+$offsetX);
-		//_bmp.y = _bmp.bitmapData.height*-1+$offsetY;
 		_bmp.y = _bmp.height*-1+$offsetY;
-		//trace('Character.', this.name+' center:', _bmp.x, _bmp.y);
+		//trace('Character.', this.name, _title, ' center:', _bmp.x, _bmp.y, ' width:', _bmp.width, ' bmdWidth:', _bmp.bitmapData.width);
 		this.graphics.clear();
 		this.graphics.beginFill(0xFF0000);
 		this.graphics.drawCircle(0,0,3);
@@ -342,18 +388,34 @@ public class Character extends Sprite
 	public function hitTest($x:int, $y:int):Boolean
 	{
 		//获取真实的左上角全局坐标
-		var __rx:int = this.x+_bmp.scaleX*_bmp.x;
+		var __rx:int = this.x+_bmp.x;
 		var __ry:int = this.y+_bmp.y;
 		//将检测坐标转换成本地坐标
-		var __lx:int = $x - __rx;
-		var __ly:int = $y - __ry;
-		//trace(_title+' 本地坐标:', __lx, __ly);
-		if(__lx>0 && __lx<_bmp.width && __ly>0 && __ly<_bmp.height)
-		{
-			var __rgba:uint = _bmp.bitmapData.getPixel32(__lx, __ly);
-			return (__rgba>>24&0xFF) > 0;
+		var __lp:Point = new Point($x - __rx, $y - __ry);
+		//翻转状态需要变换坐标，无法使用下面“注释1”的方法计算坐标，因为角色的形象被翻转了，如果采用注释1的方法，计算出的坐标对应的点其实是该位置翻转后的像素
+		//TODO 2011-07-19 可以使用display.transform.matrix计算flip，这样在center和flip的时候，就可以不计算bmp宽度的一半
+		if(_flip) __lp = _flipMatrix.transformPoint(__lp);
+		if(__lp.x>0 && __lp.x<_bmp.width && __lp.y>0 && __lp.y<_bmp.height)
+		{	
+			var __argb:uint = _bmp.bitmapData.getPixel32(__lp.x, __lp.y);
+			return (__argb>>24&0xFF) > 0;
 		}
 		return false;
+		//注释1，旧的错误方法
+		//var __rx:int = this.x+_bmp.scaleX*_bmp.x;
+		//var __ry:int = this.y+_bmp.y;
+		//var __lx:int = $x - __rx;
+		//var __ly:int = $y - __ry;
+		//this.graphics.clear();
+		//this.graphics.lineStyle(0,0xFF0000);
+		//this.graphics.drawRect(_bmp.x * _bmp.scaleX, _bmp.y, _bmp.width, _bmp.height);
+		//this.graphics.lineStyle(0,0x0000FF);
+		//this.graphics.drawCircle(__lx+_bmp.x, __ly+_bmp.y, 5);
+		//if(__lx>0 && __lx<_bmp.width && __ly>0 && __ly<_bmp.height)
+		//{	
+		//	var __rgba:uint = _bmp.bitmapData.getPixel32(__lx, __ly);
+		//	return (__rgba>>24&0xFF) > 0;
+		//}
 	}
 
 	//----------------------------------

@@ -1,3 +1,8 @@
+////////////////////////////////////////////////////////////////////////////////
+//  zengrong.net
+//  创建者:	zrong(zrongzrong@gmail.com)
+//  最后更新时间：2011-08-03
+////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.display.character
 {
 import flash.display.*;
@@ -373,11 +378,13 @@ public class MovableChar extends Character
 
 	public function run():void
 	{
+		this.play();
 		vel = speed;
 	}
 
 	public function stand():void
 	{
+		this.play();
 		vel = 0;
 	}
 
