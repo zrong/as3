@@ -1,7 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  zengrong.net
-//  创建者:	zrong
+//  创建者:	zrong(zrongzrong@gmail.com)
 //  创建时间：2010-12-30
+//  最后修改：2011-08-03
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
@@ -136,8 +137,9 @@ public class HTTPLoader
 	 */	
 	public function load($url:* , $requestVar:*=null):void
 	{
-		if(!$url)
-			return;
+		if(!$url) throw new ArgumentError('必须提供URL参数!');
+		if($url && ($url is Array) && ($url as Array).length==0)
+			throw new ArgumentError('提供的URL数组元素数量为0!');
 		//如果正在载入，就将要载入的url和值加入队列中，但不执行
 		if(_loading)
 		{

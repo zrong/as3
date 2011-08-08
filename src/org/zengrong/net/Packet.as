@@ -1,9 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
-//
 //  zengrong.net
 //  创建者:	zrong
-//  最后更新时间：2010-11-24
-//
+//  创建时间：2010-11-24
+//  最后时间：2011-08-03
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
@@ -102,6 +101,8 @@ public class Packet
 		//没有消息开头，说明消息被拆包了
 		else
 		{
+			if(!_messageByte)
+				throw new TypeError('无法找到包的前面部分，数据包定义可能有误！');
 			//将发来的字节写入_messageByte末尾
 			$data.position = 0;
 			$data.readBytes(_messageByte, _messageByte.length);
