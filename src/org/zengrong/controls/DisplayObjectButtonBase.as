@@ -14,7 +14,7 @@ import flash.events.MouseEvent;
 import flash.filters.DropShadowFilter;
 import flash.filters.ColorMatrixFilter;
 
-import com.bit101.components.Components;
+import com.bit101.components.Component;
 
 /**
  * 所有使用显示对象用作按钮的状态的按钮类的基类。ImageButton、ClassButton是它的子类

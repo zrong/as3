@@ -1,9 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-//
 //  zengrong.net
 //  创建者:	zrong
-//  最后更新时间：2010-12-07
-//
+//  最后更新时间：2011-7-12
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.display
 {
@@ -39,9 +37,7 @@ public class VideoDisplay extends Sprite
 	}
 	
 	//--------------------------------------------------------------------------
-	//
 	//  实例变量
-	//
 	//--------------------------------------------------------------------------
 	
 	private var _video:Video;
@@ -58,9 +54,7 @@ public class VideoDisplay extends Sprite
 	private var _muted:Boolean;
 	
 	//--------------------------------------------------------------------------
-	//
 	//  公共方法
-	//
 	//--------------------------------------------------------------------------
 	
 	//----------------------------------
@@ -235,11 +229,28 @@ public class VideoDisplay extends Sprite
 		}
 		_type = null;
 	}
+
+	public function destroy():void
+	{
+		close();
+		this.removeChild(_video);
+		if(_ns)
+		{
+			_ns.removeEventListener(NetStatusEvent.NET_STATUS, handler_nsStatus);
+			_ns = null;
+		}
+		if(_nc)
+		{
+			if(_nc.client)
+				_nc.client.destroy();
+			_nc.removeEventListener(NetStatusEvent.NET_STATUS, handler_ncStatus);
+			_nc.client = null;
+			_nc = null;
+		}
+	}
 	
 	//--------------------------------------------------------------------------
-	//
 	//  保护方法
-	//
 	//--------------------------------------------------------------------------
 	
 	protected function init():void
@@ -264,9 +275,7 @@ public class VideoDisplay extends Sprite
 	}
 	
 	//--------------------------------------------------------------------------
-	//
 	//  私有方法
-	//
 	//--------------------------------------------------------------------------
 	
 	private function initNC():void
@@ -371,5 +380,10 @@ class StreamClient
 		trace('VideoDisplay.NetStream.onMetaData(width,height):', $obj.width, $obj.height);
 		_videoDisplay.width = $obj.width;
 		_videoDisplay.height = $obj.height;
+	}
+
+	public function destroy():void
+	{
+		_videoDisplay = null;
 	}
 }

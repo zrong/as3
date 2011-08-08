@@ -29,7 +29,7 @@ public class ObjectUtil
 	 * @param $arrOrVector Array或者Vector
 	 * @throw RangeError 如果参数不是Array或者Vector，会抛出异常
 	 */	
-	public static function ArrayToString($arrOrVector:*, $delim:String=','):String
+	public static function Arr2String($arrOrVector:*, $delim:String=','):String
 	{
 		if(!isArray($arrOrVector))
 		{
@@ -44,61 +44,21 @@ public class ObjectUtil
 			__str += $arrOrVector[i].toString() + $delim;
 		}
 		delEndDelimiter(__str, $delim);
-		__str += ']';
-		return __str;
+		return __str + ']';
 	}
 	
 	/**
 	 * 将标准的Object转换成字符串，仅支持一层。
 	 */	
-	public static function ObjToString($obj:Object, $delim1:String=':', $delim2:String=','):String
+	public static function toString($obj:Object, $delim1:String=':', $delim2:String=','):String
 	{
 		var __str:String = '{';
 		for(var __key:String in $obj)
 		{
-			__str += __key + $delim1 + $obj[__key].toString() + $delim2;
+			__str += __key + $delim1 + $obj[__key] + $delim2;
 		}
 		delEndDelimiter(__str, $delim2);
 		return __str + '}';
-	}
-	
-	/**
-	 * 将对象转换成字符串形式
-	 * @param $obj 要转换的对象
-	 * @param $delim1 键值之间的定界符
-	 * @param $delim2 每对值之间的定界符
-	 * @param $pref 显示的前缀
-	 * @return 结果字符串
-	 */	
-	public static function toString($obj:*, $delim1:String=':', $delim2:String=', ', $pref:String=''):String
-	{
-		if(!$obj)
-			return 'null';
-		if(isSimple($obj))
-			return $obj.toString();
-		var __str:String = isArray($obj) ? '[' :'{';
-		var __data:* = null;
-		for(var __key:String in $obj)
-		{
-			__data = $obj[__key];
-			if(isSimple(__data))
-			{
-				__str += __key + $delim1 + __data.toString() + $delim2;
-			}
-			else if(isArray(__data))
-			{
-				__str += __key + $delim1 + toString(__data, $delim1, $delim2);
-			}
-			else if(__data is XML || __data is XMLList)
-			{
-				__str += __key + $delim1 + __data.toXMLString();
-			}
-			else
-			{
-				__str += __key + $delim1 + toString(__data, $delim1, $delim2);
-			}
-		}
-		return delEndDelimiter(__str, $delim2) + (isArray($obj) ? ']' :'}');
 	}
 	
 	/**
