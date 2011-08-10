@@ -5,12 +5,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.display.spritesheet
 {
-import org.zengrong.utils.ObjectUtil;
-
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.utils.ByteArray;
 import flash.utils.flash_proxy;
+
+import org.zengrong.utils.ObjectUtil;
 
 /**
  * 处理SpriteSheet的元数据
@@ -18,8 +18,9 @@ import flash.utils.flash_proxy;
  */
 public class SpriteSheetMetadata
 {
-	public function SpriteSheetMetadata()
+	public function SpriteSheetMetadata($totalFrame:int=-1)
 	{
+		if($totalFrame > 0)	setup($totalFrame);
 	}
 	
 	/**
@@ -80,7 +81,48 @@ public class SpriteSheetMetadata
 	//----------------------------------
 	//  public
 	//----------------------------------
-	
+	/**
+	 * 返回自身的副本（深复制）
+	 */
+	public function clone():SpriteSheetMetadata
+	{
+		var __meta:SpriteSheetMetadata = new SpriteSheetMetadata();
+		__meta.type = type;
+		__meta.isEqualSize = isEqualSize;
+		__meta.hasLabel = hasLabel;
+		__meta.hasName = hasName;
+		__meta.maskType = maskType;
+		__meta.totalFrame = totalFrame;
+		if(frameSizeRect)
+		{
+			__meta.frameSizeRect = new Vector.<Rectangle>;
+			for (var i:int = 0; i < frameSizeRect.length; i++) 
+			{
+				__meta.frameSizeRect[i] = frameSizeRect[i].clone();
+			}
+		}
+		if(labels)
+			__meta.labels = labels.concat();
+		if(labelsFrame)
+		{
+			__meta.labelsFrame = {};
+			for(var __label:String in labelsFrame) 
+			{
+				__meta.labelsFrame[__label] = (labelsFrame[__label] as Array).concat();
+			}
+		}
+		if(names)
+			__meta.names = names.concat();
+		if(namesIndex)
+		{
+			__meta.namesIndex = {};
+			for(var __name:String in namesIndex) 
+			{
+				__meta.namesIndex[__name] = namesIndex[__name];
+			}
+		}
+		return __meta;
+	}
 	/**
 	 * 销毁整个对象
 	 */	
@@ -244,7 +286,7 @@ public class SpriteSheetMetadata
 		}
 	}
 	/**
-	 * 从外部向数组中添加不相等的帧，一般在循环中执行
+	 * 从外部向数组中添加帧的尺寸，一般在循环中执行
 	 */	
 	public function addFrameSize($rect:Rectangle):void
 	{
@@ -269,11 +311,11 @@ public class SpriteSheetMetadata
 				',hasName:'+hasName+
 				',totalFrame:'+totalFrame+
 				',maskType:'+maskType+
-				',labels:'+ObjectUtil.ArrayToString(labels)+
-				',labelsFrame:'+ObjectUtil.ObjToString(labelsFrame)+
-				',frameSizeRect:'+ObjectUtil.ArrayToString(frameSizeRect)+
-				',names:'+ObjectUtil.ArrayToString(names)+
-				',namesIndex:'+ObjectUtil.ObjToString(namesIndex)+
+				',labels:'+ObjectUtil.array2String(labels)+
+				',labelsFrame:'+ObjectUtil.obj2String(labelsFrame)+
+				',frameSizeRect:'+ObjectUtil.array2String(frameSizeRect)+
+				',names:'+ObjectUtil.array2String(names)+
+				',namesIndex:'+ObjectUtil.obj2String(namesIndex)+
 				'}';
 	}
 }

@@ -72,6 +72,26 @@ public class SpriteSheet
 		metadata = null;
 		copyPixelIndex = 0;
 	}
+	
+	public function clone():SpriteSheet
+	{
+		var __ss:SpriteSheet = new SpriteSheet();
+		__ss.copyPixelIndex = copyPixelIndex;
+		if(_allBMDs)
+		{
+			var __bmds:Vector.<BitmapData> = new Vector.<BitmapData>;
+			for (var i:int = 0; i < _allBMDs.length; i++) 
+			{
+				__bmds[i] = _allBMDs[i].clone();
+			}
+			__ss.setFrames(__bmds);
+		}
+		if(bitmapData)
+			__ss.bitmapData = bitmapData;
+		if(metadata)
+			__ss.metadata = metadata;
+		return __ss;
+	}
 
 	/**
 	 * 仅销毁bitmapDataSheet。在parseBMD之后，就可以执行这个方法释放内存。
@@ -101,6 +121,13 @@ public class SpriteSheet
 		bitmapData.copyPixels($bmd, $bmd.rect, __point, null, null, true);
 		bitmapData.unlock();
 		copyPixelIndex ++;
+	}
+	
+	public function setFrames($bmds:Vector.<BitmapData>):void
+	{
+		while(_allBMDs && _allBMDs.length>0)
+			_allBMDs.pop().dispose();
+		_allBMDs = $bmds;
 	}
 	
 	/**
@@ -213,8 +240,8 @@ public class SpriteSheet
 	
 	private function checkRange():void
 	{
-		if(metadata.totalFrame==0 || metadata.frameSizeRect.length==0)
-			throw new RangeError('SpriteSheet中的帧数为0！');
+		if(metadata.totalFrame<=0 || metadata.frameSizeRect.length<=0)
+			throw new RangeError('SpriteSheet中的帧数必须大于0！');
 	}
 	
 }
