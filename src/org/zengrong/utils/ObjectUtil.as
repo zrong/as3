@@ -13,10 +13,10 @@ import flash.utils.getQualifiedSuperclassName;
 public class ObjectUtil
 {
 	/**
-	 * 复制一个普通对象
+	 * 克隆一个普通对象
 	 * @param value
 	 */	
-	public static function copy(value:Object):Object
+	public static function clone(value:Object):Object
 	{
 		var __buffer:ByteArray = new ByteArray();
 		__buffer.writeObject(value);

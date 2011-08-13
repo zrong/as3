@@ -19,8 +19,6 @@ public class SpriteSheet
 	{
 		bitmapData = $bmd;
 		metadata = $meta;
-		if(bitmapData && metadata)
-			parseBMD();
 	}
 	
 	/**
@@ -34,25 +32,49 @@ public class SpriteSheet
 	public var metadata:SpriteSheetMetadata;
 	
 	/**
-	 * 使用copyPixels写入图像的索引，每调用一次copyPixels，该索引增加1
-	 */	
-	public var copyPixelIndex:int = 0;
-
-	/**
 	 * 保存所有BMD的数组
 	 */
-	private var _allBMDs:Vector.<BitmapData>;
+	private var _allBmds:Vector.<BitmapData>;
 
 	/**
 	 * 因为bitmapData实际上是一整块Sheet，这个方法能够将整块Sheet解析成需要的数据
 	 * @throw ReferenceError 位图和元数据没有设置时抛出异常
 	 * @throw RangeError 帧数量为0的时候抛出异常
 	 */
-	public function parseBMD():void
+	public function parseSheet():void
 	{
 		checkData();
 		checkRange();
-		_allBMDs = createAll();
+		_allBmds = createAll();
+	}
+	
+	/**
+	 * 根据allBMDs中的bitmapdata列表，绘制整块的Sheet
+	 * @throw TypeError 没有提供被绘制的bitmapData，或缺少metadata数据
+	 * @throw RangeError metadata与spritesheet中的帧数量不匹配
+	 */
+	public function drawSheet($bmd:BitmapData=null):void
+	{
+		//没有_allBMDs，不绘制
+		if(!_allBmds) return;
+		if(!$bmd && !bitmapData) throw new TypeError('没有可供绘制的bitmapdata！');
+		if(!metadata) throw new TypeError('必须提供metadata才能开始绘制!');
+		if(!metadata.frameSizeRect) 
+			throw new TypeError('metadata中没有帧数据！');
+		if(metadata.totalFrame != _allBmds.length) 
+			throw new RangeError('metadata与spritesheet中的帧数量不匹配。meta:'+metadata.totalFrame+',sheet:'+_allBmds.length);
+		//如果提供了bitmapdata，就使用提供的覆盖当前保存的
+		if($bmd) bitmapData = $bmd;
+		var __frameBMD:BitmapData = null;
+		for (var i:int = 0; i < _allBmds.length; i++) 
+		{
+			__frameBMD = _allBmds[i];
+			bitmapData.lock();
+			//从metadata中获取该图像对应的Frame的rect，转换成Point
+			var __point:Point =  new Point(metadata.frameSizeRect[i].x, metadata.frameSizeRect[i].y);
+			bitmapData.copyPixels(__frameBMD, __frameBMD.rect, __point, null, null, true);
+			bitmapData.unlock();
+		}
 	}
 	
 	/**
@@ -61,28 +83,26 @@ public class SpriteSheet
 	public function destroy():void
 	{
 		//销毁数组中的图像
-		while(_allBMDs && _allBMDs.length>0)
+		while(_allBmds && _allBmds.length>0)
 		{
-			_allBMDs.pop().dispose();
+			_allBmds.pop().dispose();
 		}
 		dispose();
 		if(metadata)
 			metadata.destroy();
 		bitmapData = null;
 		metadata = null;
-		copyPixelIndex = 0;
 	}
 	
 	public function clone():SpriteSheet
 	{
 		var __ss:SpriteSheet = new SpriteSheet();
-		__ss.copyPixelIndex = copyPixelIndex;
-		if(_allBMDs)
+		if(_allBmds)
 		{
 			var __bmds:Vector.<BitmapData> = new Vector.<BitmapData>;
-			for (var i:int = 0; i < _allBMDs.length; i++) 
+			for (var i:int = 0; i < _allBmds.length; i++) 
 			{
-				__bmds[i] = _allBMDs[i].clone();
+				__bmds[i] = _allBmds[i].clone();
 			}
 			__ss.setFrames(__bmds);
 		}
@@ -94,7 +114,7 @@ public class SpriteSheet
 	}
 
 	/**
-	 * 仅销毁bitmapDataSheet。在parseBMD之后，就可以执行这个方法释放内存。
+	 * 仅销毁bitmapDataSheet。在parseSheet之后，就可以执行这个方法释放内存。
 	 */
 	public function dispose():void
 	{
@@ -110,24 +130,27 @@ public class SpriteSheet
 	 * @param $bmd 加入的帧的BitmapData
 	 * @throw ReferenceError 位图和元数据没有设置时抛出异常
 	 */	
-	public function addFrame($bmd:BitmapData):void
+	public function addFrame($bmd:BitmapData, $rect:Rectangle=null):void
 	{
-		checkData();
-		if(copyPixelIndex>=metadata.totalFrame)
-			return;
-		bitmapData.lock();
-		//从metadata中获取该图像对应的Frame的rect，转换成Point
-		var __point:Point =  new Point(metadata.frameSizeRect[copyPixelIndex].x, metadata.frameSizeRect[copyPixelIndex].y);
-		bitmapData.copyPixels($bmd, $bmd.rect, __point, null, null, true);
-		bitmapData.unlock();
-		copyPixelIndex ++;
+		if(!_allBmds) _allBmds = new Vector.<BitmapData>;
+		var __index:int = _allBmds.length;
+		_allBmds[__index] = $bmd;
+		if($rect && metadata && metadata.frameSizeRect)
+			metadata.frameSizeRect[__index] = $rect;
+
 	}
 	
-	public function setFrames($bmds:Vector.<BitmapData>):void
+	/**
+	 * 清空原有的帧（如果存在），并保存传递的帧列表
+	 * @param $bmds 待设置的帧列表
+	 * @param $rects 与帧列表对应的帧rect列表
+	 */
+	public function setFrames($bmds:Vector.<BitmapData>, $rects:Vector.<Rectangle>=null):void
 	{
-		while(_allBMDs && _allBMDs.length>0)
-			_allBMDs.pop().dispose();
-		_allBMDs = $bmds;
+		while(_allBmds && _allBmds.length>0)
+			_allBmds.pop().dispose();
+		_allBmds = $bmds;
+		if($rects && metadata) metadata.frameSizeRect = $rects;
 	}
 	
 	/**
@@ -137,8 +160,7 @@ public class SpriteSheet
 	 */	
 	public function getLabel($label:String):Vector.<BitmapData>
 	{
-		if(!_allBMDs)
-			parseBMD();
+		if(!_allBmds) parseSheet();
 		if(!metadata.hasLabel || metadata.labels.length==0 || !metadata.labelsFrame)
 			throw new ReferenceError('这个SpriteSheet不包含label。');
 		var __labelRange:Array = metadata.labelsFrame[$label];
@@ -156,8 +178,7 @@ public class SpriteSheet
 	{
 		checkData();
 		checkRange();
-		if(!_allBMDs)
-			parseBMD();
+		if(!_allBmds) parseSheet();
 		return getListFromRange(0, metadata.totalFrame);
 	}
 	
@@ -170,8 +191,7 @@ public class SpriteSheet
 	 */	
 	public function getListFromRange($start:int, $total:int):Vector.<BitmapData>
 	{
-		if(!_allBMDs)
-			parseBMD();
+		if(!_allBmds) parseSheet();
 		var __list:Vector.<BitmapData> = new Vector.<BitmapData>($total, true);
 		for(var i:int=0;i<$total;i++)
 			__list[i] = getBMDByIndex(i+$start);
@@ -185,9 +205,8 @@ public class SpriteSheet
 	 */	
 	public function getBMDByIndex($index:int):BitmapData
 	{
-		if(!_allBMDs)
-			parseBMD();
-		return _allBMDs[$index];
+		if(!_allBmds) parseSheet();
+		return _allBmds[$index];
 	}
 	
 	/**
@@ -199,11 +218,10 @@ public class SpriteSheet
 	 */	
 	public function getBMDByName($name:String):BitmapData
 	{
-		if(!_allBMDs)
-			parseBMD();
+		if(!_allBmds) parseSheet();
 		if(!metadata.hasName || !metadata.names)
 			throw new ReferenceError('这个SpriteSheet不包含name。');
-		return _allBMDs[metadata.namesIndex[$name]];
+		return _allBmds[metadata.namesIndex[$name]];
 	}
 
 	/**
