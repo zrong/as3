@@ -66,9 +66,21 @@ public class SpriteSheetMetadata
 	public var namesIndex:Object;
 	
 	/**
-	 * 每帧的Rect
+	 * 每帧在整个大的Sheet中的位置和尺寸
+	 * 这并非是最终在大的Sheet中体现出来的位置和尺寸。而是是未修剪之前的尺寸。也就是最终要在程序中使用的尺寸。
+	 * 因为如果执行了修剪，那么在大的Sheet中只会保存有效像素（空白的边缘被修建掉了）。
+	 * 而在还原到程序中的时候，还是必须使用原来的Rect大小的（因为要考虑到动作的外延范围）。
+	 * 这个Vector中保存的始终都是在程序使用时候的Rect。
 	 */	
-	private var _frameSizeRect:Vector.<Rectangle>;
+	public var frameRects:Vector.<Rectangle>;
+	
+	/**
+	 * 每帧原始的Rect，基于frameRect保存修剪信息
+	 * 例如，对frameRect进行了修剪操作，修剪的上下左右的值均为10像素。修剪后的frameRect为(0,0,50,50)
+	 * 那么originalFrameRect则为(-10,-10,70,70)
+	 * 如果frameRect没有经过修剪，则这个rect的w和h值与frameRect中的对应元素相等，但x和y为0
+	 */
+	public var originalFrameRects:Vector.<Rectangle>;
 	
 	//----------------------------------------
 	// getter/setter
@@ -79,17 +91,7 @@ public class SpriteSheetMetadata
 	 */	
 	public function get totalFrame():int
 	{
-		return frameSizeRect ? frameSizeRect.length : 0;
-	}
-	
-	public function get frameSizeRect():Vector.<Rectangle>
-	{
-		return _frameSizeRect;
-	}
-	
-	public function set frameSizeRect($rects:Vector.<Rectangle>):void
-	{
-		_frameSizeRect = $rects;
+		return frameRects ? frameRects.length : 0;
 	}
 	
 	//----------------------------------
@@ -105,12 +107,13 @@ public class SpriteSheetMetadata
 		__meta.hasLabel = hasLabel;
 		__meta.hasName = hasName;
 		__meta.maskType = maskType;
-		if(frameSizeRect)
+		if(frameRects)
 		{
-			__meta.frameSizeRect = new Vector.<Rectangle>;
-			for (var i:int = 0; i < frameSizeRect.length; i++) 
+			__meta.frameRects = new Vector.<Rectangle>;
+			for (var i:int = 0; i < frameRects.length; i++) 
 			{
-				__meta.frameSizeRect[i] = frameSizeRect[i].clone();
+				__meta.frameRects[i] = frameRects[i].clone();
+				__meta.originalFrameRects[i] = originalFrameRects[i].clone();
 			}
 		}
 		if(labels)
@@ -136,7 +139,7 @@ public class SpriteSheetMetadata
 		labelsFrame = null;
 		names = null;
 		namesIndex = null;
-		_frameSizeRect = null;
+		frameRects = null;
 	}
 	
 	/**
@@ -144,7 +147,8 @@ public class SpriteSheetMetadata
 	 */	
 	public function setup():void
 	{
-		frameSizeRect = new Vector.<Rectangle>();
+		frameRects = new Vector.<Rectangle>;
+		originalFrameRects = new Vector.<Rectangle>;
 	}
 	
 	/**
@@ -181,17 +185,27 @@ public class SpriteSheetMetadata
 	/**
 	 * 从外部向数组中添加帧的尺寸，一般在循环中执行
 	 */	
-	public function addFrameSize($rect:Rectangle):void
+	public function addFrame($sizeRect:Rectangle, $originalRect:Rectangle=null):void
 	{
-//		if(frameSizeRect.length>=frameCount)
+//		if(frameRects.length>=frameCount)
 //			return;
-		if(!_frameSizeRect)	setup();
-		writeFrame($rect);
+		if(!frameRects)	setup();
+		writeFrame($sizeRect, $originalRect);
 	}
 	
-	private function writeFrame($rect:Rectangle):void
+	public function addFrameAt($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null):void
 	{
-		_frameSizeRect[_frameSizeRect.length] = $rect;
+		if(!frameRects)	setup();
+		if(!$originalRect) $originalRect = $sizeRect.clone();
+		frameRects[$index] = $sizeRect;
+		originalFrameRects[$index] = $originalRect;
+	}
+	
+	private function writeFrame($sizeRect:Rectangle, $originalRect:Rectangle=null):void
+	{
+		if(!$originalRect) $originalRect = $sizeRect.clone();
+		frameRects[frameRects.length] = $sizeRect;
+		originalFrameRects[originalFrameRects.length] = $originalRect;
 	}
 	
 	//----------------------------------------
@@ -218,10 +232,14 @@ public class SpriteSheetMetadata
 			names = new Vector.<String>(__totalFrame, true);
 			namesIndex = {};
 		}
+		var __frameRect:Rectangle = null;
+		var __originalRect:Rectangle = null;
 		for(i=0;i<__totalFrame;i++)
 		{
 			__frame = __frames[i];
-			writeFrame(new Rectangle(int(__frame.x.toString()), int(__frame.y.toString()), int(__frame.w.toString()), int(__frame.h.toString())));
+			__frameRect = new Rectangle(int(__frame.x.toString()), int(__frame.y.toString()), int(__frame.w.toString()), int(__frame.h.toString()))
+			__originalRect = new Rectangle(int(__frame.ox.toString()), int(__frame.oy.toString()), int(__frame.ow.toString()), int(__frame.oh.toString()))
+			writeFrame(__frameRect, __originalRect);
 			if(hasName)
 			{
 				names[i] = __frame.@name.toString();
@@ -310,7 +328,7 @@ public class SpriteSheetMetadata
 		for(var i:int=0;i<totalFrame;i++)
 		{
 			__name = getFrameName($includeName, i);
-			__jsonObj.frames[i] = getRectObject(frameSizeRect[i], __name);
+			__jsonObj.frames[i] = getRectObject(frameRects[i], originalFrameRects[i], __name);
 		}
 		//加入附加信息
 		if(!$isSimple)
@@ -335,7 +353,7 @@ public class SpriteSheetMetadata
 		for(i=0;i<totalFrame;i++)  
 		{
 			__name = getFrameName($includeName, i);
-			__frames.appendChild( getRectXML(frameSizeRect[i], __name) );
+			__frames.appendChild( getRectXML(frameRects[i], originalFrameRects[i], __name) );
 		}
 		__xml.appendChild(__frames);
 		if(!$isSimple)
@@ -369,7 +387,7 @@ public class SpriteSheetMetadata
 		for(var i:int=0;i<totalFrame;i++)
 		{
 			__name = getFrameName($includeName, i);
-			__str += getRectTxt(frameSizeRect[i], __name);
+			__str += getRectTxt(frameRects[i], originalFrameRects[i], __name);
 		}
 		//如果需要附加信息，要在帧信息前面加上frames字样
 		if(!$isSimple)
@@ -447,9 +465,18 @@ public class SpriteSheetMetadata
 	/**
 	 * 返回Frame的Rect的Json格式
 	 */	
-	public static function getRectObject($rect:Rectangle, $name:String=null):Object
+	public static function getRectObject($sizeRect:Rectangle, $originRect:Rectangle, $name:String=null):Object
 	{
-		var __obj:Object = {x:$rect.x, y:$rect.y, w:$rect.width, h:$rect.height};
+		var __obj:Object = {
+			x:$sizeRect.x, 
+			y:$sizeRect.y, 
+			w:$sizeRect.width, 
+			h:$sizeRect.height,
+			ox:$originRect.x,
+			oy:$originRect.y,
+			ow:$originRect.width,
+			oh:$originRect.height
+		};
 		if($name) __obj.name = $name;
 		return __obj;
 	}
@@ -457,24 +484,37 @@ public class SpriteSheetMetadata
 	/**
 	 * 返回Frame的Rect的XML格式
 	 */	
-	public function getRectXML($rect:Rectangle, $name:String=null):XML
+	public function getRectXML($sizeRect:Rectangle, $originRect:Rectangle, $name:String=null):XML
 	{
 		var __xml:XML = <frame />;
 		if($name) __xml.@name = $name;
-		__xml.x = $rect.x;
-		__xml.y = $rect.y;
-		__xml.w = $rect.width;
-		__xml.h = $rect.height;
+		__xml.x = $sizeRect.x;
+		__xml.y = $sizeRect.y;
+		__xml.w = $sizeRect.width;
+		__xml.h = $sizeRect.height;
+		__xml.ox = $originRect.x;
+		__xml.oy = $originRect.y;
+		__xml.ow = $originRect.width;
+		__xml.oh = $originRect.height;
 		return __xml;
 	}
 	
 	/**
 	 * 返回Frame的Rect的纯文本格式
 	 */	
-	public function getRectTxt($rect:Rectangle, $name:String = null):String
+	public function getRectTxt($sizeRect:Rectangle, $originRect:Rectangle, $name:String = null):String
 	{
 		var __str:String = $name?($name+'='):'';
-		return __str + $rect.x+','+$rect.y+','+$rect.width+','+$rect.height+File.lineEnding;
+		return __str + 
+			$sizeRect.x+','+
+			$sizeRect.y+','+
+			$sizeRect.width+','+
+			$sizeRect.height+',' +
+			$originRect.x+','+
+			$originRect.y+','+
+			$originRect.width+','+
+			$originRect.height+
+			File.lineEnding;
 	}
 	
 	/**
@@ -518,7 +558,7 @@ public class SpriteSheetMetadata
 				',maskType:'+maskType+
 				',labels:'+ObjectUtil.array2String(labels)+
 				',labelsFrame:'+ObjectUtil.obj2String(labelsFrame)+
-				',frameSizeRect:'+ObjectUtil.array2String(frameSizeRect)+
+				',frameRects:'+ObjectUtil.array2String(frameRects)+
 				',names:'+ObjectUtil.array2String(names)+
 				',namesIndex:'+ObjectUtil.obj2String(namesIndex)+
 				'}';

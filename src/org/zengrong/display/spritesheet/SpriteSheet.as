@@ -59,20 +59,22 @@ public class SpriteSheet
 		if(!_allBmds) return;
 		if(!$bmd && !bitmapData) throw new TypeError('没有可供绘制的bitmapdata！');
 		if(!metadata) throw new TypeError('必须提供metadata才能开始绘制!');
-		if(!metadata.frameSizeRect) 
+		if(!metadata.frameRects || !metadata.originalFrameRects) 
 			throw new TypeError('metadata中没有帧数据！');
 		if(metadata.totalFrame != _allBmds.length) 
 			throw new RangeError('metadata与spritesheet中的帧数量不匹配。meta:'+metadata.totalFrame+',sheet:'+_allBmds.length);
 		//如果提供了bitmapdata，就使用提供的覆盖当前保存的
 		if($bmd) bitmapData = $bmd;
 		var __frameBMD:BitmapData = null;
+		//var __frameDrawPoint:Point = new Point();
 		for (var i:int = 0; i < _allBmds.length; i++) 
 		{
 			__frameBMD = _allBmds[i];
 			bitmapData.lock();
-			//从metadata中获取该图像对应的Frame的rect，转换成Point
-			var __point:Point =  new Point(metadata.frameSizeRect[i].x, metadata.frameSizeRect[i].y);
-			bitmapData.copyPixels(__frameBMD, __frameBMD.rect, __point, null, null, true);
+//			//从metadata中获取该图像对应的Frame的rect，转换成Point
+//			__frameDrawPoint.x = metadata.frameSizeRect[i].x
+//			__frameDrawPoint.y = metadata.frameSizeRect[i].y;
+			bitmapData.copyPixels(__frameBMD, __frameBMD.rect, metadata.frameRects[i].topLeft, null, null, true);
 			bitmapData.unlock();
 		}
 	}
@@ -127,30 +129,52 @@ public class SpriteSheet
 	
 	/**
 	 * 向SpriteSheet中加入一帧
-	 * @param $bmd 加入的帧的BitmapData
-	 * @throw ReferenceError 位图和元数据没有设置时抛出异常
 	 */	
-	public function addFrame($bmd:BitmapData, $rect:Rectangle=null):void
+	public function addFrame($bmd:BitmapData, $sizeRect:Rectangle=null, $originalRect:Rectangle=null):void
 	{
 		if(!_allBmds) _allBmds = new Vector.<BitmapData>;
 		var __index:int = _allBmds.length;
 		_allBmds[__index] = $bmd;
-		if($rect && metadata && metadata.frameSizeRect)
-			metadata.frameSizeRect[__index] = $rect;
-
+		if($sizeRect && metadata)
+			metadata.addFrame($sizeRect, $originalRect);
+	}
+	
+	/**
+	 * 向SpriteSheet的对应索引中加入一帧
+	 */
+	public function addFrameAt($index:int, $bmd:BitmapData, $sizeRect:Rectangle=null, $originalRect:Rectangle=null):void
+	{
+		if(!_allBmds) _allBmds = new Vector.<BitmapData>;
+		_allBmds[$index] = $bmd;
+		if($sizeRect && metadata)
+			metadata.addFrameAt($index, $sizeRect, $originalRect);
 	}
 	
 	/**
 	 * 清空原有的帧（如果存在），并保存传递的帧列表
 	 * @param $bmds 待设置的帧列表
-	 * @param $rects 与帧列表对应的帧rect列表
+	 * @param $sizeRects 与帧列表对应的帧sizeRect列表
+	 * @param $originalRects 与帧列表对应的帧trimRect列表
 	 */
-	public function setFrames($bmds:Vector.<BitmapData>, $rects:Vector.<Rectangle>=null):void
+	public function setFrames($bmds:Vector.<BitmapData>, $sizeRects:Vector.<Rectangle>=null, $originalRects:Vector.<Rectangle>=null):void
 	{
 		while(_allBmds && _allBmds.length>0)
 			_allBmds.pop().dispose();
 		_allBmds = $bmds;
-		if($rects && metadata) metadata.frameSizeRect = $rects;
+		if($sizeRects && metadata)
+		{
+			//如果没有提供trimRects，就复制sizeRects的vi
+			if(!$originalRects)
+			{
+				$originalRects = new Vector.<Rectangle>;
+				for (var i:int = 0; i < $sizeRects.length; i++) 
+				{
+					$originalRects[i] = new Rectangle(-$sizeRects[i].x, -$sizeRects[i].y, $sizeRects[i].width, $sizeRects[i].height);
+				}
+			}
+			metadata.frameRects = $sizeRects;
+			metadata.originalFrameRects = $originalRects;
+		}
 	}
 	
 	/**
@@ -244,10 +268,10 @@ public class SpriteSheet
 	 */	
 	public function createBMDByIndex($index:int):BitmapData
 	{
-		const __POINT:Point = new Point();
-		var __rect:Rectangle = metadata.frameSizeRect[$index];
-		var __bmd:BitmapData = new BitmapData(__rect.width, __rect.height, true, 0x00000000);
-		__bmd.copyPixels(bitmapData, __rect, __POINT, null, null, true);
+		var __origin:Rectangle = metadata.originalFrameRects[$index];
+		var __rect:Rectangle = metadata.frameRects[$index];
+		var __bmd:BitmapData = new BitmapData(__origin.width, __origin.height, true, 0x00000000);
+		__bmd.copyPixels(bitmapData, __rect, new Point(0-__origin.x, 0-__origin.y), null, null, true);
 		return __bmd;
 	}
 	private function checkData():void
@@ -258,7 +282,7 @@ public class SpriteSheet
 	
 	private function checkRange():void
 	{
-		if(metadata.totalFrame<=0 || metadata.frameSizeRect.length<=0)
+		if(metadata.totalFrame<=0 || metadata.frameRects.length<=0)
 			throw new RangeError('SpriteSheet中的帧数必须大于0！');
 	}
 	
