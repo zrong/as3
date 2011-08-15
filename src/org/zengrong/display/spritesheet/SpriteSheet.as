@@ -99,6 +99,18 @@ public class SpriteSheet
 	public function clone():SpriteSheet
 	{
 		var __ss:SpriteSheet = new SpriteSheet();
+		var __bmds:Vector.<BitmapData> = cloneFrames();
+		if(__bmds)
+			__ss.setFrames(__bmds);
+		if(bitmapData)
+			__ss.bitmapData = bitmapData.clone();
+		if(metadata)
+			__ss.metadata = metadata.clone();
+		return __ss;
+	}
+	
+	public function cloneFrames():Vector.<BitmapData>
+	{
 		if(_allBmds)
 		{
 			var __bmds:Vector.<BitmapData> = new Vector.<BitmapData>;
@@ -106,13 +118,9 @@ public class SpriteSheet
 			{
 				__bmds[i] = _allBmds[i].clone();
 			}
-			__ss.setFrames(__bmds);
+			return __bmds;
 		}
-		if(bitmapData)
-			__ss.bitmapData = bitmapData;
-		if(metadata)
-			__ss.metadata = metadata;
-		return __ss;
+		return null;
 	}
 
 	/**
@@ -163,17 +171,15 @@ public class SpriteSheet
 		_allBmds = $bmds;
 		if($sizeRects && metadata)
 		{
-			//如果没有提供trimRects，就复制sizeRects的vi
-			if(!$originalRects)
+			metadata.frameRects = new Vector.<Rectangle>;
+			metadata.originalFrameRects = new Vector.<Rectangle>;
+			for (var i:int = 0; i < $sizeRects.length; i++) 
 			{
-				$originalRects = new Vector.<Rectangle>;
-				for (var i:int = 0; i < $sizeRects.length; i++) 
-				{
-					$originalRects[i] = new Rectangle(-$sizeRects[i].x, -$sizeRects[i].y, $sizeRects[i].width, $sizeRects[i].height);
-				}
+				if($originalRects)
+					metadata.addFrameAt(i, $sizeRects[i], $originalRects[i]);
+				else
+					metadata.addFrameAt(i, $sizeRects[i]);
 			}
-			metadata.frameRects = $sizeRects;
-			metadata.originalFrameRects = $originalRects;
 		}
 	}
 	

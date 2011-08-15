@@ -190,22 +190,20 @@ public class SpriteSheetMetadata
 //		if(frameRects.length>=frameCount)
 //			return;
 		if(!frameRects)	setup();
-		writeFrame($sizeRect, $originalRect);
+		writeFrame(frameRects.length, $sizeRect, $originalRect);
 	}
 	
 	public function addFrameAt($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null):void
 	{
 		if(!frameRects)	setup();
-		if(!$originalRect) $originalRect = $sizeRect.clone();
-		frameRects[$index] = $sizeRect;
-		originalFrameRects[$index] = $originalRect;
+		writeFrame($index, $sizeRect, $originalRect);
 	}
 	
-	private function writeFrame($sizeRect:Rectangle, $originalRect:Rectangle=null):void
+	private function writeFrame($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null):void
 	{
-		if(!$originalRect) $originalRect = $sizeRect.clone();
-		frameRects[frameRects.length] = $sizeRect;
-		originalFrameRects[originalFrameRects.length] = $originalRect;
+		if(!$originalRect) $originalRect = new Rectangle(0-$sizeRect.x, 0-$sizeRect.y, $sizeRect.width, $sizeRect.height);
+		frameRects[$index] = $sizeRect;
+		originalFrameRects[$index] = $originalRect;
 	}
 	
 	//----------------------------------------
@@ -239,7 +237,7 @@ public class SpriteSheetMetadata
 			__frame = __frames[i];
 			__frameRect = new Rectangle(int(__frame.x.toString()), int(__frame.y.toString()), int(__frame.w.toString()), int(__frame.h.toString()))
 			__originalRect = new Rectangle(int(__frame.ox.toString()), int(__frame.oy.toString()), int(__frame.ow.toString()), int(__frame.oh.toString()))
-			writeFrame(__frameRect, __originalRect);
+			writeFrame(i, __frameRect, __originalRect);
 			if(hasName)
 			{
 				names[i] = __frame.@name.toString();
@@ -284,7 +282,7 @@ public class SpriteSheetMetadata
 		setup();
 		for(i=0;i<__totalFrame;i++)
 		{
-			writeFrame(new Rectangle($ba.readShort(), $ba.readShort(), $ba.readShort(), $ba.readShort())); 
+			writeFrame(i, new Rectangle($ba.readShort(), $ba.readShort(), $ba.readShort(), $ba.readShort())); 
 		}
 		if(hasLabel)
 		{
