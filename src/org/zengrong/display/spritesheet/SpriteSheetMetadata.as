@@ -201,7 +201,7 @@ public class SpriteSheetMetadata
 	
 	private function writeFrame($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null):void
 	{
-		if(!$originalRect) $originalRect = new Rectangle(0-$sizeRect.x, 0-$sizeRect.y, $sizeRect.width, $sizeRect.height);
+		if(!$originalRect) $originalRect = new Rectangle(0, 0, $sizeRect.width, $sizeRect.height);
 		frameRects[$index] = $sizeRect;
 		originalFrameRects[$index] = $originalRect;
 	}
@@ -211,8 +211,8 @@ public class SpriteSheetMetadata
 	//----------------------------------------
 	
 	/**
-	 * 从XML文件解析Metadata数据，XML文件必须由SpriteSheetPacker生成。
-	 * @param $xml 由SpriteSheetPacker生成的XML文件，或者自行生成且符合SpriteSheetPacker格式的XML文件。
+	 * 从XML文件解析Metadata数据，XML文件必须由Sprite Sheet Editor生成。
+	 * @param $xml 由Sprite Sheet Editor生成的XML文件，或者自行生成且符合Sprite Sheet Editor格式的XML文件。
 	 */	
 	public function decodeFormXML($xml:XML):void
 	{
@@ -235,8 +235,11 @@ public class SpriteSheetMetadata
 		for(i=0;i<__totalFrame;i++)
 		{
 			__frame = __frames[i];
-			__frameRect = new Rectangle(int(__frame.x.toString()), int(__frame.y.toString()), int(__frame.w.toString()), int(__frame.h.toString()))
-			__originalRect = new Rectangle(int(__frame.ox.toString()), int(__frame.oy.toString()), int(__frame.ow.toString()), int(__frame.oh.toString()))
+			__frameRect = new Rectangle(int(__frame.x.toString()), int(__frame.y.toString()), int(__frame.w.toString()), int(__frame.h.toString()));
+			__originalRect = new Rectangle(int(__frame.ox.toString()), int(__frame.oy.toString()), int(__frame.ow.toString()), int(__frame.oh.toString()));
+			//如果没有提供原始Frame的值，就交给writeFrame自动计算
+			if(__originalRect.x == 0 && __originalRect.y == 0 && __originalRect.width == 0 && __originalRect.height == 0)
+				__originalRect = null;
 			writeFrame(i, __frameRect, __originalRect);
 			if(hasName)
 			{
@@ -262,6 +265,57 @@ public class SpriteSheetMetadata
 					if(j==0 && __labelFrame[j]<0) __labelFrame[0] = 0;
 				}
 				labelsFrame[labels[i]] = __labelFrame;
+			}
+		}
+	}
+	
+	/**
+	 * 从普通Object文件解析Metadata数据，Object必须由Sprite Sheet Editor生成的JSON格式Metadata解析而来。
+	 */	
+	public function decodeFromObject($obj:Object):void
+	{
+		var i:int=0;
+		type = $obj.sheetType.toString();
+		hasLabel = $obj.hasLabel;
+		hasName = $obj.hasName;
+		maskType = int($obj.maskType);
+		var __totalFrame:int = $obj.totalFrame;
+		setup();
+		var __frames:Array = $obj.frames;
+		var __frame:Object = null;
+		if(hasName)
+		{
+			names = new Vector.<String>(__totalFrame, true);
+			namesIndex = {};
+		}
+		var __frameRect:Rectangle = null;
+		var __originalRect:Rectangle = null;
+		for(i=0;i<__totalFrame;i++)
+		{
+			__frame = __frames[i];
+			__frameRect = new Rectangle(__frame.x, __frame.y, __frame.w, __frame.h);
+			__originalRect = new Rectangle(__frame.ox, __frame.oy, __frame.ow,__frame.oh);
+			//如果没有提供原始Frame的值，就交给writeFrame自动计算
+			if(__originalRect.x == 0 && __originalRect.y == 0 && __originalRect.width == 0 && __originalRect.height == 0)
+				__originalRect = null;
+			writeFrame(i, __frameRect, __originalRect);
+			if(hasName)
+			{
+				names[i] = __frame.name;
+				namesIndex[names[i]] = i;
+			}
+		}
+		if(hasLabel)
+		{
+			var __count:int = $obj.labels.count;
+			labels = new Vector.<String>;
+			labelsFrame = {};
+			for each (var __labelName:String in $obj.labels) 
+			{
+				//count是一个特殊的属性，保存label的数量
+				if(__labelName!='count') continue;
+				labels[labels.length] = __labelName;
+				labelsFrame[__labelName] = $obj.labels[__labelName];
 			}
 		}
 	}

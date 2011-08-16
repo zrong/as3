@@ -259,25 +259,34 @@ public class SpriteSheet
 	 * @throw ReferenceError 位图和元数据没有设置时抛出异常
 	 * @throw RangeError 帧数量为0的时候抛出异常
 	 */	
-	private function createAll():Vector.<BitmapData>
+	public function createAll($origin:Boolean=true):Vector.<BitmapData>
 	{
 		checkData();
 		checkRange();
 		var __list:Vector.<BitmapData> = new Vector.<BitmapData>(metadata.totalFrame);
 		for(var i:int=0;i<metadata.totalFrame;i++)
-			__list[i] = createBMDByIndex(i);
+			__list[i] = createBMDByIndex(i, $origin);
 		return __list;
 	}
 	
 	/**
 	 * 创建对应索引的BitmapData
 	 */	
-	public function createBMDByIndex($index:int):BitmapData
+	public function createBMDByIndex($index:int, $origin:Boolean=true):BitmapData
 	{
 		var __origin:Rectangle = metadata.originalFrameRects[$index];
 		var __rect:Rectangle = metadata.frameRects[$index];
-		var __bmd:BitmapData = new BitmapData(__origin.width, __origin.height, true, 0x00000000);
-		__bmd.copyPixels(bitmapData, __rect, new Point(0-__origin.x, 0-__origin.y), null, null, true);
+		var __bmd:BitmapData = null;
+		if($origin)
+		{
+			__bmd = new BitmapData(__origin.width, __origin.height, true, 0x00000000);
+			__bmd.copyPixels(bitmapData, __rect, new Point(0-__origin.x, 0-__origin.y), null, null, true);
+		}
+		else
+		{
+			__bmd = new BitmapData(__rect.width, __rect.height, true, 0x00000000);
+			__bmd.copyPixels(bitmapData, __rect, new Point(0, 0), null, null, true);
+		}
 		return __bmd;
 	}
 	private function checkData():void

@@ -5,12 +5,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
-import org.zengrong.assets.AssetsType;
-import org.zengrong.display.spritesheet.MaskType;
-import org.zengrong.display.spritesheet.SpriteSheet;
-import org.zengrong.display.spritesheet.SpriteSheetMetadata;
-import org.zengrong.display.spritesheet.SpriteSheetType;
-
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.Loader;
@@ -24,7 +18,12 @@ import flash.net.URLLoader;
 import flash.net.URLLoaderDataFormat;
 import flash.net.URLRequest;
 import flash.system.LoaderContext;
-import flash.utils.ByteArray;
+
+import org.zengrong.assets.AssetsType;
+import org.zengrong.display.spritesheet.MaskType;
+import org.zengrong.display.spritesheet.SpriteSheet;
+import org.zengrong.display.spritesheet.SpriteSheetMetadata;
+import org.zengrong.display.spritesheet.SpriteSheetType;
 
 [Event(name="complete",type="flash.events.Event")]
 [Event(name="ioError",type="flash.events.IOErrorEvent")]
@@ -36,12 +35,22 @@ import flash.utils.ByteArray;
  * */
 public class SpriteSheetLoader extends EventDispatcher implements ILoader
 {
-	public function SpriteSheetLoader()
+	/**
+	 * @param $decodeJSON 提供将JSON字符串解析成Object对象的方法
+	 * 
+	 */	
+	public function SpriteSheetLoader($decodeJSON:Function=null)
 	{
+		_decodeJSON = $decodeJSON;
 		initLoader();
 	}
 	
+	/**
+	 * JSON解析方法比较复杂，因此从外部提供。避免增加类库大小
+	 */
+	protected var _decodeJSON:Function;
 	protected var _url:String;
+	protected var _metaType:String;
 	protected var _loading:Boolean;
 	protected var _loader:Loader;
 	protected var _urlLoader:URLLoader;
@@ -91,12 +100,14 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	public function getSpriteSheet():SpriteSheet
 	{
 		var __bmd:BitmapData = Bitmap(_loader.content).bitmapData;
+		if(!_metadata)
+			return new SpriteSheet(__bmd);
 		if(_metadata.maskType == MaskType.NO_MASK)
 			return new SpriteSheet(__bmd, _metadata);
 		var __merge:BitmapData = null;
 		var __rect:Rectangle = new Rectangle();
 		var __point:Point = new Point();
-		//复制Alpha通道
+		//合并Alpha通道
 		if(_metadata.maskType == MaskType.HOR_MASK)
 		{
 			__rect.width = __bmd.width*.5;
@@ -121,45 +132,20 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	//  public
 	//----------------------------------
 	/**
-	 * 开始载入SpriteSheet
-	 * 如果载入的是SS格式的SpriteSheet，则直接使用嵌入的元数据，不使用metadata参数提供的元数据。
-	 * 如果载入的是普通的图像文件，则使用metadata参数提供的元数据。
-	 * 如果载入的是普通的图像文件，但没有提供metadata参数，则自动载入同目录下同文件名的XML文件作为元数据。若无此文件，则抛出异常。（使用XML的原因是因为JSON需要增加解析包，会增加最终文件的大小。而XML原生支持）
+	 * 开始载入SpriteSheet，使用metadata参数提供的元数据，元数据类型默认为XML格式
+	 * 如果没有提供metadata参数，则自动载入同目录下同文件名的XML文件作为元数据。
+	 * 若无此文件，则抛出异常。（使用XML的原因是因为JSON需要增加解析包，会增加最终文件的大小。而XML原生支持）
 	 * @param $url	SpriteSheet文件路径
-	 * @param $type	是普通pic文件，则为true；是ss文件，则为false
-	 * @param $metaData	SpriteSheet的Metadata信息，由SpriteSheetPacker生成的XML格式。
+	 * @param $metaData	SpriteSheet的Metadata信息，由Sprite Sheet Editor生成，默认是XML格式，可支持XML和JSON（以标准Object方式提供）
 	 * @see org.zengrong.display.spritesheet.SpriteSheetMetadata
 	 */	
-	public function load($url:String, $type:Boolean=false, $metadata:XML=null):void
+	public function load($url:String, $metadata:*=null, $metaType:String='xml'):void
 	{
-		if(_loading)
-			return;
+		if(_loading)return;
 		_loading = true;
 		_url = $url;
-		_metadata = new SpriteSheetMetadata();
-		//trace('ss load:', _url, $type);
-		if($type)
-		{
-			//对于标准的图像文件，需要获取metadata信息，如果有，就开始载入图像文件
-			if($metadata)
-			{
-				_metadata.decodeFormXML($metadata);
-				_loader.load(new URLRequest(_url));
-			}
-			//如果没有metadata信息，就使用同目录下的同名json文件为metadata，载入它。
-			//metadata载入成功后，才载入实际的图像
-			else
-			{
-				_urlLoader.dataFormat = URLLoaderDataFormat.TEXT;
-				_urlLoader.load(new URLRequest(getMetadataXMLUrl(_url)));
-			}
-		}
-		//对于SS文件，直接载入二进制数据
-		else
-		{
-			_urlLoader.dataFormat = URLLoaderDataFormat.BINARY;
-			_urlLoader.load(new URLRequest(_url));
-		}
+		_metaType = $metaType;
+		decodeMetadata($metadata);
 	}
 	
 	public function destroy():void
@@ -181,6 +167,7 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 		_metadata = null;
 		_url = null;
 		_loading = false;
+		_metaType = null;
 	}
 	
 	//----------------------------------
@@ -195,17 +182,21 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	
 	protected function handler_urlLoaded(evt:Event):void
 	{
-		//trace('spriteSheetLoader.handler_urlLoaded:', evt.currentTarget, _urlLoader.dataFormat);
-		//如果载入的是Metadata，就保存XML格式的Metadata，然后再载入实际的图像
-		if(_urlLoader.dataFormat == URLLoaderDataFormat.TEXT)
+		if(_metaType == 'json')
 		{
-			_metadata.decodeFormXML(new XML(_urlLoader.data));
-			_loader.load(new URLRequest(_url), new LoaderContext(true));
+			if(_decodeJSON is Function)
+			{
+				_metadata = new SpriteSheetMetadata();
+				_metadata.decodeFromObject(_decodeJSON.call(null, _urlLoader.data));
+			}
 		}
-		//如果载入的是二进制数据，就将其分离成元数据和图像信息，使用loader再次载入实际的图像字节数组
 		else
 		{
+			_metadata = new SpriteSheetMetadata();
+			_metadata.decodeFormXML(new XML(_urlLoader.data));
 		}
+		//载入图像文件
+		_loader.load(new URLRequest(_url), new LoaderContext(true));
 	}
 	
 	protected function handler_progress(evt:ProgressEvent):void
@@ -224,18 +215,50 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	}
 	
 	//----------------------------------
-	//  private
+	//  内部方法
 	//----------------------------------
-	//根据载入的图片的地址，获取同名的xml metadata文件
-	private function getMetadataXMLUrl($url:String):String
+	
+	/**
+	 * 这个方法只实现了XML格式metadta的自动载入。因为JSON需要解码器，会增加文件大小。
+	 */
+	protected function decodeMetadata($metadata:*):void
+	{
+		//trace('ss load:', _url, $type);
+		//对于标准的图像文件，需要获取metadata信息，如果有，就开始载入图像文件
+		if($metadata)
+		{
+			_metadata = new SpriteSheetMetadata();
+			if(_metaType == 'xml')
+				_metadata.decodeFormXML($metadata);
+			else
+				_metadata.decodeFromObject($metadata);
+			//如果提供了Metadata，就开始载入图像文件
+			_loader.load(new URLRequest(_url));
+		}
+		//如果没有metadata信息，就载入同目录下的同名文件为metadata，扩展名取决于$metaType的值
+		//metadata载入成功后，才载入实际的图像
+		else
+		{
+			_urlLoader.dataFormat = URLLoaderDataFormat.TEXT;
+			_urlLoader.load(new URLRequest(getMetadataUrl(_url, _metaType)));
+		}
+	}
+	
+	/**
+	 * 根据载入的图片的地址，获取同名的metadata文件
+	 */
+	protected function getMetadataUrl($url:String, $type:String):String
 	{
 		var __dotIndex:int = $url.lastIndexOf('.');
 		if(__dotIndex == -1)
-			return $url + '.xml';
-		return $url.slice(0, __dotIndex) + '.xml';
+			return $url + '.'+$type;
+		return $url.slice(0, __dotIndex) + '.'+$type;
 	}
 	
-	private function isLoadMetadata($loader:*):Boolean
+	/**
+	 * 判断当前的载入是否与Metadata相关的
+	 */
+	protected function isLoadMetadata($loader:*):Boolean
 	{
 		return $loader == _urlLoader && _urlLoader.dataFormat == URLLoaderDataFormat.TEXT;
 	}
