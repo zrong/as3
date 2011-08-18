@@ -158,6 +158,12 @@ public class SpriteSheet
 			metadata.addFrameAt($index, $sizeRect, $originalRect);
 	}
 	
+	public function removeFrameAt($index:int):void
+	{
+		if(_allBmds) _allBmds.splice($index,1);
+		if(metadata) metadata.removeFrameAt($index);
+	}
+	
 	/**
 	 * 清空原有的帧（如果存在），并保存传递的帧列表
 	 * @param $bmds 待设置的帧列表

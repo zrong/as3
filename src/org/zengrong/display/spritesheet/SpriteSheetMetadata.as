@@ -199,6 +199,12 @@ public class SpriteSheetMetadata
 		writeFrame($index, $sizeRect, $originalRect);
 	}
 	
+	public function removeFrameAt($index:int):void
+	{
+		frameRects.splice($index,1);
+		originalFrameRects.splice($index,1);
+	}
+	
 	private function writeFrame($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null):void
 	{
 		if(!$originalRect) $originalRect = new Rectangle(0, 0, $sizeRect.width, $sizeRect.height);
