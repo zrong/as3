@@ -19,60 +19,97 @@ package org.zengrong.utils
 	public class Chessboard
 	{
 		/**
+		 * 外部容器宽度，运算外部动态值的时候需要,arithmetic需要
+		 */
+		public static var box_w:int;
+
+		/**
+		 * 舞台高度，需求同上
+		 */
+		public static var box_h:int;
+
+		/**
 		 * 计算站位的总宽度
 		 */		
-		public static var WIDTH:int = 432;
+		public static var width:int = 432;
 		
 		/**
 		 *计算站位的总高度 
 		 */
-		public static var HEIGHT:int = 400;
+		public static var height:int = 400;
 		
 		/**
 		 * 计算站位的行数
 		 */		
-		public static var ROW:int = 3;
+		public static var row:int = 3;
 		
 		/**
 		 * 计算站位的列数
 		 */		
-		public static var COLUMN:int = 4;
+		public static var column:int = 4;
 		
 		/**
 		 * 每个人站位坐标的横向间距，间距自动计算
 		 */		
-		private static var H_GAP:int = 100;
+		private static var h_gap:int = 100;
 		
 		/**
 		 * 每个人站位坐标的纵向间距，间距自动计算
 		 */		
-		private static var V_GAP:int = 130;
+		private static var v_gap:int = 130;
+
+		/**
+		 * 支持的运算符和变量
+		 * 例如：w-8 h/2 等等。格式必须是 1(w或h) 2(运算符) 3(数字)
+		 */
+		private static var arithReg:RegExp = /([w|h])([+|\-|*|\/]+)(\d+)/;
 		
-		private var _points:Object;	//保存坐标
-		private var _pointUse:Object;	//保存坐标是否被使用
-		
-		private var _basePoint:Point;
-		private var _isLeft:Boolean;
-		//$ourpart, 是否是己方。如果是己方，坐标从右往左计算，否则就从左往右计算。因为己方总是站在左边的
-		public function Chessboard($point:Point=null, $left:Boolean=true)
+		/**
+		 * 建立一个站位排列，需要提供基准站位点和是否站在左边
+		 * 如果站在右边，基准站位点是位于本方站位方块左上角的那一点。因为右边的x偏移值是整数
+		 * 如果站在左边，基准站位点就是位于本方站位方块右上角的那一点。因为左边的x偏移值是负数
+		 * @param $basePoint 基准坐标
+		 * @param $left	是否是左边的坐标
+		 */
+		public function Chessboard($basePoint:Point=null, $left:Boolean=true)
 		{
-			if(!$point)
+			if(!$basePoint)
 				return;
-			create($point, $left);
+			create($basePoint, $left);
 		}
 		
-		public function create($point:Point, $left:Boolean):void
+		/**
+		 * 保存所有坐标
+		 */
+		private var _points:Object;	
+
+		/**
+		 * 坐标是否被使用的情况
+		 */
+		private var _pointUse:Object;
+		
+		/**
+		 * 基准坐标
+		 */
+		private var _basePoint:Point;
+
+		/**
+		 * 是不是坐标的坐标
+		 */
+		private var _isLeft:Boolean;
+
+		public function create($basePoint:Point, $left:Boolean):void
 		{
-			if(!$point)
+			if(!$basePoint)
 				throw new Error('要生成站位坐标，必须首先提供初始坐标！');
-			_basePoint = $point;
+			_basePoint = $basePoint;
 			_isLeft = $left;
-			H_GAP = WIDTH / COLUMN;
+			h_gap = width / column;
 			_points = new Object();
 			_pointUse = new Object();
 			var __direction:int = _isLeft ? -1 : 1;
 			//根据站位的行数生成坐标
-			for(var i:int=1; i<=ROW; i++)
+			for(var i:int=1; i<=row; i++)
 			{
 				drawPoint(i, __direction);
 			}
@@ -97,14 +134,43 @@ package org.zengrong.utils
 		{
 			return _pointUse;
 		}
-		
+
+		/**
+		 * 对传来的值进行运算，支持加减乘除的一次运算，变量支持w和h
+		 */
+		public function arithmetic($coord:*):int
+		{
+			var __num:Number = parseInt($coord);
+			//如果可以解析，就返回解析后的值
+			if(!isNaN(__num)) return __num;
+			//如果该值不是字符串，就返回0
+			if(!($coord is String)) return 0;
+			var __coord:String = String($coord).toLowerCase();
+			//不符合规则，返回0
+			if(!arithReg.test(__coord)) return 0;
+			//如果没有设置容器宽高，返回0
+			if(box_w == 0 || box_h == 0) return 0;
+			var __arr:Array = __coord.match(arithReg);
+			//trace('arr:', __arr);
+			var __box:int = __arr[1] == 'w' ? box_w : box_h;
+			__num = int(__arr[3]);
+			//加减乘除运算
+			if(__arr[2] == '+')
+				return __box + __num;
+			else if(__arr[2] == '-')
+				return __box - __num;
+			else if(__arr[2] == '*')
+				return __box * __num;
+			return int(__box/__num);
+		}
+
 		public function setPoints($point:Object):void
 		{
 			_points = {};
 			_pointUse = {};
 			for(var __key:String in $point)
 			{
-				_points[__key] = new Point($point[__key].x, $point[__key].y);
+				_points[__key] = new Point(arithmetic($point[__key].x), arithmetic($point[__key].y));
 				_pointUse[__key] = false;
 			}
 		}
@@ -162,21 +228,21 @@ package org.zengrong.utils
 		private function drawPoint($row:int, $direction:int=1):void
 		{
 			//垂直分隔的值根据行数来确定
-			V_GAP = HEIGHT / $row;
+			v_gap = height / $row;
 			//计算“这次”生成一共有几个坐标
-			var __count:int = COLUMN*$row;
+			var __count:int = column*$row;
 			var __points:Array = [];
 			for(var i:int=0; i<__count; i++)
 			{
 				//列索引，以站在右边的一方为例。左边第1列为0，第2列为1，以此类推。
-				var __c:int = int(i%COLUMN);
+				var __c:int = int(i%column);
 				//行索引，0代表这一列中站立的第1个人的坐标，1代表这一列中站立的第2个人的坐标，以此类推。
-				var __r:int = int(i/COLUMN);
+				var __r:int = int(i/column);
 				
 				/*基于基准站位点计算坐标。
 				如果本方站在右边，基准站位点是位于本方站位方块左上角的那一点。因为右边的x偏移值是整数
 				如果本方站在左边，基准站位点就是位于本方站位方块右上角的那一点。因为左边的x偏移值是负数*/
-				var __x:Number = _basePoint.x + $direction*(H_GAP/2 + H_GAP*__c);
+				var __x:Number = _basePoint.x + $direction*(h_gap/2 + h_gap*__c);
 				var __y:Number = _basePoint.y + getOffsetY($row, __r);
 				
 				var __point:Point = new Point(__x, __y);
@@ -218,13 +284,13 @@ package org.zengrong.utils
 			else
 			{
 				//偶数行的间隔初始值为行高的一半
-				__centerDist = V_GAP / 2;
+				__centerDist = v_gap / 2;
 				//偶数行第一行和第二行中中间为中心线，那么第1、2行与中心线的距离为行高的一半，3、4行为1倍行高，5、6行为2倍行高……
 				__vy = Math.floor($rowIndex/2);
 				//偶数行，当行索引为奇数的时候，坐标应该向上，否则向下
 				__pn = Boolean($rowIndex%2) ? 1 : -1;
 			}
-			return __pn*(__centerDist + V_GAP * __vy); 
+			return __pn*(__centerDist + v_gap * __vy); 
 		}
 	}
 }

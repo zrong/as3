@@ -5,7 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.display.character
 {
-import org.zengrong.text.FTEFactory;
+import com.youxi.text.FTEFactory;
 
 import flash.display.BitmapData;
 import flash.display.Bitmap;
@@ -35,6 +35,9 @@ public class Character extends Sprite
 		init();
 	}
 
+	//----------------------------------------
+	// public变量
+	//----------------------------------------
 	/**
 	 * 角色的z轴值，因为z已经被Sprite使用，因此采用wz
 	 */
@@ -74,6 +77,15 @@ public class Character extends Sprite
 	 * 是否重复播放，如果为真，那么当播放到最后一帧的时候，会跳转到第一帧。否则就会停止在最后帧
 	 */	
 	public var isRepeat:Boolean = false;
+
+	//----------------------------------------
+	// protected变量
+	//----------------------------------------
+	
+	/**
+	 * 是否已经初始化
+	 */
+	protected var _init:Boolean = false;
 
 	/**
 	 * 图像列表
@@ -136,6 +148,7 @@ public class Character extends Sprite
 
 	protected function init():void
 	{
+		_init = true;
 		_flipMatrix = new Matrix(-1,0,0,1);
 		_bmp = new Bitmap();
 		this.addChild(_bmp);
@@ -151,6 +164,7 @@ public class Character extends Sprite
 
 	public function destroy():void
 	{
+		_init = false;
 		this.removeChild(_bmp);
 		_bmp = null;
 		_bmds = null;
@@ -166,6 +180,11 @@ public class Character extends Sprite
 	//----------------------------------
 	//  getter/setter
 	//----------------------------------
+
+	public function get isInit():Boolean
+	{
+		return _init;
+	}
 
 	/**
 	 * 当前是否正在播放帧动画
@@ -252,6 +271,7 @@ public class Character extends Sprite
 	//----------------------------------
 	public function update($elapsed:Number, $delay:Number):void
 	{
+		if(!isInit) return;
 		updateFrame($elapsed);
 		hideOnOverEdge();
 		//自动计算z值，z值其实是y值

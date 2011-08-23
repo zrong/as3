@@ -1,12 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  youxi.com
+//  zengrong.net
 //  创建者:	zrong
 //  创建时间：2011-04-11
 //	修改时间：2011-08-11
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.display.spritesheet
 {
-import flash.filesystem.File;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.utils.ByteArray;
@@ -220,7 +219,7 @@ public class SpriteSheetMetadata
 	 * 从XML文件解析Metadata数据，XML文件必须由Sprite Sheet Editor生成。
 	 * @param $xml 由Sprite Sheet Editor生成的XML文件，或者自行生成且符合Sprite Sheet Editor格式的XML文件。
 	 */	
-	public function decodeFormXML($xml:XML):void
+	public function decodeFromXML($xml:XML):void
 	{
 		var i:int=0;
 		type = $xml.sheetType.toString();
@@ -560,7 +559,7 @@ public class SpriteSheetMetadata
 	/**
 	 * 返回Frame的Rect的纯文本格式
 	 */	
-	public function getRectTxt($sizeRect:Rectangle, $originRect:Rectangle, $name:String = null):String
+	public function getRectTxt($sizeRect:Rectangle, $originRect:Rectangle, $name:String = null, $lineEnding:String="\n"):String
 	{
 		var __str:String = $name?($name+'='):'';
 		return __str + 
@@ -572,7 +571,7 @@ public class SpriteSheetMetadata
 			$originRect.y+','+
 			$originRect.width+','+
 			$originRect.height+
-			File.lineEnding;
+			$lineEnding;
 	}
 	
 	/**
@@ -580,12 +579,12 @@ public class SpriteSheetMetadata
 	 * @param $key	键名
 	 * @param $value	键值
 	 */	
-	private function getTextLine($key:String, $value:*=null):String
+	private function getTextLine($key:String, $value:*=null, $lineEnding:String="\n"):String
 	{
 		var __str:String = $key;
 		if($value != null)
 			__str += '=' + $value.toString();
-		return __str + File.lineEnding;
+		return __str + $lineEnding;
 	}
 	
 	/**
