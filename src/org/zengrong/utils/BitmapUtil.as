@@ -82,8 +82,9 @@ public class BitmapUtil
 		}
 		if(__rect.width<=0||__rect.height<=0)
 		{
-			trace('不能处理空位图:', __rect.toString()	);
-			return null;
+			trace('空位图原样返回');
+			return {rect:$bmd.rect.clone(), bitmapData:$bmd.clone()};
+			//return null;
 		}
 		var __bmd:BitmapData = new BitmapData(__rect.width, __rect.height, $bmd.transparent, 0x00000000);
 		__bmd.copyPixels($bmd, __rect, new Point(0,0), null, null, true);
