@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  zengrong.net
+//  zengrong.org
 //  创建者:	zrong
 //  创建时间：2011-04-11
-//	修改时间：2011-08-11
+//	修改时间：2011-08-25
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.display.spritesheet
 {
@@ -325,52 +325,6 @@ public class SpriteSheetMetadata
 		}
 	}
 	
-	/**
-	 * 从ByteArray解析MetaData
-	 * @param $ba 从SS格式中提取的Metadata数据
-	 */	
-	public function decodeFromByteArray($ba:ByteArray):void
-	{
-		var i:int=0;
-		$ba.position = 0;
-		type = $ba.readUTF();
-		hasLabel = $ba.readBoolean();
-		hasName = $ba.readBoolean();
-		maskType = $ba.readByte();
-		var __totalFrame:int = $ba.readShort();
-		setup();
-		for(i=0;i<__totalFrame;i++)
-		{
-			writeFrame(i, new Rectangle($ba.readShort(), $ba.readShort(), $ba.readShort(), $ba.readShort())); 
-		}
-		if(hasLabel)
-		{
-			var __count:int = $ba.readShort();
-			labels = new Vector.<String>(__count, true);
-			labelsFrame = {};
-			var __first:int = 0;
-			var __total:int = 0;
-			for(i=0; i<__count; i++)
-			{
-				labels[i] = $ba.readUTF();
-				__first = $ba.readShort();
-				__total = $ba.readShort();
-				if(__first<0) __first = 0;
-				labelsFrame[labels[i]] = [__first, __total];
-			}
-		}
-		if(hasName)
-		{
-			names = new Vector.<String>(__totalFrame, true);
-			namesIndex = {};
-			for(i=0;i<__totalFrame;i++)
-			{
-				names[i] = $ba.readUTF();
-				namesIndex[names[i]] = $ba.readShort();
-			}
-		}
-	}
-	
 	//----------------------------------------
 	// encode
 	//----------------------------------------
@@ -390,7 +344,7 @@ public class SpriteSheetMetadata
 		//加入附加信息
 		if(!$isSimple)
 		{
-			var __addObj:Object = getAddObject();
+			var __addObj:Object = getAddObject($includeName);
 			for(var __addKey:String in __addObj)
 				__jsonObj[__addKey] = __addObj[__addKey];
 		}
@@ -415,7 +369,7 @@ public class SpriteSheetMetadata
 		__xml.appendChild(__frames);
 		if(!$isSimple)
 		{
-			var __addXMLList:XMLList = getAddXML().children();
+			var __addXMLList:XMLList = getAddXML($includeName).children();
 			for(i = 0;i<__addXMLList.length();i++)
 			{
 				__xml.appendChild(__addXMLList[i]);
@@ -428,41 +382,41 @@ public class SpriteSheetMetadata
 	 * 返回Metadata的XML格式字符串，并加上XML头
 	 * @param $isSimple 是否简单数据
 	 */	
-	public function toXMLString($isSimple:Boolean=false, $includeName:Boolean=true):String
+	public function toXMLString($isSimple:Boolean=false, $includeName:Boolean=true, $lineEnding:String='\n'):String
 	{
-		return getTextLine('<?xml version="1.0" encoding="UTF-8"?>') + toXML($isSimple,$includeName).toXMLString();
+		return getTextLine('<?xml version="1.0" encoding="UTF-8"?>',null, $lineEnding) + toXML($isSimple,$includeName).toXMLString();
 	}
 	
 	/**
 	 * 返回TXT格式的Metadata
 	 * @param $isSimple 是否简单数据
 	 */	
-	public function toTXT($isSimple:Boolean=false, $includeName:Boolean=true):String
+	public function toTXT($isSimple:Boolean=false, $includeName:Boolean=true, $lineEnding:String="\n"):String
 	{
-		var __str:String = getTextLine('frames');
+		var __str:String = getTextLine('frames',null,$lineEnding);
 		var __name:String = null;
 		for(var i:int=0;i<totalFrame;i++)
 		{
 			__name = getFrameName($includeName, i);
-			__str += getRectTxt(frameRects[i], originalFrameRects[i], __name);
+			__str += getRectTxt(frameRects[i], originalFrameRects[i], __name, $lineEnding);
 		}
 		//如果需要附加信息，要在帧信息前面加上frames字样
 		if(!$isSimple)
-			__str += getAddTXT();
+			__str += getAddTXT($includeName, $lineEnding);
 		return __str;
 	}
 	
 	/**
 	 * 获取Object格式的附加信息
 	 */	
-	public function getAddObject():Object
+	public function getAddObject($includeName:Boolean):Object
 	{
 		var __jsonObj:Object =	{};
 		//写入sheet的类型
 		__jsonObj.sheetType = type;
 		__jsonObj.hasLabel = hasLabel;
 		__jsonObj.maskType = maskType;
-		__jsonObj.hasName = hasName;
+		__jsonObj.hasName = $includeName;
 		__jsonObj.totalFrame = totalFrame;
 		if(hasLabel)
 		{
@@ -475,13 +429,13 @@ public class SpriteSheetMetadata
 	/**
 	 * 获取XML格式的附加信息
 	 */	
-	public function getAddXML():XML
+	public function getAddXML($includeName:Boolean):XML
 	{
 		var __xml:XML = <metadata />;
 		__xml.sheetType = type;
 		__xml.hasLabel = hasLabel;
 		__xml.maskType = maskType;
-		__xml.hasName = hasName;
+		__xml.hasName = $includeName;
 		__xml.totalFrame =totalFrame;
 		if(hasLabel)
 		{
@@ -499,21 +453,21 @@ public class SpriteSheetMetadata
 	/**
 	 * 获取TXT格式的附加信息
 	 */	
-	public function getAddTXT():String
+	public function getAddTXT($includeName:Boolean, $lineEnding:String="\n"):String
 	{
 		var __str:String = '';
-		__str += getTextLine('sheepType', type);
-		__str += getTextLine('hasLabel',hasLabel);
-		__str += getTextLine('maskType',maskType);
-		__str += getTextLine('hasName',hasName);
-		__str += getTextLine('totalFrame',totalFrame);
+		__str += getTextLine('sheepType', type, $lineEnding);
+		__str += getTextLine('hasLabel',hasLabel, $lineEnding);
+		__str += getTextLine('maskType',maskType, $lineEnding);
+		__str += getTextLine('hasName',$includeName, $lineEnding);
+		__str += getTextLine('totalFrame',totalFrame, $lineEnding);
 		if(hasLabel)
 		{
-			__str += getTextLine('labels');
-			__str += getTextLine('count', labels.length);
+			__str += getTextLine('labels',null, $lineEnding);
+			__str += getTextLine('count', labels.length, $lineEnding);
 			for(var __key:String in labelsFrame)
 			{
-				__str += getTextLine(__key, labelsFrame[__key].toString());
+				__str += getTextLine(__key, labelsFrame[__key].toString(), $lineEnding);
 			}
 		}
 		return __str;

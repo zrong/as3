@@ -193,7 +193,7 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 		else
 		{
 			_metadata = new SpriteSheetMetadata();
-			_metadata.decodeFormXML(new XML(_urlLoader.data));
+			_metadata.decodeFromXML(new XML(_urlLoader.data));
 		}
 		//载入图像文件
 		_loader.load(new URLRequest(_url), new LoaderContext(true));
@@ -229,7 +229,7 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 		{
 			_metadata = new SpriteSheetMetadata();
 			if(_metaType == 'xml')
-				_metadata.decodeFormXML($metadata);
+				_metadata.decodeFromXML($metadata);
 			else
 				_metadata.decodeFromObject($metadata);
 			//如果提供了Metadata，就开始载入图像文件
