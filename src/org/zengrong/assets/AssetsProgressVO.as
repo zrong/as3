@@ -1,7 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  zengrong.org
+//  zengrong.net
 //  创建者:	zrong
 //  创建时间：2011-04-27
+//  修改时间：2011-08-25
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.assets
 {
@@ -15,9 +16,9 @@ public class AssetsProgressVO
 	{
 		if($curFile)
 		{
-			name = $curFile.name;
+			name = $curFile.fname;
 			url = $curFile.url;
-			type = $curFile.type;
+			type = $curFile.ftype;
 			if($curFile.loaded!=undefined)
 				loaded = $curFile.loaded;
 			if($curFile.total!=undefined)

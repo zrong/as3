@@ -2,6 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2011-04-23
+//  最后修改：2011-08-24
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.assets
 {
@@ -43,37 +44,10 @@ public class Assets extends EventDispatcher
 	 */
 	public static const PROGRESS:String = 'progress';
 
-	private static var _instance:Assets;
 	
-	private static var _fun_loadDone:Function;
-	private static var _fun_loadInfo:Function;
-	private static var _fun_loadProgress:Function;
-	
-	/**
-	 * Assets是否已经初始化
-	 */
-	public static function get isInit():Boolean
-	{
-		return Boolean(_instance);
-	}
-
-	/**
-	 * 获取instance的get方法，只是简单的调用getAssets，看你喜欢用哪种
-	 */
-	public static function get instance():Assets
-	{
-		return getAssets();
-	}
-
-	/**
-	 * 获取instance的方法
-	 */
-	public static function getAssets():Assets
-	{
-		if(!_instance)
-			_instance = new Assets(new Singlton);
-		return _instance;
-	}
+	private var _fun_loadDone:Function;
+	private var _fun_loadInfo:Function;
+	private var _fun_loadProgress:Function;
 	
 	/**
 	 * 设置Assets在载入外部资源的过程中的处理程序，第一个处理程序必须设定。
@@ -84,31 +58,19 @@ public class Assets extends EventDispatcher
 	 * 需要注意的是，代表列表的载入流程的事件，是从该资源开始载入的时候发出的。
 	 * @see org.zengrong.assets.AssetsProgressVO
 	 * */
-	public static function setListener($done:Function, $info:Function=null, $progress:Function=null):void
+	public function setListener($done:Function, $info:Function=null, $progress:Function=null):void
 	{
 		_fun_loadDone = $done;
 		_fun_loadInfo = $info;
 		_fun_loadProgress = $progress;
 	}
 	
-	public static function clear():void
-	{
-		_fun_loadDone = null;
-		_fun_loadInfo = null;
-		_fun_loadProgress = null;
-		if(_instance)
-		{
-			_instance.destroy();
-			_instance = null;
-		}
-	}
-	
-	public function Assets($sig:Singlton)
+	public function Assets()
 	{
 		init();
 	}
 	
-	private var _visualLoader:VisualLoader;	//载入可视文件的loader，对应FILE_VISUAL
+	private var _visualLoader:VisualLoader;		//载入可视文件的loader
 	private var _ssLoader:SpriteSheetLoader; 	//载入SpriteSheet
 	
 	private var _urls:Array;			//保存所有需要载入的文件的路径
@@ -156,15 +118,17 @@ public class Assets extends EventDispatcher
 	 * <ul>
 	 * 	<li>url（必须）：待载入文件的URL</li>
 	 * 	<li>ftype（必须）：待载入文件的类型，可用值见AssetsType。</li>
-	 * 	<li>symbols（可选/必选）：若载入的文件为AssetsType.SWF，则必须提供，否则不必提供。以字符串数组的方式提供所有需要的FLA库中的Symbol（CLASS）名称。</li>
-	 * 	<li>fname（可选）：待载入的文件的键名，如果不提供，则使用文件的主文件名。fname的命名规则与变量命名规则相同。fname相同的文件不会被重复载入。
-	 * 	<li>pic（可选）:若ftype值为AssetsType.SPRITE_SHEET时可用，若文件为标准图像文件（jpg、png），则传递true；若文件是ss文件，则传递false或不传递值。</li>
-	 * 	<li>meta（可选）：若ftype值为AssetsType.SPRITE_SHEET，且pic值为true的时候提供，值为SpriteSheetPacker生成的XML格式元数据。如果不提供，且pic为true，就自动载入url同目录下的同名xml文件。</li>
+	 * 	<li>fname（可选）：待载入的文件的键名，如果不提供，则使用文件的主文件名。fname的命名规则与变量命名规则相同。fname相同的文件不会被重复载入。</li>
+	 * 	<li>symbols（可选/必须）：ftype值为AssetsType.SWF时必须提供，否则不必提供。以字符串数组的方式提供所有需要的FLA库中的Symbol（CLASS）名称。</li>
+	 * 	<li>mtype（可选/必须）：ftype值为AssetStype.SPRITE_SHEET时必须提供，否则不必提供。值为SpriteSheetMetadataType中的值。</li>
+	 * 	<li>meta（可选）：ftype值为AssetsType.SPRITE_SHEET时可以提供，值为<a href="http://zengrong.net/sprite_sheet_editor">SpriteSheetEditor</a>生成的元数据内容。
+	 * 	数据内容应该与mtype的值相匹配。如果不提供，就自动载入url同目录下的同名metadata文件，其扩展名就是mtype的值。</li>
 	 * </ul>
 	 * @param $urls 待载入的外部资源素材配置文件
 	 * @see org.zengrong.display.assets.AssetsType
 	 * @see org.zengrong.display.spritesheet.SpriteSheetType
 	 * @see org.zengrong.display.net.SpriteSheetLoader
+	 * @see org.zengrong.display.spritesheet.SpriteSheetMetadataType
 	 * */
 	public function load($urls:Array):void
 	{
@@ -206,6 +170,9 @@ public class Assets extends EventDispatcher
 		{
 			removeAssets(__key);
 		}
+		_fun_loadDone = null;
+		_fun_loadInfo = null;
+		_fun_loadProgress = null;
 		_assets = null;
 		_urls = null;
 		_curFile = null;
@@ -350,7 +317,7 @@ public class Assets extends EventDispatcher
 			//载入的资源是SpriteSheet类型
 			else if(_curFile.ftype == AssetsType.SPRITE_SHEET)
 			{
-				_ssLoader.load(_curFile.url, _curFile.pic, _curFile.meta);
+				_ssLoader.load(_curFile.url, _curFile.meta, _curFile.mtype);
 			}
 			else
 				throw new RangeError('要载入的资源类型不符合要求！类型：'+_curFile.ftype+',URL:'+_curFile.url);
