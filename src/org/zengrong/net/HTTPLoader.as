@@ -255,7 +255,7 @@ public class HTTPLoader
 		var __returnData:Object = null;
 		//如果提供了返回变量，就将返回变量作为参数加入到返回值中
 		if(_returnVar)
-			__returnData = ObjectUtil.copy(_returnVar);
+			__returnData = ObjectUtil.clone(_returnVar);
 		//如果提供了每次返回的变量（实际上就是load的时候提供的所有变量），就将这些变量加入到返回值的returnData中
 		if(_curReturnVar)
 		{
