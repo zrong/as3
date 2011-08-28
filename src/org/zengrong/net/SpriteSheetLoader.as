@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  zengrong.net
 //  创建者:	zrong
-//  最后更新时间：2011-07-09
+//  更新时间：2011-08-24
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
@@ -22,8 +22,9 @@ import flash.system.LoaderContext;
 import org.zengrong.assets.AssetsType;
 import org.zengrong.display.spritesheet.MaskType;
 import org.zengrong.display.spritesheet.SpriteSheet;
-import org.zengrong.display.spritesheet.SpriteSheetMetadata;
 import org.zengrong.display.spritesheet.SpriteSheetType;
+import org.zengrong.display.spritesheet.SpriteSheetMetadata;
+import org.zengrong.display.spritesheet.SpriteSheetMetadataType;
 
 [Event(name="complete",type="flash.events.Event")]
 [Event(name="ioError",type="flash.events.IOErrorEvent")]
@@ -37,7 +38,6 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 {
 	/**
 	 * @param $decodeJSON 提供将JSON字符串解析成Object对象的方法
-	 * 
 	 */	
 	public function SpriteSheetLoader($decodeJSON:Function=null)
 	{
@@ -46,7 +46,7 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	}
 	
 	/**
-	 * JSON解析方法比较复杂，因此从外部提供。避免增加类库大小
+	 * JSON解析方法比较复杂，因此从外部提供。避免增加类库大小。而且从Flash Player 11开始，已经内置JSON解析。这样处理方便过渡。
 	 */
 	protected var _decodeJSON:Function;
 	protected var _url:String;
@@ -142,6 +142,8 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	public function load($url:String, $metadata:*=null, $metaType:String='xml'):void
 	{
 		if(_loading)return;
+		if($metaType == SpriteSheetMetadataType.JSON && !(_decodeJSON is Function))
+			throw new TypeError('Metadata为JSON格式的时候，必须提供解析JSON用的方法！');
 		_loading = true;
 		_url = $url;
 		_metaType = $metaType;
@@ -182,7 +184,7 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	
 	protected function handler_urlLoaded(evt:Event):void
 	{
-		if(_metaType == 'json')
+		if(_metaType == SpriteSheetMetadataType.JSON)
 		{
 			if(_decodeJSON is Function)
 			{
@@ -193,7 +195,7 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 		else
 		{
 			_metadata = new SpriteSheetMetadata();
-			_metadata.decodeFormXML(new XML(_urlLoader.data));
+			_metadata.decodeFromXML(new XML(_urlLoader.data));
 		}
 		//载入图像文件
 		_loader.load(new URLRequest(_url), new LoaderContext(true));
@@ -219,7 +221,8 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	//----------------------------------
 	
 	/**
-	 * 这个方法只实现了XML格式metadta的自动载入。因为JSON需要解码器，会增加文件大小。
+	 * 这个方法实现了XML格式和JSON格式metadta的自动载入。
+	 * 若要支持其他格式（例如ByteArray格式或TXT格式），可覆盖此方法
 	 */
 	protected function decodeMetadata($metadata:*):void
 	{
@@ -228,17 +231,21 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 		if($metadata)
 		{
 			_metadata = new SpriteSheetMetadata();
-			if(_metaType == 'xml')
-				_metadata.decodeFormXML($metadata);
-			else
+			if(_metaType == SpriteSheetMetadataType.XML)
+				_metadata.decodeFromXML($metadata);
+			else if(_metaType == SpriteSheetMetadataType.JSON)
 				_metadata.decodeFromObject($metadata);
+			else throw TypeError('不支持的metadata格式:'+_metaType);
 			//如果提供了Metadata，就开始载入图像文件
-			_loader.load(new URLRequest(_url));
+			_loader.load(new URLRequest(_url),  new LoaderContext(true));
 		}
-		//如果没有metadata信息，就载入同目录下的同名文件为metadata，扩展名取决于$metaType的值
+		//如果没有metadata信息，就载入同目录下的同名文件为metadata，扩展名取决于metaType的值
 		//metadata载入成功后，才载入实际的图像
 		else
 		{
+			//不支持除XML和JSON格式之外的外部Metadata文件
+			if(_metaType != SpriteSheetMetadataType.JSON && _metaType != SpriteSheetMetadataType.XML)
+				throw TypeError('不支持的metadata格式:'+_metaType);
 			_urlLoader.dataFormat = URLLoaderDataFormat.TEXT;
 			_urlLoader.load(new URLRequest(getMetadataUrl(_url, _metaType)));
 		}

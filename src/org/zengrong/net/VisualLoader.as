@@ -1,7 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  zengrong.net
 //  创建者:	zrong
-//  最后更新时间：2010-11-19
+//  创建时间：2010-11-19
+//  更新时间：2011-08-25
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
@@ -10,6 +11,7 @@ import org.zengrong.assets.AssetsType;
 import flash.display.*;
 import flash.events.*;
 import flash.net.*;
+import flash.system.LoaderContext;
 import flash.utils.ByteArray;
 
 [Event(name="complete",type="flash.events.Event")]
@@ -81,7 +83,7 @@ public class VisualLoader extends EventDispatcher implements ILoader
 	/**
 	 * 返回载入的AS3SWF库中的类，例如MovieClip、Sprite、Bitmap、Sound、Font等。只要Flash软件支持的类型，这里都可以获取到。
 	 * @throw Error 如果载入的文件不是SWF，则抛出异常。判断文件类型通过AssetsType.SWF属性。
-	 * @see com.youxi.assets.ActorType#SWF
+	 * @see org.zengrong.assets.ActorType#SWF
 	 * @see #_type
 	 */	
 	public function getClass($className:String):Class
@@ -97,7 +99,7 @@ public class VisualLoader extends EventDispatcher implements ILoader
 	/**
 	 * 返回载入的图像的BitmapData
 	 * @throw Error 如果载入的文件不是图像，则抛出异常。判断文件类型通过ActorType.isPic()方法。
-	 * @see com.youxi.assets.ActorType#isPic()
+	 * @see org.zengrong.assets.ActorType#isPic()
 	 * @see #_type
 	 */	
 	public function getBitmapData():BitmapData
@@ -167,7 +169,7 @@ public class VisualLoader extends EventDispatcher implements ILoader
 		_url = $url;
 		_type = $type;
 		initLoader();
-        _loader.load(new URLRequest($url));
+        _loader.load(new URLRequest($url),  new LoaderContext(true));
     }
 	
 	public function destroy():void

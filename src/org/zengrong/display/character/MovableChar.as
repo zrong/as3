@@ -205,6 +205,7 @@ public class MovableChar extends Character
 	 */		
     override public function update($elapsed:Number, $delay:Number) : void
     {
+		if(!isInit) return;
 		updateMyMoveState($elapsed, $delay);
 		super.update($elapsed, $delay);
     }
@@ -216,6 +217,7 @@ public class MovableChar extends Character
 	 */		
     public function moveTo($x:int, $y:int) : void
     {
+		if(!isInit) return;
 		targetV = new Vec2D($x, $y);
         var __vec:Vec2D = targetV.subVec(posV);
 		var __radian:Number = __vec.radian;

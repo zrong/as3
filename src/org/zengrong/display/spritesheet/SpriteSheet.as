@@ -200,8 +200,7 @@ public class SpriteSheet
 		if(!metadata.hasLabel || metadata.labels.length==0 || !metadata.labelsFrame)
 			throw new ReferenceError('这个SpriteSheet不包含label。');
 		var __labelRange:Array = metadata.labelsFrame[$label];
-		if(__labelRange)
-			return getListFromRange(__labelRange[0], __labelRange[1]);
+		if(__labelRange) return getListFromIndices(__labelRange);
 		return null;
 	}
 	
@@ -223,7 +222,7 @@ public class SpriteSheet
 	 * @param $start 开始帧（0基）
 	 * @param $total 总帧数
 	 * @throw ReferenceError 位图和元数据没有设置时抛出异常
-	 * @throw RangeError 帧数量为0的时候抛出异常
+	 * @throw RangeError 可用帧数量为0的时候抛出异常
 	 */	
 	public function getListFromRange($start:int, $total:int):Vector.<BitmapData>
 	{
@@ -231,6 +230,23 @@ public class SpriteSheet
 		var __list:Vector.<BitmapData> = new Vector.<BitmapData>($total, true);
 		for(var i:int=0;i<$total;i++)
 			__list[i] = getBMDByIndex(i+$start);
+		return __list;
+	}
+
+	/**
+	 * 根据提供的索引列表获取BitmapData列表
+	 * @param $indices 需要的帧的索引
+	 * @throw ReferenceError 位图和元数据没有设置时抛出异常
+	 * @throw RangeError 可用帧数量为0的时候抛出异常
+	 */
+	public function getListFromIndices($indices:Array):Vector.<BitmapData>
+	{
+		if(!_allBmds) parseSheet();
+		if(!$indices) return null;
+		if($indices.length==0) return null;
+		var __list:Vector.<BitmapData> = new Vector.<BitmapData>($indices.length, true);
+		for(var i:int=0;i<$indices.length;i++)
+			__list[i] = getBMDByIndex($indices[i]);
 		return __list;
 	}
 	
