@@ -65,16 +65,22 @@ public class SpriteSheet
 			throw new RangeError('metadata与spritesheet中的帧数量不匹配。meta:'+metadata.totalFrame+',sheet:'+_allBmds.length);
 		//如果提供了bitmapdata，就使用提供的覆盖当前保存的
 		if($bmd) bitmapData = $bmd;
+		//帧位图块，将这个块在循环中绘制到大图上
 		var __frameBMD:BitmapData = null;
-		//var __frameDrawPoint:Point = new Point();
+		//如何在帧位图块中取需要绘制的范围
+		var __drawRect:Rectangle = new Rectangle();
 		for (var i:int = 0; i < _allBmds.length; i++) 
 		{
 			__frameBMD = _allBmds[i];
 			bitmapData.lock();
-//			//从metadata中获取该图像对应的Frame的rect，转换成Point
-//			__frameDrawPoint.x = metadata.frameSizeRect[i].x
-//			__frameDrawPoint.y = metadata.frameSizeRect[i].y;
-			bitmapData.copyPixels(__frameBMD, __frameBMD.rect, metadata.frameRects[i].topLeft, null, null, true);
+			//计算修剪帧尺寸与原始帧尺寸的偏移，绘制在大图上的像素并不包含剪切过的空白像素
+			//当然，如果帧没有被执行过“修剪空白操作”，那么originalFrame的x和y应该为0，w和h应该与frame相同
+			__drawRect.x = 0-metadata.originalFrameRects[i].x;
+			__drawRect.y = 0-metadata.originalFrameRects[i].y;
+			__drawRect.width = metadata.frameRects[i].width;
+			__drawRect.height = metadata.frameRects[i].height;
+			bitmapData.copyPixels(__frameBMD, __drawRect, metadata.frameRects[i].topLeft, null, null, true);
+			//trace('SpriteSheet.drawSheet:', __frameBMD.rect, __drawRect, metadata.originalFrameRects[i]);
 			bitmapData.unlock();
 		}
 	}
@@ -248,6 +254,27 @@ public class SpriteSheet
 		for(var i:int=0;i<$indices.length;i++)
 			__list[i] = getBMDByIndex($indices[i]);
 		return __list;
+	}
+	
+	/**
+	 * 返回对应索引的BitmapData的修剪版本。如果位图没有被修剪过，直接返回该位图。
+	 * @throw ReferenceError 位图和元数据没有设置时抛出异常
+	 * @throw RangeError 帧数量为0的时候抛出异常
+	 */	
+	public function getTrimBMDByIndex($index:int):BitmapData
+	{
+		if(!_allBmds) parseSheet();
+		var __frame:Rectangle = metadata.frameRects[$index];
+		var __origin:Rectangle = metadata.originalFrameRects[$index];
+		//如果帧没有被修剪过，直接返回原始的位图
+		if(__frame.width == __origin.width && 
+			__frame.height == __origin.height &&
+			__origin.x == 0 && __origin.y == 0)
+			return _allBmds[$index];
+		var __frameBmd:BitmapData = new BitmapData(__frame.width, __frame.height, true, 0x00000000);
+		var __drawRect:Rectangle = new Rectangle(0-__origin.x, 0-__origin.y, __frame.width, __frame.height);
+		__frameBmd.copyPixels(_allBmds[$index], __drawRect, new Point(0,0), null, null, true);
+		return __frameBmd;
 	}
 	
 	/**

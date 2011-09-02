@@ -2,6 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2011-04-01
+//	修改时间：2011-09-02
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.utils
 {
@@ -20,12 +21,17 @@ public class SOUtil
 		if(_so == null)
 		{
 			if(!name)
-				name = 'zrong';
+				name = 'org.zengrong.util.so';
 			_so = SharedObject.getLocal(name);
 		}
 		return _so;
 	}
 	
+	/**
+	 * 保存数据，如果不提供$name参数，则自动建立name
+	 * @param $data 要保存的数据
+	 * @param $name 数据的键名
+	 */
 	public static function save($data:Object, $name:String=''):void
 	{
 		var __name:String;
@@ -38,25 +44,40 @@ public class SOUtil
 		else
 		{
 			__name = 'auto_save_' + list().length;
+			so.data[__name] = $data;
 		}
-		
 	}
 	
+	/**
+	 * 获取$name键名的值
+	 * @param $name
+	 */	
 	public static function get($name:String):Object
 	{
-		return so.data[$name]
+		return so.data[$name];
 	}
 	
+	/**
+	 * 删除$name键
+	 * @param $name
+	 * 
+	 */	
 	public static function del($name:String):void
 	{
 		delete so.data[$name];
 	}
 	
+	/**
+	 * 清除so
+	 */	
 	public static function clear():void
 	{
 		so.clear();
 	}
 	
+	/**
+	 * 获取so中保存的所有键值对的数组
+	 */	
 	public static function list():Array
 	{
 		var __list:Array = [];
