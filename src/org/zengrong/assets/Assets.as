@@ -2,7 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2011-04-23
-//  最后修改：2011-08-24
+//  最后修改：2011-09-01
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.assets
 {
@@ -274,12 +274,13 @@ public class Assets extends EventDispatcher
 			_fun_loadProgress.call(null, $vo);
 	}
 
-	private function getProgressVO($loaded:int, $total:int, $whole:Boolean=false):AssetsProgressVO
+	private function getProgressVO($loaded:int, $total:int, $whole:Boolean=false, $done:Boolean=false):AssetsProgressVO
 	{
 		var __vo:AssetsProgressVO = new AssetsProgressVO(_curFile);
 		__vo.loaded = $loaded;
 		__vo.total = $total;
 		__vo.whole = $whole;
+		__vo.done = $done;
 		return __vo;
 	}
 	
@@ -296,17 +297,18 @@ public class Assets extends EventDispatcher
 				//若没有提供fname，使用主文件名作为fname
 				_curFile.fname = getMainFileName(_curFile.url);
 			}
-			//发送载入列表的百分比
-			var __vo:AssetsProgressVO = getProgressVO(_loadingCount-_urls.length, _loadingCount, true);
-			dispatchProgress(__vo);
+			//载入一个新的资源开始的时候，发送载入列表的百分比
+			dispatchProgress(getProgressVO(_loadingCount-_urls.length, _loadingCount, true, false));
 			//如果要载入的资源已经存在于保存的资源中了，就跳过这个资源的载入，载入下一个资源
 			//因为在分析要载入的资源阶段，可能有些资源是重复的（例如某些技能可能共享效果资源文件）
 			if(_assets[_curFile.fname])
 			{
+				//由于存在这个资源，代表载入成功了，这里发送载入资源完毕时候的百分比事件
+				dispatchProgress(getProgressVO(_loadingCount-_urls.length, _loadingCount, true, true));
 				loadAssets();
 				return;
 			}
-			info('正在载入:'+_curFile.url);
+			info('开始载入:'+_curFile.url);
 			//载入的外部资源是可视化资源
 			if(	AssetsType.isVisual(_curFile.ftype) )
 			{
@@ -325,16 +327,15 @@ public class Assets extends EventDispatcher
 		else
 		{
 			this.dispatchEvent(new InfoEvent(COMPLETE));
-			if(_fun_loadDone is Function)
-				_fun_loadDone.call();
-			}
+			if(_fun_loadDone is Function) _fun_loadDone.call();
 		}
+	}
 		
-		/**
-		 * 将从外部获取到的可视对象保存在对象中备用
-		 * */
-		private function saveAssets():void
-		{
+	/**
+	 * 将从外部获取到的可视对象保存在对象中备用
+	 * */
+	private function saveAssets():void
+	{
 		//如果载入的是swf，就获取symbol对象。将symbol的Class存在变量中
 		if(_curFile.ftype == AssetsType.SWF)
 		{
@@ -358,6 +359,7 @@ public class Assets extends EventDispatcher
 		{
 			throw new Error('载入完成的文件类型不被支持！类型：'+_curFile.ftype,',URL:'+_curFile.url);
 		}
+		dispatchProgress(getProgressVO(_loadingCount-_urls.length, _loadingCount, true, true));
 	}
 	
 	//获取URL中的主文件名
