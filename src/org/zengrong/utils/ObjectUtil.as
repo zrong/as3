@@ -70,7 +70,7 @@ public class ObjectUtil
 		var __str:String = '{';
 		for(var __key:String in $obj)
 		{
-			__str += __key + $delim1 + $obj[__key].toString() + $delim2;
+			__str += __key + $delim1 + $obj[__key] + $delim2;
 		}
 		delEndDelimiter(__str, $delim2);
 		return __str + '}';
