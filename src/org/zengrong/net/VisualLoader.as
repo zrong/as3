@@ -2,7 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2010-11-19
-//  更新时间：2011-08-25
+//  更新时间：2011-09-06
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
@@ -12,6 +12,8 @@ import flash.display.*;
 import flash.events.*;
 import flash.net.*;
 import flash.system.LoaderContext;
+import flash.system.SecurityDomain;
+import flash.system.ApplicationDomain;
 import flash.utils.ByteArray;
 
 [Event(name="complete",type="flash.events.Event")]
@@ -161,7 +163,7 @@ public class VisualLoader extends EventDispatcher implements ILoader
 	 * @param $bytes 要载入的资源文件路径
 	 * @param $type 要载入的资源类型
 	 * */
-    public function load($url:String, $type:String) : void
+    public function load($url:String, $type:String, $loaderContext:LoaderContext=null) : void
     {
 		if(_loading)
 			return;
@@ -169,7 +171,9 @@ public class VisualLoader extends EventDispatcher implements ILoader
 		_url = $url;
 		_type = $type;
 		initLoader();
-        _loader.load(new URLRequest($url),  new LoaderContext(true));
+		if(!$loaderContext)
+			$loaderContext = new LoaderContext(true, new ApplicationDomain(ApplicationDomain.currentDomain), SecurityDomain.currentDomain);
+        _loader.load(new URLRequest($url),  $loaderContext);
     }
 	
 	public function destroy():void
