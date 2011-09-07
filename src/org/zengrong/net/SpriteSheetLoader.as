@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  zengrong.net
 //  创建者:	zrong
-//  更新时间：2011-08-24
+//  更新时间：2011-09-07
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
@@ -55,6 +55,7 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	protected var _loader:Loader;
 	protected var _urlLoader:URLLoader;
 	protected var _metadata:SpriteSheetMetadata;
+	protected var _loaderContext:LoaderContext;
 	
 	//----------------------------------
 	//  init
@@ -139,11 +140,14 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	 * @param $metaData	SpriteSheet的Metadata信息，由Sprite Sheet Editor生成，默认是XML格式，可支持XML和JSON（以标准Object方式提供）
 	 * @see org.zengrong.display.spritesheet.SpriteSheetMetadata
 	 */	
-	public function load($url:String, $metadata:*=null, $metaType:String='xml'):void
+	public function load($url:String, $metadata:*=null, $metaType:String='xml', $loaderContext:LoaderContext=null):void
 	{
 		if(_loading)return;
 		if($metaType == SpriteSheetMetadataType.JSON && !(_decodeJSON is Function))
 			throw new TypeError('Metadata为JSON格式的时候，必须提供解析JSON用的方法！');
+		//如果没有提供LoaderContext，就建立一个，并允许检测Policy文件
+		_loaderContext = $loaderContext;
+		if(!_loaderContext) _loaderContext = new LoaderContext(true);
 		_loading = true;
 		_url = $url;
 		_metaType = $metaType;
@@ -198,7 +202,7 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 			_metadata.decodeFromXML(new XML(_urlLoader.data));
 		}
 		//载入图像文件
-		_loader.load(new URLRequest(_url), new LoaderContext(true));
+		_loader.load(new URLRequest(_url), _loaderContext);
 	}
 	
 	protected function handler_progress(evt:ProgressEvent):void
@@ -237,7 +241,7 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 				_metadata.decodeFromObject($metadata);
 			else throw TypeError('不支持的metadata格式:'+_metaType);
 			//如果提供了Metadata，就开始载入图像文件
-			_loader.load(new URLRequest(_url),  new LoaderContext(true));
+			_loader.load(new URLRequest(_url),  _loaderContext);
 		}
 		//如果没有metadata信息，就载入同目录下的同名文件为metadata，扩展名取决于metaType的值
 		//metadata载入成功后，才载入实际的图像

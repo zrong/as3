@@ -2,7 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2010-11-19
-//  更新时间：2011-09-06
+//  更新时间：2011-09-07
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
@@ -171,8 +171,7 @@ public class VisualLoader extends EventDispatcher implements ILoader
 		_url = $url;
 		_type = $type;
 		initLoader();
-		if(!$loaderContext)
-			$loaderContext = new LoaderContext(true, new ApplicationDomain(ApplicationDomain.currentDomain), SecurityDomain.currentDomain);
+		if(!$loaderContext) $loaderContext = new LoaderContext(true);
         _loader.load(new URLRequest($url),  $loaderContext);
     }
 	

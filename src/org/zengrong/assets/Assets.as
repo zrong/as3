@@ -2,7 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2011-04-23
-//  最后修改：2011-09-01
+//  最后修改：2011-09-07
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.assets
 {
@@ -17,6 +17,7 @@ import flash.events.IOErrorEvent;
 import flash.events.ProgressEvent;
 import flash.utils.ByteArray;
 import flash.events.EventDispatcher;
+import flash.system.LoaderContext;
 
 /**
  * 单例类，负责载入和解析外部资源。这些资源按zrong的习惯一般位于assets文件夹。
@@ -45,10 +46,6 @@ public class Assets extends EventDispatcher
 	public static const PROGRESS:String = 'progress';
 
 	
-	private var _fun_loadDone:Function;
-	private var _fun_loadInfo:Function;
-	private var _fun_loadProgress:Function;
-	
 	/**
 	 * 设置Assets在载入外部资源的过程中的处理程序，第一个处理程序必须设定。
 	 * @param $done 处理载入全部完毕的处理器，不需要参数
@@ -70,6 +67,15 @@ public class Assets extends EventDispatcher
 		init();
 	}
 	
+	/**
+	 * 内含的VisualLoader进行载入的时候需要的LoaderContext
+	 */
+	public var loaderContext:LoaderContext;
+	
+	private var _fun_loadDone:Function;
+	private var _fun_loadInfo:Function;
+
+	private var _fun_loadProgress:Function;
 	private var _visualLoader:VisualLoader;		//载入可视文件的loader
 	private var _ssLoader:SpriteSheetLoader; 	//载入SpriteSheet
 	
@@ -130,10 +136,10 @@ public class Assets extends EventDispatcher
 	 * @see org.zengrong.display.net.SpriteSheetLoader
 	 * @see org.zengrong.display.spritesheet.SpriteSheetMetadataType
 	 * */
-	public function load($urls:Array):void
+	public function load($urls:Array, $loaderContext:LoaderContext=null):void
 	{
-		if(!_urls)
-			throw new ReferenceError('请先初始化调用init方法初始化!');
+		loaderContext = $loaderContext;
+		if(!_urls) throw new ReferenceError('请先初始化调用init方法初始化!');
 		//如果正在载入，将要载入的数据压入数组，并更新数组总量
 		if(isLoading)
 		{
@@ -314,12 +320,12 @@ public class Assets extends EventDispatcher
 			{
 				if(_curFile.ftype == AssetsType.SWF && !_curFile.symbols)
 					throw new ReferenceError('对于SWF素材，必须提供symbols数组！');
-				_visualLoader.load(_curFile.url, _curFile.ftype);
+				_visualLoader.load(_curFile.url, _curFile.ftype, loaderContext);
 			}
 			//载入的资源是SpriteSheet类型
 			else if(_curFile.ftype == AssetsType.SPRITE_SHEET)
 			{
-				_ssLoader.load(_curFile.url, _curFile.meta, _curFile.mtype);
+				_ssLoader.load(_curFile.url, _curFile.meta, _curFile.mtype, loaderContext);
 			}
 			else
 				throw new RangeError('要载入的资源类型不符合要求！类型：'+_curFile.ftype+',URL:'+_curFile.url);
@@ -339,12 +345,13 @@ public class Assets extends EventDispatcher
 		//如果载入的是swf，就获取symbol对象。将symbol的Class存在变量中
 		if(_curFile.ftype == AssetsType.SWF)
 		{
+			
 			var __swfSymbols:Object = new Object();
 			for each(var __symbol:String in _curFile.symbols)
 			{
 				__swfSymbols[__symbol] = _visualLoader.getClass(__symbol);
 			}
-			_assets[_curFile.name] = __swfSymbols; 
+			_assets[_curFile.fname] = __swfSymbols; 
 		}
 		//普通图片，直接保存BitmapData
 		else if(AssetsType.isPic(_curFile.ftype))
