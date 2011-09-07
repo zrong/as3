@@ -1,11 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  zengrong.net
 //  创建者:	zrong
-//  最后更新时间：2011-08-03
+//  最后更新时间：2011-09-07
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.display.character
 {
-import com.youxi.text.FTEFactory;
+import org.zengrong.text.FTEFactory;
 
 import flash.display.BitmapData;
 import flash.display.Bitmap;
@@ -38,6 +38,12 @@ public class Character extends Sprite
 	//----------------------------------------
 	// public变量
 	//----------------------------------------
+	/**
+	 * 是否填充了正确的图像。用于替代的图像不算正确填充
+	 * 这个变量是在“延时载入”时判断该Layer是否需要置换载入的新图片
+	 */
+	public var isFill:Boolean = false;
+
 	/**
 	 * 角色的z轴值，因为z已经被Sprite使用，因此采用wz
 	 */
@@ -130,7 +136,7 @@ public class Character extends Sprite
 	/**
 	 * 播放的帧率，根据这个值计算多长时间应该切换一次帧
 	 */
-	private var _frameRate:int = 8;
+	protected var _frameRate:int = 8;
 
 	/**
 	 * 根据frameRate计算换帧的时间间隔，单位秒。默认frameRate是8，因此这个值默认是1/8

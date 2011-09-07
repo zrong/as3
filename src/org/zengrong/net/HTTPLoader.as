@@ -2,7 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong(zrongzrong@gmail.com)
 //  创建时间：2010-12-30
-//  最后修改：2011-08-03
+//  最后修改：2011-09-07
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
@@ -310,7 +310,6 @@ public class HTTPLoader
 			//提交的url地址
 			__result.url = _curUrl;
 			clearVar();
-			_fun_loadDone.call(null, __result);
 			//如果在单次载入的时候队列中有值，就再次载入
 			if(_urls && _urls.length>0)
 			{
@@ -322,6 +321,8 @@ public class HTTPLoader
 					_submitVars = null;
 				}
 			}
+			//此句必须放在最后，因为如果在_fun_loadDone中再次调用load，就会影响_urls的值，导致跳过某些载入
+			_fun_loadDone.call(null, __result);
 		}
 	}
 

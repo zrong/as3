@@ -2,7 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2011-04-27
-//  修改时间：2011-09-01
+//  修改时间：2011-09-07
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.assets
 {
@@ -18,7 +18,8 @@ public class AssetsProgressVO
 		{
 			name = $curFile.fname;
 			url = $curFile.url;
-			type = $curFile.ftype;
+			ftype = $curFile.ftype;
+			otype = $curFile.otype;
 			if($curFile.loaded!=undefined)
 				loaded = $curFile.loaded;
 			if($curFile.total!=undefined)
@@ -62,16 +63,22 @@ public class AssetsProgressVO
 	public var url:String;
 	
 	/**
-	 * 正在载入的资源的type
+	 * 正在载入的资源的文件类型
 	 */	
-	public var type:String;
+	public var ftype:String;
+
+	/**
+	 * 正在载入的资源的职责类型
+	 */
+	public var otype:String;
 	
 	public function toString():String
 	{
 		return 'org.zengrong.assets::AssetsProgressVO{'+
 				'name:'+name+
 				',url:'+url+
-				',type:'+type+
+				',ftype:'+ftype+
+				',otype:'+otype+
 				',loaded:'+loaded+
 				',total:'+total+
 				',whole:'+whole + 
