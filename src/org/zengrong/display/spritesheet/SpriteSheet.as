@@ -2,6 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2011-04-11
+//  更新时间：2011-09-07
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.display.spritesheet
 {
@@ -38,14 +39,19 @@ public class SpriteSheet
 
 	/**
 	 * 因为bitmapData实际上是一整块Sheet，这个方法能够将整块Sheet解析成需要的数据
+	 * @param $force 是否强行解析。如果该值为true，则不会理会_allBmds是否设置过，都会执行解析
 	 * @throw ReferenceError 位图和元数据没有设置时抛出异常
 	 * @throw RangeError 帧数量为0的时候抛出异常
 	 */
-	public function parseSheet():void
+	public function parseSheet($force:Boolean=false):void
 	{
-		checkData();
-		checkRange();
-		_allBmds = createAll();
+		//不存在allBmds，或者要求强行解析的情况下执行解析
+		if(!_allBmds || $force)
+		{
+			checkData();
+			checkRange();
+			_allBmds = createAll();
+		}
 	}
 	
 	/**
@@ -217,7 +223,7 @@ public class SpriteSheet
 	 */	
 	public function getAll():Vector.<BitmapData>
 	{
-		checkData();
+		//checkData();
 		checkRange();
 		if(!_allBmds) parseSheet();
 		return getListFromRange(0, metadata.totalFrame);
