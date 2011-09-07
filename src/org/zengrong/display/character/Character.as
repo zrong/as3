@@ -52,7 +52,7 @@ public class Character extends Sprite
 	/**
 	 * 角色的形象，是主文件名字符串
 	 */
-	public var img:String;
+	public var fname:String;
 
 	/**
 	 * 角色的类型
