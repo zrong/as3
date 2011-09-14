@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  zengrong.net
 //  创建者:	zrong
-//  最后更新时间：2011-09-07
+//  最后更新时间：2011-09-14
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.display.character
 {
@@ -10,6 +10,7 @@ import org.zengrong.text.FTEFactory;
 import flash.display.BitmapData;
 import flash.display.Bitmap;
 import flash.display.Sprite;
+import flash.display.DisplayObject;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.geom.Matrix;
@@ -104,14 +105,14 @@ public class Character extends Sprite
 	protected var _bmp:Bitmap;
 
 	/**
-	 * 用以显示玩家名称
+	 * 用以在玩家头顶显示信息
 	 */
-	protected var _titleTL:TextLine;
+	protected var _titleDisplay:DisplayObject;
 
 	/**
-	 * 用来保存玩家的名称
+	 * 用来保存玩家顶部显示的信息
 	 */
-	protected var _title:String;
+	protected var _title:*;
 
 	/**
 	 * 当前是否是翻转状态
@@ -243,24 +244,26 @@ public class Character extends Sprite
 		return _bmds.length;
 	}
 
-	public function get title():String
+	public function get title():*
 	{
 		return _title;
 	}
 
-	public function set title($title:String):void
+	public function set title($title:*):void
 	{
+		if(_title == $title) return;
 		_title = $title;
-		if(_titleTL && this.contains(_titleTL))
+		if(!_title || !_title is String) return;
+		if(_titleDisplay && this.contains(_titleDisplay))
 		{
-			this.removeChild(_titleTL);
-			_titleTL = null;
+			this.removeChild(_titleDisplay);
+			_titleDisplay = null;
 		}
-		_titleTL = FTEFactory.createSingleTextLine(_title, 1000);
-		if(_titleTL)
+		_titleDisplay = FTEFactory.createSingleTextLine(_title.toString(), 1000);
+		if(_titleDisplay)
 		{
 			moveTitle();
-			this.addChild(_titleTL);
+			this.addChild(_titleDisplay);
 		}
 	}
 
@@ -322,6 +325,7 @@ public class Character extends Sprite
 	{
 		//_bmds为固定的，说明是从SpriteSheet生成的，这样的_bmds不能销毁，因为其他的角色还需要它
 		//固定的就直接新建一个空bmds替换
+		if(!_bmds) return;
 		if(_bmds.fixed)
 		{
 			_bmds = new Vector.<BitmapData>;
@@ -400,11 +404,11 @@ public class Character extends Sprite
 	 */
 	public function moveTitle():void
 	{
-		if(_titleTL)
+		if(_titleDisplay)
 		{
-			//trace('Character.moveTitle:',_titleTL.width, _titleTL.textBlock.content.text );
-			_titleTL.x = (_flip ? -1*_bmp.x : _bmp.x) + (_bmp.width-_titleTL.width)*.5;
-			_titleTL.y = _bmp.y-10;
+			//trace('Character.moveTitle:',_titleDisplay.width, _titleDisplay.textBlock.content.text );
+			_titleDisplay.x = (_flip ? -1*_bmp.x : _bmp.x) + (_bmp.width-_titleDisplay.width)*.5;
+			_titleDisplay.y = _bmp.y-10;
 		}
 	}
 
