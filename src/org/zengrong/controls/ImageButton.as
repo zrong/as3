@@ -100,6 +100,22 @@ public class ImageButton extends DisplayObjectButtonBase
 		_upState.visible = false;
 		_downState.visible = false;
 		_overState.visible = true;
+		if(_toggle)
+		{
+			addEventListener(MouseEvent.ROLL_OUT, onMouseOut);
+			if(_selected)
+			{
+				_upState.visible = true;
+				_downState.visible = false;
+				_overState.visible = false;
+			}
+			else
+			{
+				_upState.visible = false;
+				_downState.visible = true;
+				_overState.visible = false;
+			}
+		}
 	}
 	
 	/**
@@ -114,6 +130,22 @@ public class ImageButton extends DisplayObjectButtonBase
 			_downState.visible = false;
 			_overState.visible = false;
 		}
+		if(_toggle)
+		{
+			if(_selected)
+			{
+				_upState.visible = false;
+				_downState.visible = true;
+				_overState.visible = false;
+			}
+			else
+			{
+				_upState.visible = true;
+				_downState.visible = false;
+				_overState.visible = false;
+			}
+			removeEventListener(MouseEvent.ROLL_OUT, onMouseOut);
+		}
 	}
 	
 	/**
@@ -122,9 +154,13 @@ public class ImageButton extends DisplayObjectButtonBase
 	override protected function onMouseGoDown(event:MouseEvent):void
 	{
 		super.onMouseGoDown(event);
-		_upState.visible = false;
+		_upState.visible = _selected;
 		_overState.visible = false;
-		_downState.visible = true;
+		_downState.visible = !_selected;
+		if(_toggle && _selected)
+		{
+			//_upState.visible = false;
+		}
 	}
 	
 	/**
