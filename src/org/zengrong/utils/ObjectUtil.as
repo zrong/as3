@@ -2,7 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2011-01-02
-//  修改时间：2011-08-10
+//  修改时间：2011-09-20
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.utils
 {
@@ -42,8 +42,7 @@ public class ObjectUtil
 		{
 			__str += $arrOrVector[i].toString() + $delim;
 		}
-		delEndDelimiter(__str, $delim);
-		return __str += ']';;
+		return delEndDelimiter(__str, $delim) + ']';
 	}
 	
 	/**
@@ -58,8 +57,7 @@ public class ObjectUtil
 		{
 			__str += obj2String(__item) + ',';
 		}
-		delEndDelimiter(__str, ',');
-		return __str+']';
+		return delEndDelimiter(__str, ',') + ']';
 	}
 	
 	/**
@@ -72,8 +70,7 @@ public class ObjectUtil
 		{
 			__str += __key + $delim1 + $obj[__key] + $delim2;
 		}
-		delEndDelimiter(__str, $delim2);
-		return __str + '}';
+		return delEndDelimiter(__str, $delim2) + '}';
 	}
 	
 	/**
