@@ -79,29 +79,15 @@ public class VideoDisplay extends Sprite
 	{
 		return _maintainAspectRatio;
 	}
-	
-	override public function get width():Number
-	{
-		return _width;
-	}
-	
-	override public function get height():Number
-	{
-		return _height;
-	}
-	
-	//----------------------------------
-	//  setter方法
-	//----------------------------------
+
 	public function set maintainAspectRatio($maintainAspectRatio:Boolean):void
 	{
 		_maintainAspectRatio = $maintainAspectRatio;
 	}
 	
-	public function set muted($muted:Boolean):void
+	override public function get width():Number
 	{
-		_muted = $muted;
-		setMuted();	
+		return _width;
 	}
 	
 	override public function set width(value:Number):void
@@ -112,6 +98,11 @@ public class VideoDisplay extends Sprite
 		draw();
 	}
 	
+	override public function get height():Number
+	{
+		return _height;
+	}
+
 	override public function set height(value:Number):void
 	{
 		//trace('set video height', value);
@@ -119,6 +110,33 @@ public class VideoDisplay extends Sprite
 		_video.height = _height;
 		draw();
 	}
+
+	public function get deblocking():int
+	{
+		return _video.deblocking;
+	}
+
+	public function set deblocking($deb:int):void
+	{
+		_video.deblocking = $deb;
+	}
+
+	public function get smoothing():Boolean
+	{
+		return _video.smoothing;
+	}
+
+	public function set smoothing($smo:Boolean):void
+	{
+		_video.smoothing;
+	}
+	
+	public function set muted($muted:Boolean):void
+	{
+		_muted = $muted;
+		setMuted();	
+	}
+	
 	
 	/**
 	 * 设置显示视频的大小 
@@ -264,6 +282,7 @@ public class VideoDisplay extends Sprite
 		_video = new Video(_width, _height);
 		_video.visible = false;
 		this.addChild(_video);
+		this.smoothing = true;
 	}
 	
 	protected function draw():void

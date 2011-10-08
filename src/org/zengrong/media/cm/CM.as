@@ -11,7 +11,9 @@ import flash.events.EventDispatcher;
 import flash.events.StatusEvent;
 import flash.media.Camera;
 import flash.media.Microphone;
+import flash.media.SoundCodec;
 import flash.utils.setTimeout;
+import flash.system.Capabilities;
 
 import mx.core.Singleton;
 
@@ -22,6 +24,9 @@ import mx.core.Singleton;
 [Event(name="cameraUnMuted",type="org.zengrong.media.cm.CMEvent")]
 [Event(name="noCamera",type="org.zengrong.media.cm.CMEvent")]
 [Event(name="multiCamera",type="org.zengrong.media.cm.CMEvent")]
+[Event(name="activityStart",type="org.zengrong.media.cm.CMEvent")]
+[Event(name="activityStop",type="org.zengrong.media.cm.CMEvent")]
+
 public class CM extends EventDispatcher
 {
 	public function CM($sig:Singleton)
@@ -80,7 +85,57 @@ public class CM extends EventDispatcher
 	{
 		return Microphone.names;
 	}
-	
+
+	/**
+	 *  系统是否支持高级麦克风
+	 */
+	public function get supportEnhancedMicrophone():Boolean
+	{
+		var __ver:String = Capabilities.version;
+		if(__ver.indexOf("10,3") != -1)
+			return true;
+		return false;
+	}
+
+	/**
+	 * 重置摄像头的大小
+	 */
+	public function setMode($w:int, $h:int, $fps:int, $favorArea:Boolean=true):void
+	{
+		if(_cam)
+		{
+			trace('CM.setMode:', $w, $h, $fps);
+			trace('CM.setMode,cam:', _cam.width, _cam.height, _cam.fps);
+			if(_cam.width != $w || _cam.height != $h || _cam.fps != $fps)
+			{
+				_cam.setMode($w, $h, $fps, $favorArea);
+			}
+		}
+	}
+
+	public function setQuality($bw:int, $quality:int):void
+	{
+		if(_cam)
+		{
+			if(_cam.quality != $quality || _cam.bandwidth != $bw)
+				_cam.setQuality($bw, $quality);
+		}
+	}
+
+	/**
+	 * 为Microphone设定默认设置
+	 */
+	public function setMicDefalutSetting():void
+	{
+		if(_mic)
+		{
+			_mic.codec = SoundCodec.SPEEX;
+			_mic.setSilenceLevel(0);
+			_mic.enableVAD = true;
+			_mic.rate = 16;
+		}
+	}
+
 	/**
 	 * 重置 
 	 */	
@@ -161,14 +216,28 @@ public class CM extends EventDispatcher
 	
 	/**
 	 * 检测麦克风数量，不需要参数
-	 * 如果麦克风数量大于1，则显示一个列表进行选择。如果
 	 **/
 	public function checkMic():Microphone
 	{
-		if(micAmount <= 0){
+		if(micAmount <= 0)
+		{
 			this.dispatchEvent(new CMEvent(CMEvent.NO_MICROPHONE));	//发布摄像头检测消息
-		}else{
-			_mic = Microphone.getMicrophone();
+		}
+		else
+		{
+			if(supportEnhancedMicrophone)
+			{
+				//_mic = Microphone.getEnhancedMicrophone();
+				_mic = Microphone.getMicrophone();
+				_mic.setUseEchoSuppression(true);
+				setMicDefalutSetting();
+			}
+			else
+			{
+				_mic = Microphone.getMicrophone();
+				_mic.setUseEchoSuppression(true);
+				setMicDefalutSetting();
+			}
 			_mic.addEventListener(StatusEvent.STATUS, handler_micStatus);
 			checkMicStatus();
 		}
