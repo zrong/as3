@@ -1,9 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  zengrong.net
 //  创建者:	zrong
-//  最后更新时间：2011-7-12
+//  修改时间：2011-7-12
+//  更新时间：2011-10-12
 ////////////////////////////////////////////////////////////////////////////////
-package org.zengrong.display
+package org.zengrong.ui
 {
 import flash.display.Sprite;
 import flash.events.Event;
@@ -23,7 +24,7 @@ import org.zengrong.media.NetConnectionInfoCode;
  * 支持视频流、视频文件和摄像头视频的显示。
  * @author zrong
  */
-public class VideoDisplay extends Sprite
+public class VideoDisplay extends UI
 {
 	public static const URI_STREAM:String = 'uristream'
 	public static const NET_STREAM:String = 'netstream';
@@ -34,6 +35,8 @@ public class VideoDisplay extends Sprite
 		_width = $width;
 		_height = $height;
 		init();
+		addChildren();
+		draw();
 	}
 	
 	//--------------------------------------------------------------------------
@@ -42,16 +45,47 @@ public class VideoDisplay extends Sprite
 	
 	private var _video:Video;
 	private var _type:String;
-	private var _playing:Boolean = false;
+	private var _playing:Boolean;
 	private var _streamName:String;
 	private var _serverURI:String;
 	private var _nc:NetConnection;
 	private var _ns:NetStream;
 	
-	private var _width:Number;
-	private var _height:Number;
 	private var _maintainAspectRatio:Boolean;
 	private var _muted:Boolean;
+	
+	//--------------------------------------------------------------------------
+	//  init
+	//--------------------------------------------------------------------------
+	
+	override protected function init():void
+	{
+		_type = null;
+		_playing = false;
+		_streamName = null;
+		_serverURI = null;
+		_nc = null;
+		_ns = null;
+		_maintainAspectRatio = false;
+		_muted = false;
+	}
+	
+	protected function addChildren():void
+	{
+		trace('VideoDisplay addChildren:', _width, _height);
+		_video = new Video(_width, _height);
+		_video.visible = false;
+		this.addChild(_video);
+		this.smoothing = true;
+	}
+	
+	protected function draw():void
+	{
+		this.graphics.clear();
+		this.graphics.beginFill(0x0000000);
+		this.graphics.drawRect(0, 0, _width, _height);
+		this.graphics.endFill();
+	}
 	
 	//--------------------------------------------------------------------------
 	//  公共方法
@@ -87,28 +121,26 @@ public class VideoDisplay extends Sprite
 	
 	override public function get width():Number
 	{
-		return _width;
+		return _video.width;
 	}
 	
-	override public function set width(value:Number):void
+	override public function set width($w:Number):void
 	{
-		//trace('set video width', value);
-		_width = value;
+		super.width = $w;
 		_video.width = _width;
-		draw();
+		trace('set VideoDisplay width', _width, this.width);
 	}
 	
 	override public function get height():Number
 	{
-		return _height;
+		return _video.height;
 	}
 
-	override public function set height(value:Number):void
+	override public function set height($h:Number):void
 	{
-		//trace('set video height', value);
-		_height = value;
+		super.height = $h;
 		_video.height = _height;
-		draw();
+		trace('set VideoDisplay height', _width, this.height);
 	}
 
 	public function get deblocking():int
@@ -135,18 +167,6 @@ public class VideoDisplay extends Sprite
 	{
 		_muted = $muted;
 		setMuted();	
-	}
-	
-	
-	/**
-	 * 设置显示视频的大小 
-	 * @param $width 要显示的宽度
-	 * @param $height 要显示的高度
-	 */	
-	public function setSize($width:int, $height:int): void 
-	{
-		width = $width;
-		height = $height;
 	}
 	
 	//----------------------------------
@@ -265,32 +285,6 @@ public class VideoDisplay extends Sprite
 			_nc.client = null;
 			_nc = null;
 		}
-	}
-	
-	//--------------------------------------------------------------------------
-	//  保护方法
-	//--------------------------------------------------------------------------
-	
-	protected function init():void
-	{
-		addChildren();
-		draw();
-	}
-	
-	protected function addChildren():void
-	{
-		_video = new Video(_width, _height);
-		_video.visible = false;
-		this.addChild(_video);
-		this.smoothing = true;
-	}
-	
-	protected function draw():void
-	{
-		this.graphics.clear();
-		this.graphics.beginFill(0x0000000);
-		this.graphics.drawRect(0, 0, _width, _height);
-		this.graphics.endFill();
 	}
 	
 	//--------------------------------------------------------------------------

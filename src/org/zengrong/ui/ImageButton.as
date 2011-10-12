@@ -1,12 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////////
-//
 //  zengrong.net
 //  创建者:	zrong
-//  最后更新时间：2010-12-14
+//  创建时间：2010-12-14
+//  修改时间：2011-10-12
 //	说明：本组件参照Keith Peters的Minimalcomps组件写成，修改、使用或继承Minimalcal源码
-//
 ////////////////////////////////////////////////////////////////////////////////
-package org.zengrong.controls
+package org.zengrong.ui
 {
 import flash.display.Bitmap;
 import flash.display.BitmapData;
