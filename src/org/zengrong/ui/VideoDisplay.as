@@ -70,16 +70,16 @@ public class VideoDisplay extends UI
 		_muted = false;
 	}
 	
-	protected function addChildren():void
+	override protected function addChildren():void
 	{
 		trace('VideoDisplay addChildren:', _width, _height);
 		_video = new Video(_width, _height);
 		_video.visible = false;
+		_video.smoothing = true;
 		this.addChild(_video);
-		this.smoothing = true;
 	}
 	
-	protected function draw():void
+	override protected function draw():void
 	{
 		this.graphics.clear();
 		this.graphics.beginFill(0x0000000);
@@ -160,7 +160,7 @@ public class VideoDisplay extends UI
 
 	public function set smoothing($smo:Boolean):void
 	{
-		_video.smoothing;
+		_video.smoothing = $smo;
 	}
 	
 	public function set muted($muted:Boolean):void
@@ -268,7 +268,7 @@ public class VideoDisplay extends UI
 		_type = null;
 	}
 
-	public function destroy():void
+	override public function destroy():void
 	{
 		close();
 		this.removeChild(_video);
@@ -355,7 +355,7 @@ public class VideoDisplay extends UI
 
 import flash.events.Event;
 
-import org.zengrong.display.VideoDisplay;
+import org.zengrong.ui.VideoDisplay;
 import org.zengrong.media.NetStreamInfoCode;
 
 /**

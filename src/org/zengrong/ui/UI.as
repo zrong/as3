@@ -1,5 +1,6 @@
 package org.zengrong.ui
 {
+import flash.display.Sprite;
 /**
  * 所有UI组件的基类
  */
@@ -9,9 +10,9 @@ public class UI extends Sprite
 	{
 	}
 
-	private var _width:Number;
-	private var _height:Number;
-	private var _enabled:Boolean;
+	protected var _width:Number;
+	protected var _height:Number;
+	protected var _enabled:Boolean;
 
 	protected function init():void
 	{
@@ -51,7 +52,6 @@ public class UI extends Sprite
 		_enabled = $en;
 		mouseEnabled = mouseChildren = _enabled;
 		tabEnabled = $en;
-		alpha = _enabled ? 1.0 : 0.5;
 	}
 
 	public function get enabled():Boolean
