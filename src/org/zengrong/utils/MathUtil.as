@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.utils
 {
+import flash.utils.getQualifiedClassName;
 public class MathUtil
 {
 	/**
