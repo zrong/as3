@@ -1,5 +1,6 @@
 package org.zengrong.flex.controls
 {
+	import flash.display.BitmapData;
 	import flash.events.Event;
 	import flash.events.NetStatusEvent;
 	import flash.media.Camera;
@@ -152,6 +153,13 @@ package org.zengrong.flex.controls
 			{
 				throw new Error('VideoDisplay已經被用於其它視訊！');		
 			}
+		}
+		
+		public function capture():BitmapData
+		{
+			var __bmd:BitmapData = new BitmapData(_video.width, _video.height, false);
+			__bmd.draw(_video);
+			return __bmd;
 		}
 		
 		private function initnc():void
