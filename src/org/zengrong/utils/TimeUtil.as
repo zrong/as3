@@ -63,15 +63,18 @@ public class TimeUtil
 	 /**
 	  * 获取当前的日期和时间，并格式化后作为字符串返回
 	  * @param $date 传递一个date用于格式化
+	  * @param $dateSep	日期的分隔符
+	  * @param $timeSeq 时间的分隔符
+	  * @param $separator 日期和时间的分隔符 
 	  */	
-	 public static function getFormatedDateAndTime($date:Date=null):String
+	 public static function getFormatedDateAndTime($date:Date=null, $dateSep:String='-', $timeSeq:String=':', $separator:String=' '):String
 	 {
 		 var __date:Date = null;
 		 if($date)
 			 __date = $date;
 		 else
 			 __date = new Date();
-		 return getFormatedDate('-', __date) + ' ' + getFormatedTime(':', __date);
+		 return getFormatedDate($dateSep, __date) + $separator + getFormatedTime($timeSeq, __date);
 	 }
 	 
 	 /**
