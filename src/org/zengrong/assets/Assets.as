@@ -23,9 +23,9 @@ import flash.system.LoaderContext;
  * 单例类，负责载入和解析外部资源。这些资源按zrong的习惯一般位于assets文件夹。
  * @author zrong
  */
-[Event(name="complete",type="InfoEvent")]
-[Event(name="info",type="InfoEvent")]
-[Event(name="progress",type="InfoEvent")]
+[Event(name="complete",type="org.zengrong.events.InfoEvent")]
+[Event(name="info",type="org.zengrong.events.InfoEvent")]
+[Event(name="progress",type="org.zengrong.event.InfoEvent")]
 
 public class Assets extends EventDispatcher
 {

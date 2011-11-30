@@ -4,6 +4,21 @@ package org.zengrong.events
 
 	public class InfoEvent extends Event
 	{
+		/**
+		 * 通用的完成事件
+		 */
+		public static const COMPLETE:String = 'complete';
+		
+		/**
+		 * 通用的信息事件
+		 */
+		public static const INFO:String = 'info';
+		
+		/**
+		 * 通用的处理事件
+		 */
+		public static const PROGRESS:String = 'progress';
+		
 		public var info:*;
 		
 		public function InfoEvent($type:String, $info:*=null, $bubbles:Boolean=false, $cancelable:Boolean=false)
