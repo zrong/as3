@@ -13,6 +13,8 @@ import flash.utils.flash_proxy;
 
 import org.zengrong.utils.ObjectUtil;
 
+import spark.primitives.Rect;
+
 /**
  * 处理SpriteSheet的元数据
  * @author zrong
@@ -21,7 +23,7 @@ public class SpriteSheetMetadata
 {
 	public function SpriteSheetMetadata()
 	{
-		setup();
+		setup(true);
 	}
 	
 	/**
@@ -143,35 +145,60 @@ public class SpriteSheetMetadata
 	
 	/**
 	 * 根据设置的属性初始化一些值
+	 * @param $force 是否强制初始化。值为true则不判断原来是否存在该变量，强行覆盖
 	 */	
-	public function setup():void
+	protected function setup($force:Boolean=false):void
 	{
-		frameRects = new Vector.<Rectangle>;
-		originalFrameRects = new Vector.<Rectangle>;
+		var __frameRects:Vector.<Rectangle> = new Vector.<Rectangle>;
+		var __originalFrameRects:Vector.<Rectangle> = new Vector.<Rectangle>;
+		if($force)
+		{
+			frameRects = __frameRects;
+			originalFrameRects = __originalFrameRects;
+		}
+		else if(!frameRects)
+		{
+			frameRects = __frameRects;
+			originalFrameRects = __originalFrameRects;
+		}
+	}
+	
+	/**
+	 * 增加一个Label
+	 * @param $labelName 要增加的Label的名称
+	 * @param $labelFrame 要增加的Label的帧索引
+	 * 
+	 * @throw TypeError 提供的Label名称或者帧索引为空的时候抛出错误
+	 */	
+	public function addLabel($labelName:String, $labelFrame:Array):void
+	{
+		if(!$labelName) throw new TypeError('增加的Label不能为空！');
+		if(!$labelFrame || $labelFrame.length==0) throw new TypeError('必须为增加的Label('+$labelName+')定义帧序列！');
+		hasLabel = true;
+		if(!labels) labels = new Vector.<String>;
+		if(!labelsFrame) labelsFrame = {};
+		labels[labels.length] = $labelName;
+		labelsFrame[$labelName] = $labelFrame;
 	}
 	
 	/**
 	 * 设置Label的属性
 	 * @param $hasLabel	是否使用了Label
-	 * @param $items	Label的对象数组，每个对象格式为:{label,first,total}，其中first是1基的
+	 * @param $labels	Label的对象，每个键名为label名称，每个键值是数组，保存帧的索引号，格式为:[1,2,3]
 	 * 
 	 */	
-	public function setLabels($hasLabel:Boolean, $items:Array=null):void
+	public function setLabels($hasLabel:Boolean, $labels:Object=null):void
 	{
-		trace('SpriteSheetMetadata.setLabels:', $hasLabel, $items);
+		trace('SpriteSheetMetadata.setLabels:', $hasLabel, $labels);
 		//必须传递可用的$items才算是使用了Label，否则都算没有Label
-		if($hasLabel && $items && $items.length>0)
+		if($hasLabel && $labels)
 		{
 			hasLabel = true;
-			labels = new Vector.<String>($items.length, true);
-			labelsFrame = {};
-			for(var i:int=0; i<$items.length; i++)
+			labels = new Vector.<String>;
+			labelsFrame = ObjectUtil.clone($labels);
+			for(var __labelName:String in $labels) 
 			{
-				labels[i] = $items[i].label;
-				//起始帧是1基的，要转换成0基，因此要-1
-				var __first:int = $items[i].first - 1;
-				if(__first<0) __first = 0;
-				labelsFrame[labels[i]] = [__first, $items[i].total];
+				labels[labels.length] = __labelName;
 			}
 		}
 		else
@@ -188,13 +215,13 @@ public class SpriteSheetMetadata
 	{
 //		if(frameRects.length>=frameCount)
 //			return;
-		if(!frameRects)	setup();
+		setup();
 		writeFrame(frameRects.length, $sizeRect, $originalRect);
 	}
 	
 	public function addFrameAt($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null):void
 	{
-		if(!frameRects)	setup();
+		setup();
 		writeFrame($index, $sizeRect, $originalRect);
 	}
 	
@@ -227,7 +254,7 @@ public class SpriteSheetMetadata
 		hasName = $xml.hasName.toString() == 'true';
 		maskType = int($xml.maskType.toString());
 		var __totalFrame:int = int($xml.totalFrame.toString());
-		setup();
+		setup(true);
 		var __frames:XMLList = $xml.frames.children();
 		var __frame:XML = null;
 		if(hasName)
@@ -256,7 +283,7 @@ public class SpriteSheetMetadata
 		{
 			var __count:int = $xml.labels.@count;
 			var __labelsXML:XMLList = $xml.labels.children();
-			labels = new Vector.<String>(__count, true);
+			labels = new Vector.<String>(__count);
 			labelsFrame = {};
 			for(i=0; i<__count; i++)
 			{
@@ -285,7 +312,7 @@ public class SpriteSheetMetadata
 		hasName = $obj.hasName;
 		maskType = int($obj.maskType);
 		var __totalFrame:int = $obj.totalFrame;
-		setup();
+		setup(true);
 		var __frames:Array = $obj.frames;
 		var __frame:Object = null;
 		if(hasName)
