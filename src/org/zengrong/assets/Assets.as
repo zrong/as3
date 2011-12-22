@@ -25,7 +25,7 @@ import flash.system.LoaderContext;
  */
 [Event(name="complete",type="org.zengrong.events.InfoEvent")]
 [Event(name="info",type="org.zengrong.events.InfoEvent")]
-[Event(name="progress",type="org.zengrong.event.InfoEvent")]
+[Event(name="progress",type="org.zengrong.events.InfoEvent")]
 
 public class Assets extends EventDispatcher
 {

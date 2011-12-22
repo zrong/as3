@@ -106,6 +106,11 @@ public class MovableChar extends Character
 	 * 当前向下
 	 */		
 	protected var _down:Boolean = false;
+
+	/**
+	 * 当前是否移动
+	 */
+	protected var _move:Boolean = false;
 	
 
 	//----------------------------------------
@@ -176,6 +181,11 @@ public class MovableChar extends Character
 		_down = $down;
 	}
 
+	public function get isMove():Boolean
+	{
+		return _move;
+	}
+
 	/**
 	 * 角色是否在边缘
 	 */
@@ -190,6 +200,7 @@ public class MovableChar extends Character
 	 */
 	public function getOffsetV($delay:Number):Vec2D
 	{
+		if(!_init) return null;
         moveV.angle += angVel * $delay;
 		//更新速度，如果acc为0，则vel是个恒定的值
         vel += acc * $delay;
@@ -205,7 +216,7 @@ public class MovableChar extends Character
 	 */		
     override public function update($elapsed:Number, $delay:Number) : void
     {
-		if(!isInit) return;
+		if(!_init) return;
 		updateMyMoveState($elapsed, $delay);
 		super.update($elapsed, $delay);
     }
@@ -330,7 +341,7 @@ public class MovableChar extends Character
 
 	public function runTo($x:int, $y:int):void
 	{
-		trace('MovableChar('+this.name+').runTo:', $x, $y);
+		//trace('MovableChar('+this.name+').runTo:', $x, $y);
 		clearTarget();
 		//判断点击的地点在当前player的哪个方向
 		var __dx:int = $x - int(this.x);
@@ -369,7 +380,7 @@ public class MovableChar extends Character
 		//如果不能确定方向，说明目标点与站立点重合，这种情况不跑动
 		if(!this.up && !this.down && !this.left && !this.right)
 		{
-			trace('MovableChar('+this.name+').runTo，不能确定方向，不跑动。');
+			//trace('MovableChar('+this.name+').runTo，不能确定方向，不跑动。');
 			clearTarget();
 			return;
 		}
@@ -382,12 +393,14 @@ public class MovableChar extends Character
 	{
 		this.play();
 		vel = speed;
+		_move = true;
 	}
 
 	public function stand():void
 	{
 		this.play();
 		vel = 0;
+		_move = false;
 	}
 
 	//----------------------------------------
@@ -396,6 +409,7 @@ public class MovableChar extends Character
 	//更新自己的移动
 	protected function updateMyMoveState($elapsed:Number,$delay:Number):void
 	{
+		if(!_init) return;
 		var __vec:Vec2D = this.getOffsetV($delay);
 		//trace(this.name, 'Character.update开始更新xy,targetV:', targetV, ',moveV:', moveV, ',__vec:', __vec, '$delay:', $delay, ',vel:', vel);
 		this.x += __vec.x;

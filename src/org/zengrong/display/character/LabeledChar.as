@@ -77,6 +77,7 @@ public class LabeledChar extends MovableChar
 		{
 			_bmds = getListByLabel($label);
 			goto(0);
+			center();
 		}
 		//else
 		//	throw new RangeError('没有名为'+$label+'的label！');
@@ -86,7 +87,7 @@ public class LabeledChar extends MovableChar
 	{
 		return _labelsList[$label];
 	}
-
+	
 	//----------------------------------------		
 	// public
 	//----------------------------------------
@@ -114,6 +115,32 @@ public class LabeledChar extends MovableChar
 			this.removeAllFrame();
 		}
 		_labelsList = {};
+	}
+
+	override public function next():BitmapData
+	{
+		//若播放到最后一帧，调用播放结束的方法
+		if(_curFrame >= _bmds.length)
+		{
+			//若是重复播放，就跳转到第一帧播放
+			if(isRepeat)
+			{
+				_curFrame = 0;
+				_bmp.bitmapData = getFrame(_curFrame);
+			}
+			else
+			{
+				//如果不是重复播放，就停止动画的播放，这就避免next被不断执行，不断调用labelDone
+				this.stop();
+			}
+			labelDone();
+		}
+		else
+		{
+			_bmp.bitmapData = getFrame(_curFrame);
+			_curFrame ++;
+		}
+		return _bmp.bitmapData; 
 	}
 
 	/**
@@ -146,6 +173,14 @@ public class LabeledChar extends MovableChar
 		if(ActionLabel.STAND45 in _labelsList)
 			this.label = ActionLabel.STAND45;
 		super.stand();
+	}
+	
+	/**
+	 * 一个Label播放完毕后调用
+	 */
+	protected function labelDone():void
+	{
+		
 	}
 }
 }
