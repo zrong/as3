@@ -14,6 +14,8 @@ import flash.media.Microphone;
 import flash.media.SoundCodec;
 import flash.utils.setTimeout;
 import flash.system.Capabilities;
+import flash.utils.getDefinitionByName;
+import org.zengrong.utils.checkVersion;
 
 import mx.core.Singleton;
 
@@ -91,10 +93,8 @@ public class CM extends EventDispatcher
 	 */
 	public function get supportEnhancedMicrophone():Boolean
 	{
-		var __ver:String = Capabilities.version;
-		if(__ver.indexOf("10,3") != -1)
-			return true;
-		return false;
+		var __ver:int = checkVersion(10,3);
+		return __ver <= 0;
 	}
 
 	/**
@@ -124,8 +124,9 @@ public class CM extends EventDispatcher
 
 	/**
 	 * 为Microphone设定默认设置
+	 * @param $isEnhancedMic 是否是增强麦克风
 	 */
-	public function setMicDefalutSetting():void
+	public function setMicDefalutSetting($isEnhancedMic:Boolean=false):void
 	{
 		if(_mic)
 		{
@@ -133,6 +134,18 @@ public class CM extends EventDispatcher
 			_mic.setSilenceLevel(0);
 			_mic.enableVAD = true;
 			_mic.rate = 16;
+			//使用高质量的音频
+			_mic.encodeQuality = 9;
+			if($isEnhancedMic && supportEnhancedMicrophone)
+			{
+				//由于需要判断Flash Player版本，不能引用类名，采用反射
+				var __OptionClass:Class = getDefinitionByName("flash.media.MicrophoneEnhancedOptions") as Class;
+				var __ModeClass:Class = getDefinitionByName("flash.media.MicrophoneEnhancedMode") as Class;
+				var __options:* = new __OptionClass();
+				__options.mode = __ModeClass.FULL_DUPLEX;
+				_mic["enhancedOptions"] = __options;
+				//_mic.setLoopBack(true);
+			}
 		}
 	}
 
@@ -143,9 +156,10 @@ public class CM extends EventDispatcher
 	{
 		trace('CM重新设置');
 		if(_cam != null)
+		{
 			_cam.removeEventListener(StatusEvent.STATUS, handler_camStatus);
-		if(_cam != null)
 			_cam.removeEventListener(ActivityEvent.ACTIVITY, handler_activity);
+		}
 		if(_mic != null)
 			_mic.removeEventListener(StatusEvent.STATUS, handler_micStatus);
 		_cam = null;
@@ -225,14 +239,21 @@ public class CM extends EventDispatcher
 		}
 		else
 		{
+			//若当前Flash Player支持增强麦克风，就使用增强麦克风
 			if(supportEnhancedMicrophone)
 			{
-				//_mic = Microphone.getEnhancedMicrophone();
-				_mic = Microphone.getMicrophone();
-				_mic.setUseEchoSuppression(true);
-				setMicDefalutSetting();
+				//即使是Flash Player版本足夠，也可能出現“1066，不支持的函數”這個錯誤
+				//所以這裡還是要捕獲錯誤并不處理，使用普通麥克風
+				try
+				{
+					_mic = Microphone.getEnhancedMicrophone();
+					//如果能获得增强麦克风，就使用它
+					if(_mic) setMicDefalutSetting(true);
+				}
+				catch($err:Error) { }
 			}
-			else
+			//如果无法获得增强麦克风，就使用普通麦克风
+			if(!_mic)
 			{
 				_mic = Microphone.getMicrophone();
 				_mic.setUseEchoSuppression(true);
@@ -287,6 +308,7 @@ public class CM extends EventDispatcher
 		}
 		throw new RangeError('必须提供Camera或者Microphone类型！');
 	}
+
 }
 }
 class Singleton{}
