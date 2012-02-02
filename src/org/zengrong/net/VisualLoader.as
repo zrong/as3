@@ -2,7 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2010-11-19
-//  更新时间：2011-09-07
+//  更新时间：2012-02-02
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
@@ -148,14 +148,14 @@ public class VisualLoader extends EventDispatcher implements ILoader
 	 * @param $bytes 要载入的字节数组
 	 * @param $type 要载入的字节数组的类型
 	 * */
-	public function loadBytes($bytes:ByteArray, $type:String):void
+	public function loadBytes($bytes:ByteArray, $type:String, $loaderContext:LoaderContext=null):void
 	{
 		if(_loading)
 			return;
 		_loading = true;
 		_type = $type;
 		initLoader();
-		_loader.loadBytes($bytes);
+		_loader.loadBytes($bytes, $loaderContext);
 	}
 
 	/**

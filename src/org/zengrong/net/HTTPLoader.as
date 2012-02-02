@@ -290,8 +290,7 @@ public class HTTPLoader
 		_fun_loadError.call(null, __result);
 		//对于多重载入，即使载入错误，依然要继续载入。但检测的时候，不将返回输入加入数组中。
 		//也就是说最终返回的结果数组，将不包含这次载入错误的数据。
-		if(_multi)
-			checkMultiLoadDone(false);
+		if(_multi) checkMultiLoadDone(false);
 	}
 	
 	protected function handler_complete(evt:Event):void

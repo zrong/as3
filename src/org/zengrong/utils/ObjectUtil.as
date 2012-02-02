@@ -2,7 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2011-01-02
-//  修改时间：2011-09-20
+//  修改时间：2012-02-02
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.utils
 {
@@ -13,7 +13,7 @@ import flash.utils.getQualifiedSuperclassName;
 public class ObjectUtil
 {
 	/**
-	 * 克隆一个普通对象
+	 * 复制一个普通对象
 	 * @param value
 	 */	
 	public static function clone(value:Object):Object
@@ -53,9 +53,9 @@ public class ObjectUtil
 	{
 		if(!isArray($arrOrVector)) return null;
 		var __str:String = '[';
-		for each(var __item:Object in $arrOrVector)
+		for(var i:int=0;i<$arrOrVector.length;i++)
 		{
-			__str += obj2String(__item) + ',';
+			__str += obj2String($arrOrVector[i]) + ',';
 		}
 		return delEndDelimiter(__str, ',') + ']';
 	}
@@ -65,10 +65,14 @@ public class ObjectUtil
 	 */	
 	public static function obj2String($obj:Object, $delim1:String=':', $delim2:String=','):String
 	{
+		if($obj === null) return 'null';
 		var __str:String = '{';
+		var __value:*;
 		for(var __key:String in $obj)
 		{
-			__str += __key + $delim1 + $obj[__key] + $delim2;
+			__value = $obj[__key];
+			if(__value) __value = __value.toString();
+			__str += __key + $delim1 + __value + $delim2;
 		}
 		return delEndDelimiter(__str, $delim2) + '}';
 	}

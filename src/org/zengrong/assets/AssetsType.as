@@ -1,7 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  zengrong.net
+//  youxi.com
 //  创建者:	zrong
 //  创建时间：2011-04-23
+//  修改时间：2011-10-14
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.assets
 {
@@ -11,16 +12,38 @@ package org.zengrong.assets
  */
 public class AssetsType
 {
+	//========================================
+	// 指示各种资源文件的扩展名或者类型值
+	//========================================
+	/**
+	 * 指示载入的类型为纯文本包的常量。专用格式。
+	 * @see org.zengrong.FileHead
+	 */
+	public static const TXT_PACK:String = 'txp';
+
+	/**
+	 * 指示载入的类型为spriteSheet包的常量。专用格式。
+	 * @see org.zengrong.FileHead
+	 */
+	public static const SPRITE_SHEET_PACK:String = 'ssp';
+
+	/**
+	 * 指示载入的类型为图像文件包的常量。专用格式。
+	 * @see org.zengrong.FileHead
+	 */
+	public static const IMAGE_PACK:String = 'imp';
+
+	/**
+	 * 指示载入的类型为spriteSheet图片的常量。专用格式。
+	 * @see org.zengrong.FileHead
+	 * */
+	public static const SPRITE_SHEET:String = 'ss';
+	
 	/**
 	 * 指示载入的类型为mp3文件
 	 */	
 	public static const MP3:String = 'mp3';
-	
-	/**
-	 * 指示载入的类型为spriteSheet图片的常量。
-	 * */
-	public static const SPRITE_SHEET:String = 'ss';
-	
+
 	/**
 	 * 指示在如类型为swf动画的常量。
 	 * */
@@ -46,7 +69,9 @@ public class AssetsType
 	 * */
 	public static const GIF_ANI:String = 'gifAnimation';
 	
-	
+	/**
+	 * 根据文件类型判断文件是否是图像文件
+	 */
 	public static function isPic($type:String):Boolean
 	{
 		return $type == AssetsType.PNG || 
@@ -54,14 +79,30 @@ public class AssetsType
 				$type == AssetsType.GIF;
 	}
 	
+	/**
+	 * 根据文件类型判断文件是否是动画文件
+	 */
 	public static function isAni($type:String):Boolean
 	{
 		return $type == AssetsType.SWF || $type == AssetsType.GIF_ANI;
 	}
 	
+	/**
+	 * 根据文件类型判断文件是否是可视化的文件 
+	 */
 	public static function isVisual($type:String):Boolean
 	{
 		return isPic($type) || isAni($type);
+	}
+
+	/**
+	 * 根据文件类型判断文件是否是包文件
+	 */
+	public static function isPack($type:String):Boolean
+	{
+		return 	$type == TXT_PACK ||
+				$type == IMAGE_PACK ||
+				$type == SPRITE_SHEET_PACK;
 	}
 }
 }

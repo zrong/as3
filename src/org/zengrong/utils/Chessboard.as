@@ -147,13 +147,17 @@ package org.zengrong.utils
 			if(!($coord is String)) return 0;
 			var __coord:String = String($coord).toLowerCase();
 			//不符合规则，返回0
-			if(!arithReg.test(__coord)) return 0;
+			//if(!arithReg.test(__coord)) return 0;
 			//如果没有设置容器宽高，返回0
 			if(box_w == 0 || box_h == 0) return 0;
-			var __arr:Array = __coord.match(arithReg);
+			
+			return evalString(__coord.replace('w',box_w.toString()).replace('h',box_h.toString()));
+			
+			/*var __arr:Array = __coord.match(arithReg);
 			//trace('arr:', __arr);
 			var __box:int = __arr[1] == 'w' ? box_w : box_h;
-			__num = int(__arr[3]);
+			//__num = int(__arr[3]);
+			__num = Number(__arr[3]);
 			//加减乘除运算
 			if(__arr[2] == '+')
 				return __box + __num;
@@ -161,7 +165,55 @@ package org.zengrong.utils
 				return __box - __num;
 			else if(__arr[2] == '*')
 				return __box * __num;
-			return int(__box/__num);
+			return int(__box/__num);*/
+		}
+		
+		
+		private function evalString(s:String):Number {
+			var a:Array = [];
+			var b:String;
+			for (var i:int = 0; i<s.length; i++) {
+				b = s.substr(i, 1);
+				if(b ==" ") continue;
+				if (b == "+" || b == "-" || b == "*" || b == "/"/* || b == "."*/) {
+					a.push(b);
+				} else if (String(Number(b)) != "NaN" || b == ".") {//是数字
+					if (String(Number(a[a.length-1])) == "NaN") {//如果前一个不是数字
+						a.push(b);
+					} else {
+						a[a.length-1] += b;
+					}
+				}
+			}
+			
+			var n:Number = Number(a[0]);
+			for (var j:int = 1; j < a.length; j+=2) 
+			{
+				switch(a[j])
+				{
+					case '+':
+					{
+						n += Number(a[j+1]);
+						break;
+					}
+					case '-':
+					{
+						n -= Number(a[j+1]);
+						break;
+					}
+					case '*':
+					{
+						n *= Number(a[j+1]);
+						break;
+					}
+					case '/':
+					{
+						n /= Number(a[j+1]);
+						break;
+					}
+				}
+			}
+			return n;
 		}
 
 		public function setPoints($point:Object):void
