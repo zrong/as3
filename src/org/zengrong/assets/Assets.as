@@ -77,7 +77,7 @@ public class Assets extends EventDispatcher
 	protected var _fun_loadProgress:Function;
 
 	protected var _visualLoader:VisualLoader;		//载入可视文件的loader
-	protected var _ssLoader:SpriteSheetLoader2; 	//载入SpriteSheet
+	protected var _ssLoader:SpriteSheetLoader; 	//载入SpriteSheet
 
 	protected var _urls:Array;			//保存所有需要载入的文件的路径
 	protected var _loadingCount:int;		//所有需要载入的外部资源的总数量
