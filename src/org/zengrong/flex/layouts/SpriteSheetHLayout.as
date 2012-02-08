@@ -44,8 +44,8 @@ public class SpriteSheetHLayout extends SpriteSheetLayoutBase
 	{
 		var __perferredW:int;
 		var __perferredH:int;
-		var __minH;
-		var __minW;
+		var __minH:int;
+		var __minW:int;
 		
 		for(var i:int=0;i<this.cells.length;i++)
 		{

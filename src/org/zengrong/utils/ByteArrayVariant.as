@@ -15,6 +15,22 @@ import flash.utils.ByteArray;
  */
 public class ByteArrayVariant extends ByteArray
 {
+	/**
+	 * 将提供的ByteArray转换成ByteArrayVariant类型
+	 * @param $source 要转换的ByteArray对象
+	 * @param $setPosToZero 是否将新的ByteArrayVariant的position设置为0
+	 */
+	static public function toVariant($byteArray:ByteArray, $setPosToZero:Boolean=false):ByteArrayVariant
+	{
+		var __vb:ByteArrayVariant = new ByteArrayVariant();
+		__vb.endian = $byteArray.endian;
+		var __oldpos:int = $byteArray.position;
+		$byteArray.position = 0;
+		$byteArray.readBytes(__vb);
+		__vb.position = $setPosToZero ? 0 : __oldpos;
+		return __vb;
+	}
+
 	public function ByteArrayVariant()
 	{
 		super();
@@ -55,7 +71,16 @@ public class ByteArrayVariant extends ByteArray
 	{
 		return decodeVarint();
 	}
-
+	
+	/**
+	 * 读取一个UTF-8字符串，假定字符串前面是无符号的可变整型
+	 */	
+	public function readVariantUTF():String
+	{
+		var __len:uint = this.readUnsignedVariantInt();
+		return this.readUTFBytes(__len);
+	}
+	
 	/**
 	 * 编码并写入Varint字节
 	 * @private
