@@ -108,7 +108,7 @@ public class SpriteSheetCell implements IMXMLObject
 
 	public function initialized($document:Object, $id:String):void
 	{
-		trace('SpriteSheetCell.initialized:', $document, $id);
+		//trace('SpriteSheetCell.initialized:', $document, $id);
 	}
 
 	public function get index():int

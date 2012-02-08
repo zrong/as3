@@ -3,6 +3,7 @@ package org.zengrong.flex.layouts
 import flash.geom.Rectangle;
 
 import mx.core.ILayoutElement;
+import mx.states.OverrideBase;
 
 import org.zengrong.flex.layouts.SpriteSheetCellVO;
 import org.zengrong.flex.primitives.SpriteSheetBitmapImage;
@@ -15,6 +16,7 @@ import spark.primitives.BitmapImage;
  * 实现对SpriteSheetBitmapImage的横向排版
  * @author zrong
  * 创建时间：2012-02-06
+ * 修改时间：2012-02-08
  */
 public class SpriteSheetHLayout extends SpriteSheetLayoutBase
 {
@@ -23,11 +25,65 @@ public class SpriteSheetHLayout extends SpriteSheetLayoutBase
 		super();
 	}
 	
+	override public function measure():void
+	{
+		return;
+		//trace('measure:', this);
+		var __target:GroupBase = this.target;
+		if(this.cells && this.cells.length>0)
+		{
+			measureFormCells(__target);
+		}
+		else
+		{
+			measureFromElements(__target);
+		}
+	}
+	
+	private function measureFormCells($target:GroupBase):void
+	{
+		var __perferredW:int;
+		var __perferredH:int;
+		var __minH;
+		var __minW;
+		
+		for(var i:int=0;i<this.cells.length;i++)
+		{
+			
+		}
+		$target.measuredHeight = __perferredH;
+		$target.measuredWidth = __perferredW;
+		$target.measuredMinHeight = __minH;
+		$target.measuredMinWidth  = __minW;
+	}
+	
+	private function measureFromElements():void
+	{
+		
+	}
+	
+	private function getElementWidth(element:ILayoutElement, result:SizesAndLimit):void
+	{
+		// Calculate preferred width first, as it's being used to calculate min width
+		var elementPreferredWidth:Number = Math.ceil(element.getPreferredBoundsWidth());
+		
+		// Calculate min width
+		var flexibleWidth:Boolean = !isNaN(element.percentWidth);
+		var elementMinWidth:Number = flexibleWidth ? Math.ceil(element.getMinBoundsWidth()) : 
+			elementPreferredWidth;
+		result.preferredSize = elementPreferredWidth;
+		result.minSize = elementMinWidth;
+	}
+	
 	override public function updateDisplayList($w:Number, $h:Number):void
 	{
 		var __target:GroupBase = target;
 		if(!__target) return;
-		trace('layoutTarget wh:', __target.width, __target.height);
+		//trace('layoutTarget wh:', __target.width, __target.height);
+		//trace('layoutTarget contentWidth wh:', __target.contentWidth, __target.contentHeight);
+		//trace('layoutTarget preferredWidth:', __target.getPreferredBoundsWidth());
+		//trace('layoutTarget measuredWidth:', __target.measuredWidth);
+		
 		if(cells && cells.length>0)
 			updateImageListFromCell();
 		else
@@ -68,7 +124,7 @@ public class SpriteSheetHLayout extends SpriteSheetLayoutBase
 			__sizevo = __sizeList[j];
 			__sizevo.bmp.setLayoutBoundsSize(__sizevo.measureW, __sizevo.measureH);
 			__sizevo.bmp.setLayoutBoundsPosition(__sizevo.measureX, __sizevo.measureY);
-			trace('图像在布局中的尺寸：', __sizevo.bmp.getLayoutBoundsWidth(), __sizevo.bmp.getLayoutBoundsHeight());
+			//trace('图像在布局中的尺寸：', __sizevo.bmp.getLayoutBoundsWidth(), __sizevo.bmp.getLayoutBoundsHeight());
 		}
 		
 	}
@@ -78,7 +134,7 @@ public class SpriteSheetHLayout extends SpriteSheetLayoutBase
 	 */	
 	private function updateSpriteSheetCellVOList($layoutW:int, $sizeList:Vector.<SpriteSheetCellVO>):void
 	{
-		trace('需要更新sizevo：', $layoutW, ',共有'+$sizeList.length+'个对象');
+		//trace('需要更新sizevo：', $layoutW, ',共有'+$sizeList.length+'个对象');
 		var __sizevo:SpriteSheetCellVO;
 		//保存可用宽度，默认是最大宽度
 		var __totalW:int = $layoutW;
@@ -98,14 +154,14 @@ public class SpriteSheetHLayout extends SpriteSheetLayoutBase
 				//使用显示设置的宽度
 				else
 					__sizevo.measureW = __sizevo.bmp.cell.width;
-				trace('计算使用平铺的对象,__repeatVOList.length:', __numRepeat.length);
+				//trace('计算使用平铺的对象,__repeatVOList.length:', __numRepeat.length);
 			}
 			//如果没有设置正确的Repeat，就使用图像的原始宽度
 			else
 			{
 				__sizevo.measureW = __sizevo.originalW;
 				__totalW -= __sizevo.originalW;
-				trace('计算没有使用平铺的对象,__totalW:', __totalW);
+				//trace('计算没有使用平铺的对象,__totalW:', __totalW);
 			}
 		}
 		if(__totalW<0) __totalW = 0;
@@ -122,7 +178,7 @@ public class SpriteSheetHLayout extends SpriteSheetLayoutBase
 				__curRepeat = __numRepeat[i];
 				__sizevo = $sizeList[__curRepeat];
 				__sizevo.measureW = __repeatW;
-				trace('重新计算百分比宽度:', __sizevo.measureW);
+				//trace('重新计算百分比宽度:', __sizevo.measureW);
 			}
 			//根据最终的宽度更新x的值
 			var __rect:Rectangle = new Rectangle();
@@ -141,7 +197,7 @@ public class SpriteSheetHLayout extends SpriteSheetLayoutBase
 					__sizevo.measureX = __sizevo.explicitX;
 					__rect.width = __sizevo.measureX + __sizevo.measureW;
 				}
-				trace('重新计算x,W:',__sizevo.measureW,',X:',__sizevo.measureX);
+				//trace('重新计算x,W:',__sizevo.measureW,',X:',__sizevo.measureX);
 			}
 		}
 	}
@@ -169,9 +225,14 @@ public class SpriteSheetHLayout extends SpriteSheetLayoutBase
 			__locRect.width += __imageOriginalW;
 			__bmpi.setLayoutBoundsSize(NaN, NaN);
 			__bmpi.setLayoutBoundsPosition(__x, __y);
-			trace(__bmpi.getLayoutBoundsWidth(), __bmpi.getLayoutBoundsHeight());
-			trace('wh2:',__bmpi.width, __bmpi.height);
+			//trace(__bmpi.getLayoutBoundsWidth(), __bmpi.getLayoutBoundsHeight());
+			//trace('wh2:',__bmpi.width, __bmpi.height);
 		}
 	}
 }
+}
+class SizesAndLimit
+{
+	public var preferredSize:Number;
+	public var minSize:Number;
 }

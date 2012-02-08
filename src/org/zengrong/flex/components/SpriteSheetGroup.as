@@ -86,8 +86,7 @@ public class SpriteSheetGroup extends Group
 		_loader = getSpriteSheetLoader();
 		_loader.addEventListener(Event.COMPLETE, handler_ssLoadComp);
 		_loader.load(source as String, metadata, metadataType);
-		trace(this.numElements+'个可视元素');
-		//trace(spritetSheetLayout.cells.length+'个layoutCell');
+		//trace(this.numElements+'个可视元素');
 	}
 	
 	/**
@@ -104,7 +103,7 @@ public class SpriteSheetGroup extends Group
 		_ss = _loader.getSpriteSheet();
 		_ss.parseSheet();
 		_ss.dispose();
-		trace(_ss.metadata.toString());
+		//trace(_ss.metadata.toString());
 		var __cells:Array = spriteSheetLayout.cells;
 		var i:int=0;
 		var __bmpi:SpriteSheetBitmapImage;
@@ -115,7 +114,7 @@ public class SpriteSheetGroup extends Group
 			for (i= 0;  i< __cells.length; i++) 
 			{
 				__cell = __cells[i];
-				trace('__cell.index:', __cell.index);
+				//trace('__cell.index:', __cell.index);
 				if(__cell.index>-1)
 					__source = _ss.getBMDByIndex(__cell.index);
 				else if(__cell.name)
@@ -138,7 +137,13 @@ public class SpriteSheetGroup extends Group
 				this.addElement(__bmpi);
 			}
 		}
-		trace('载入完毕');
+		//trace('载入完毕');
+	}
+	
+	override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void
+	{
+		super.updateDisplayList(unscaledWidth, unscaledWidth);
+		//trace('Group update:', unscaledWidth, unscaledHeight);
 	}
 }
 }
