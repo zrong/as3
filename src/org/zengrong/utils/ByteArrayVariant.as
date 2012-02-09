@@ -37,6 +37,26 @@ public class ByteArrayVariant extends ByteArray
 	}
 
 	/**
+	 * 将32bit的字节保存的多个数字读取成为unit数组<br>
+	 * 为了节省数据量，可以使用不同的位数来保存数字，使用这个方法将保存在32位字节中的n个数组读取成一个uint数组。
+	 * @param $len 要读取的数字的数量
+	 * @param $bitPerInt 指定使用几位来保存1个数字
+	 */
+	public function readVariantUintVector($len:uint=6, $bitPerInt:uint=5):Vector.<uint>
+	{
+		//根据数字占有的位数获取对应位数的移位符
+		//例如$bitPerInt=5，则移位符为0x1F(111111)；若为6，则移位符为0x3F(111111)
+		var __shift:uint = 1<<$bitPerInt-1;
+		var __uint:uint = this.readUnsignedVariantInt();
+		var __vector:Vector.<uint> = new Vector.<uint>($len, true);
+		for(var i:int=0;i<$len;i++)
+		{
+			__vector[i] = __uint<<($bitPerInt*(i+1))&__shift;
+		}
+		return __vector;
+	}
+
+	/**
 	 * 写入一个有符号可变整型
 	 */
 	public function writeVariantInt($value:int):void
