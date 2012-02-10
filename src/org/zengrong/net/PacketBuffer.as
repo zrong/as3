@@ -37,22 +37,22 @@ public class PacketBuffer
 	/**
 	 * 前面的校验码长度
 	 */
-	public static const SUF_MASK_LEN:int = 2;
+	public static var SUF_MASK_LEN:int = 2;
 
 	/**
 	 * 后面的校验码长度
 	 */
-	public static const PRE_MASK_LEN:int = 2;
+	public static var PRE_MASK_LEN:int = 2;
 
 	/**
 	 * 消息体长度使用32位整数保存，占用4字节
 	 */
-	public static const BODY_LEN:int = 4;
+	public static var BODY_LEN:int = 4;
 	
 	/**
 	 * 命令代码的长度使用16位整数保存，占用2字节
 	 */	
-	public static const METHOD_CODE_LEN:int = 2;
+	public static var METHOD_CODE_LEN:int = 2;
 
 	public static var endian:String = Endian.LITTLE_ENDIAN;
 
@@ -127,54 +127,61 @@ public class PacketBuffer
 		_buf.position = _buf.length;  
 		_buf.writeBytes($ba);
 		_buf.position = 0;  
-		trace('_bufPosAndLen:', _buf.position, _buf.length);
-		//读取缓冲区
+		var __flag1:uint;
+		var __flag2:uint;
+		trace('开始解析，整个缓冲区大小:', _buf.length);
+		//读取整个缓冲区
 		while (_buf.bytesAvailable >= __preMaskAndBody_len)  
 		{
-			var __flag1:uint = uint(_buf.readByte());
+			//读取第一个校验码
+			__flag1 = uint(_buf.readByte());
 			trace('__flag1:', __flag1);
+			//判断第一个校验码是否匹配，不匹配就继续读取
 			if ((__flag1 & MASK1) != __flag1) continue;
-			var __flag2:uint = uint(_buf.readByte());
+			//读取第二个校验码
+			__flag2 = uint(_buf.readByte());
 			trace('__flag2:', __flag2);
+			//判断第二个校验码是否匹配，不匹配就继续读
 			if ((__flag2 & MASK2) != __flag2) continue;
-			
-			trace('执行到flag之后,pos:', __pos);
+			trace('前置校验码读取正确,pos:', __pos);
+			//读取信息主体的长度
 			var __bodyLen:int=_buf.readInt();
+			//暂存信息主体开头所在位置的指针
 			__pos = _buf.position;
-			trace('__bodyLen:', __bodyLen, ',__pos:', __pos, '_buf.length:', _buf.length);
-			//如果没有将数据包的所有数据接受完全（即当前可用的长度小于当前位置＋消息长度＋尾部校验码长度）则等待下一次处理
+			trace('信息主体长度:', __bodyLen, ',pos:', __pos, '_buf.bytesAvailable:', _buf.bytesAvailable, '_buf.length:', _buf.length);
+			//如果没有将数据包的所有数据接受完全（即当前可用的长度小于当前位置＋消息主体长度＋尾部校验码长度）则等待下一次处理
 			if (_buf.length < __pos + __bodyLen + SUF_MASK_LEN) break;
-			//设置位置，读取尾部校验码
-			_buf.position=__pos + __bodyLen;
+			//数据包长度足够，就读取尾部校验码
+			_buf.position = __pos + __bodyLen;
 			__flag1 = _buf.readByte();
 			__flag2 = _buf.readByte();
 			trace('_buf.pos:', _buf.position);
-			//如果结束码校验正常则提取消息体加入队列
+			//如果后置校验码正确则提取消息体加入队列
 			if ((__flag1 & MASK3) == __flag1 && (__flag2 & MASK4) == __flag2)
 			{
 				trace('校验码正确');
 				//长度在允许的范围内就析取数据包
 				if (__bodyLen <= MAX_SIZE)
 				{
-					//跳过前面的信息长度值（32位整数，占4字节）
+					//将缓冲区的读取位置设置到信息主体开头
 					_buf.position =__pos;
 					//建立一个Object，将数据包的method和body放在其中
 					var __msg:Object = {};
-					//写入方法类型
+					//读取信息主体中的方法名称，使用16位整数保存
 					__msg.method = _buf.readShort();
+					//读取信息主体中的数据，读取的长度从主体信息长度中减去方法名占用的长度
 					var __msgBody:ByteArray = getBaseBA();
-					
-					_buf.readBytes(__msgBody, 0, __bodyLen - METHOD_CODE_LEN);   //len为body的长度，将body的数据放入msgBody  
+					_buf.readBytes(__msgBody, 0, __bodyLen - METHOD_CODE_LEN);  
 					__msgBody.position = 0;
 					__msg.body = __msgBody;
-					__msgs.push(__msg);  //放入数组
-					_buf.position += 2;
+					//放入数组
+					__msgs.push(__msg); 
+					//将指针位置移动到后置校验码的后方
+					_buf.position += SUF_MASK_LEN;
 				}
 			}
-			else
-			{
-				_buf.position=__pos;// + msgLen;
-			}
+			//如果后置校验码不正确，就还原缓冲区的指针到信息主体长度记录之前
+			else _buf.position= __pos;
 		}
 		__pos = _buf.position;
 		//如果缓冲区数据全部处理完则清空缓冲区

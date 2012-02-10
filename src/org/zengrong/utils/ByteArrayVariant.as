@@ -131,7 +131,7 @@ public class ByteArrayVariant extends ByteArray
 		{
             __byte = this.readByte();
             __result |= ((__byte & 0x7f) << __shift);
-			trace('byte:', __byte, ',result:', __result, ',shift', __shift);
+			//trace('byte:', __byte, ',result:', __result, ',shift', __shift);
             if(!(__byte & 0x80))
 			{
 				return __result;
