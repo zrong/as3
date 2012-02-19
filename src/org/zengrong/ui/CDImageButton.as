@@ -9,6 +9,7 @@ package org.zengrong.ui
 {
 
 import flash.display.Bitmap;
+import flash.display.BitmapData;
 import flash.display.DisplayObjectContainer;
 import flash.display.Shape;
 import flash.events.MouseEvent;
@@ -70,7 +71,7 @@ public class CDImageButton extends ImageButton
 	 * @param clickStart 		是否在按钮上单击鼠标的时候，自动开始CD
 	 * @param btnid				按钮的id
 	 */	
-	public function CDImageButton(parent:DisplayObjectContainer, upStateImage:Bitmap, coolDownTime:int=5000, aniType:String='radial', defaultHandler:Function=null, clickStart:Boolean=true, btnid:int=-1)
+	public function CDImageButton(parent:DisplayObjectContainer, upStateImage:BitmapData, coolDownTime:int=5000, aniType:String='radial', defaultHandler:Function=null, clickStart:Boolean=true, btnid:int=-1)
 	{
 		_cdt = coolDownTime;
 		_aniType = aniType;

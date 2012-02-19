@@ -9,7 +9,7 @@ import flash.display.BitmapData;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 
-import com.youxi.utils.Vec2D;
+import org.zengrong.utils.Vec2D;
 
 /**
  * 基于位图引擎的Sprite，并加入运动功能

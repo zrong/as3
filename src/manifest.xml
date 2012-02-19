@@ -1,38 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <componentPackage>
 <!-- 组件介绍 -->
-  <component id="InfoEvent" class="org.zengrong.events.InfoEvent" />
-  <component id="Firebug" class="org.zengrong.logging.Firebug" />
-  <component id="FirebugLogger" class="org.zengrong.logging.FirebugLogger" />
-  <component id="Logger" class="org.zengrong.logging.Logger" />
-  <component id="FirebugTarget" class="org.zengrong.logging.targets.FirebugTarget" />
-  <component id="LCDebugTarget" class="org.zengrong.logging.targets.LCDebugTarget" />
-  <component id="NetConnectionInfoCode" class="org.zengrong.media.NetConnectionInfoCode" />
-  <component id="NetStreamInfoCode" class="org.zengrong.media.NetStreamInfoCode" />
-  <component id="CM" class="org.zengrong.media.cm.CM" />
-  <component id="CMEvent" class="org.zengrong.media.cm.CMEvent" />
-  <component id="CMFormat" class="org.zengrong.media.cm.CMFormat" />
-  <component id="FaultEvent" class="org.zengrong.rpc.FaultEvent" />
-  <component id="Operation" class="org.zengrong.rpc.Operation" />
-  <component id="OperationPool" class="org.zengrong.rpc.OperationPool" />
-  <component id="Remoting" class="org.zengrong.rpc.Remoting" />
-  <component id="ResultEvent" class="org.zengrong.rpc.ResultEvent" />
-  <component id="ServiceProxy" class="org.zengrong.rpc.ServiceProxy" />
-  <component id="TimeUtil" class="org.zengrong.utils.TimeUtil" />
-  <component id="ImageDecoder" class="org.zengrong.utils.ImageDecoder" />
-  <component id="VisualLoader" class="org.zengrong.net.VisualLoader" />
-  <component id="JSONLoader" class="org.zengrong.net.JSONLoader" />
-  <component id="SoundLoader" class="org.zengrong.net.SoundLoader" />
-  <component id="VideoDisplay" class="org.zengrong.display.VideoDisplay" />
-  <component id="BMPSlicer" class="org.zengrong.display.BMPSlicer" />
-  <component id="BMPDiverseSlicer" class="org.zengrong.display.BMPDiverseSlicer" />
-  <component id="BMPText" class="org.zengrong.display.BMPText" />
-  <component id="Dialog" class="org.zengrong.flex.utils.Dialog" />
-  <component id="ColoredDataGrid" class="org.zengrong.flex.controls.ColoredDataGrid" />
-  <component id="Loader" class="org.zengrong.flex.controls.Loader" />
-  <component id="VideoComponent" class="org.zengrong.flex.controls.VideoComponent" />
-  <component id="ImageButton" class="org.zengrong.flex.controls.ImageButton" />
-  <component id="ImageButtonSkin" class="org.zengrong.flex.skins.ImageButtonSkin" />
-  <component id="JS" class="org.zengrong.flex.utils.JS" />
-  <component id="Updater" class="org.zengrong.air.utils.Updater" />
 </componentPackage>
