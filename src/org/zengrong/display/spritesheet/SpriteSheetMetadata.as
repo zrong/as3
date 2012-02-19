@@ -2,18 +2,15 @@
 //  zengrong.org
 //  创建者:	zrong
 //  创建时间：2011-04-11
-//	修改时间：2011-08-25
+//	修改时间：2012-02-02
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.display.spritesheet
 {
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.utils.ByteArray;
-import flash.utils.flash_proxy;
 
 import org.zengrong.utils.ObjectUtil;
-
-import spark.primitives.Rect;
 
 /**
  * 处理SpriteSheet的元数据
@@ -369,6 +366,13 @@ public class SpriteSheetMetadata
 		}
 	}
 	
+	/**
+	 * 从字节数组解析普通Object文件解析Metadata数据，ByteArray是从SS格式中提取的
+	 * @param $ba 从SS格式中提取的Metadata数据
+	 */	
+	public function decodeFromByteArray($ba:ByteArray):void
+	{
+	}
 	//----------------------------------------
 	// encode
 	//----------------------------------------

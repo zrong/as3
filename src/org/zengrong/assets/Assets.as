@@ -2,7 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2011-04-23
-//  最后修改：2011-09-07
+//  最后修改：2012-02-02
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.assets
 {
@@ -25,7 +25,7 @@ import flash.system.LoaderContext;
  */
 [Event(name="complete",type="org.zengrong.events.InfoEvent")]
 [Event(name="info",type="org.zengrong.events.InfoEvent")]
-[Event(name="progress",type="org.zengrong.event.InfoEvent")]
+[Event(name="progress",type="org.zengrong.events.InfoEvent")]
 
 public class Assets extends EventDispatcher
 {
@@ -72,36 +72,44 @@ public class Assets extends EventDispatcher
 	 */
 	public var loaderContext:LoaderContext;
 	
-	private var _fun_loadDone:Function;
-	private var _fun_loadInfo:Function;
+	protected var _fun_loadDone:Function;
+	protected var _fun_loadInfo:Function;
+	protected var _fun_loadProgress:Function;
 
-	private var _fun_loadProgress:Function;
-	private var _visualLoader:VisualLoader;		//载入可视文件的loader
-	private var _ssLoader:SpriteSheetLoader; 	//载入SpriteSheet
-	
-	private var _urls:Array;			//保存所有需要载入的文件的路径
-	private var _loadingCount:int;		//所有需要载入的外部资源的总数量
-	private var _curFile:Object;		//保存正在载入的文件的相关信息
-	private var _assets:Object;		//保存解析后的资源信息
+	protected var _visualLoader:VisualLoader;		//载入可视文件的loader
+	protected var _ssLoader:SpriteSheetLoader; 	//载入SpriteSheet
+
+	protected var _urls:Array;			//保存所有需要载入的文件的路径
+	protected var _loadingCount:int;		//所有需要载入的外部资源的总数量
+	protected var _curFile:Object;		//保存正在载入的文件的相关信息
+	protected var _assets:Object;		//保存解析后的资源信息
 	
 	//----------------------------------
 	//  init
 	//----------------------------------
-	private function init():void
+	protected function init():void
 	{
 		_assets = {};
 		_urls = [];
 		_loadingCount = -1;
-		
+
 		_visualLoader = new VisualLoader();
 		_visualLoader.addEventListener(Event.COMPLETE, handler_loaded);
 		_visualLoader.addEventListener(IOErrorEvent.IO_ERROR, handler_ioError);
 		_visualLoader.addEventListener(ProgressEvent.PROGRESS, handler_progress);
-		
-		_ssLoader = new SpriteSheetLoader();
+
+		_ssLoader = getSSLoader();
 		_ssLoader.addEventListener(Event.COMPLETE, handler_loaded);
 		_ssLoader.addEventListener(IOErrorEvent.IO_ERROR, handler_ioError);
 		_ssLoader.addEventListener(ProgressEvent.PROGRESS, handler_progress);
+	}
+
+	/**
+	 * 初始化SpriteSheepLoader的实例，子类可以通过重写这个类来提供新的SpriteSheetLoader
+	 */
+	protected function getSSLoader():SpriteSheetLoader
+	{
+		return new SpriteSheetLoader();
 	}
 	
 	//----------------------------------
@@ -250,37 +258,38 @@ public class Assets extends EventDispatcher
 	//  handler
 	//--------------------------------------------------------------------------
 	
-	private function handler_ioError(evt:IOErrorEvent):void
+	protected function handler_ioError(evt:IOErrorEvent):void
 	{
 		info(evt.text);
 		//碰到载入错误，继续载入
 		loadAssets();
 	}
 	
-	private function handler_loaded(evt:Event):void
+	protected function handler_loaded(evt:Event):void
 	{
 		saveAssets();
+		dispatchProgress(getProgressVO(_loadingCount-_urls.length, _loadingCount, true, true));
 		loadAssets();
 	}
 	
-	private function handler_progress(evt:ProgressEvent):void
+	protected function handler_progress(evt:ProgressEvent):void
 	{
 		var __vo:AssetsProgressVO = getProgressVO(ProgressEvent(evt).bytesLoaded,ProgressEvent(evt).bytesTotal);
 		dispatchProgress(__vo);
 	}
 	
 	//----------------------------------
-	//  private
+	//  内部方法
 	//----------------------------------
 	//发送载入进度的vo
-	private function dispatchProgress($vo:AssetsProgressVO):void
+	protected function dispatchProgress($vo:AssetsProgressVO):void
 	{
 		this.dispatchEvent(new InfoEvent(PROGRESS, $vo));
 		if(_fun_loadProgress is Function)
 			_fun_loadProgress.call(null, $vo);
 	}
 
-	private function getProgressVO($loaded:int, $total:int, $whole:Boolean=false, $done:Boolean=false):AssetsProgressVO
+	protected function getProgressVO($loaded:int, $total:int, $whole:Boolean=false, $done:Boolean=false):AssetsProgressVO
 	{
 		var __vo:AssetsProgressVO = new AssetsProgressVO(_curFile);
 		__vo.loaded = $loaded;
@@ -290,7 +299,10 @@ public class Assets extends EventDispatcher
 		return __vo;
 	}
 	
-	private function loadAssets():void
+	/**
+	 * 开始载入素材，载入前的一些判断在这里进行
+	 */
+	protected function loadAssets():void
 	{
 		if(_urls == null)
 			throw new Error('找不到资源文件路径！');
@@ -301,7 +313,7 @@ public class Assets extends EventDispatcher
 			if(!_curFile.fname)
 			{
 				//若没有提供fname，使用主文件名作为fname
-				_curFile.fname = getMainFileName(_curFile.url);
+				_curFile.fname = getFileName(_curFile.url).main;
 			}
 			//载入一个新的资源开始的时候，发送载入列表的百分比
 			dispatchProgress(getProgressVO(_loadingCount-_urls.length, _loadingCount, true, false));
@@ -314,21 +326,7 @@ public class Assets extends EventDispatcher
 				loadAssets();
 				return;
 			}
-			info('开始载入:'+_curFile.url);
-			//载入的外部资源是可视化资源
-			if(	AssetsType.isVisual(_curFile.ftype) )
-			{
-				if(_curFile.ftype == AssetsType.SWF && !_curFile.symbols)
-					throw new ReferenceError('对于SWF素材，必须提供symbols数组！');
-				_visualLoader.load(_curFile.url, _curFile.ftype, loaderContext);
-			}
-			//载入的资源是SpriteSheet类型
-			else if(_curFile.ftype == AssetsType.SPRITE_SHEET)
-			{
-				_ssLoader.load(_curFile.url, _curFile.meta, _curFile.mtype, loaderContext);
-			}
-			else
-				throw new RangeError('要载入的资源类型不符合要求！类型：'+_curFile.ftype+',URL:'+_curFile.url);
+			performLoad();
 		}
 		else
 		{
@@ -336,11 +334,53 @@ public class Assets extends EventDispatcher
 			if(_fun_loadDone is Function) _fun_loadDone.call();
 		}
 	}
+
+	/**
+	 * 确定载入一个文件
+	 * 载入每种类型的文件，使用独立的方法，方便子类覆盖
+	 */
+	protected function performLoad():void
+	{
+		if(_curFile.url is ByteArray)
+			info('Assets开始执行载入ByteArray:'+_curFile.fname+',ftype:'+_curFile.ftype);
+		else
+			info('Assets开始执行载入:'+_curFile.url);
+		//载入的外部资源是可视化资源
+		if(	AssetsType.isVisual(_curFile.ftype) )
+		{
+			if(_curFile.ftype == AssetsType.SWF && !_curFile.symbols)
+				throw new ReferenceError('对于SWF素材，必须提供symbols数组！');
+			loadVisual();
+		}
+		//载入的资源是SpriteSheet类型
+		else if(_curFile.ftype == AssetsType.SPRITE_SHEET)
+		{
+			loadSpriteSheet();
+		}
+		else
+			throw new RangeError('要载入的资源类型不符合要求！类型：'+_curFile.ftype+',URL:'+_curFile.url);
+	}
+
+	/**
+	 * 载入可视化文件对象
+	 */
+	protected function loadVisual():void
+	{
+		_visualLoader.load(_curFile.url, _curFile.ftype, loaderContext);
+	}
+
+	/**
+	 * 载入spritesheet
+	 */
+	protected function loadSpriteSheet():void
+	{
+		_ssLoader.load(_curFile.url, _curFile.meta, _curFile.mtype, loaderContext);
+	}
 		
 	/**
 	 * 将从外部获取到的可视对象保存在对象中备用
 	 * */
-	private function saveAssets():void
+	protected function saveAssets():void
 	{
 		//如果载入的是swf，就获取symbol对象。将symbol的Class存在变量中
 		if(_curFile.ftype == AssetsType.SWF)
@@ -366,33 +406,44 @@ public class Assets extends EventDispatcher
 		{
 			throw new Error('载入完成的文件类型不被支持！类型：'+_curFile.ftype,',URL:'+_curFile.url);
 		}
-		dispatchProgress(getProgressVO(_loadingCount-_urls.length, _loadingCount, true, true));
 	}
 	
 	//获取URL中的主文件名
-	private function getMainFileName($url:String):String
+	protected function getFileName($url:String):Object
 	{
-		var __fileName:String = '';
+		//使用main和ext两个属性保存主文件名和扩展名
+		var __mainAndExt:Object = {};
 		var __slashIndex:int = $url.lastIndexOf('/');
 		var __dotIndex:int = $url.lastIndexOf('.');
 		if(__slashIndex > -1)
 		{
+			//如果能找到点，说明这个文件有扩展名，就去掉扩展名
 			if(__dotIndex>-1)
-				__fileName = $url.slice(__slashIndex+1, __dotIndex);
+			{
+				__mainAndExt.main = $url.slice(__slashIndex+1, __dotIndex);
+				__mainAndExt.ext = $url.slice(__dotIndex+1);
+			}
+			//找不到点，说明没有扩展名，直接使用主文件名
 			else
-				__fileName =  $url.slice(__slashIndex+1);
+			{
+				__mainAndExt.main =  $url.slice(__slashIndex+1);
+			}
 		}
 		else
 		{
+			//如果找不到斜杠，说明这个路径本来就只有一个文件名，直接从0开始算
 			if(__dotIndex>-1)
-				__fileName =  $url.slice(0, __dotIndex);
+			{
+				__mainAndExt.main =  $url.slice(0, __dotIndex);
+				__mainAndExt.ext =  $url.slice(__dotIndex+1);
+			}
 			else
-				__fileName =  $url;
+				__mainAndExt.main =  $url;
 		}
-		return __fileName;
+		return __mainAndExt;
 	}
 	
-	private function info($msg:String):void
+	protected function info($msg:String):void
 	{
 		this.dispatchEvent(new InfoEvent(INFO, $msg));
 		if(_fun_loadInfo is Function)

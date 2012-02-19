@@ -2,7 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2010-11-24
-//  最后时间：2011-08-03
+//  最后时间：2012-02-07
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
@@ -11,12 +11,12 @@ import flash.utils.ByteArray;
 /**
  * Socket发来的数据如果过长，会拆包；如果两个操作比较近，也有可能两个数据包合成一个发送。这个类处理处理数据包的合并和分拆的相关操作。
  * */
-public class Packet
+public class PacketString
 {
 	public static const BOF:String = '\\x00';	//看似5个字符，其实\\是\的转义符，这个字符串只有4个字符
 	public static const EOF:String = '\\xFF';
 	
-	public function Packet()
+	public function PacketString()
 	{
 		_msg = '';
 		_packetLength = 0;

@@ -2,7 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2011-01-02
-//  修改时间：2011-10-12
+//  修改时间：2012-02-02
 //	说明：本组件参照Keith Peters的Minimalcomps组件写成，修改、使用或继承Minimalcal源码
 ////////////////////////////////////////////////////////////////////////////////
  
@@ -13,9 +13,6 @@ import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
 import flash.filters.DropShadowFilter;
-import flash.filters.ColorMatrixFilter;
-
-import com.bit101.components.Component;
 
 /**
  * 所有使用显示对象用作按钮的状态的按钮类的基类。ImageButton、ClassButton是它的子类
@@ -23,25 +20,6 @@ import com.bit101.components.Component;
  */
 public class DisplayObjectButtonBase extends Component
 {
-
-	public static const COLORLESS_FILTER:ColorMatrixFilter = new ColorMatrixFilter([0.3086,0.6094,0.082,0,-25,0.3086,0.6094,0.082,0,-25,0.3086,0.6094,0.082,0,-25,0,0,0,1,0]);
-	protected var _over:Boolean = false;
-	protected var _down:Boolean = false;
-	protected var _selected:Boolean = false;
-	protected var _toggle:Boolean = false;
-	
-	/**
-	 * 是否在禁用按钮的时候使用去色效果
-	 */
-	protected var _colorless:Boolean = false;
-	
-	/**
-	 * 是否使用阴影效果。阴影效果使用不同深度的阴影自动为按钮添加三态
-	 */	
-	protected var _shaow:Boolean = true;
-	
-	protected var _upState:DisplayObject;
-	
 	/**
 	 * 构造函数。
 	 * @param 按钮的父显示对象
@@ -57,6 +35,28 @@ public class DisplayObjectButtonBase extends Component
 			addEventListener(MouseEvent.CLICK, defaultHandler);
 		}
 	}
+	
+	protected var _over:Boolean = false;
+	protected var _down:Boolean = false;
+	protected var _selected:Boolean = false;
+	protected var _toggle:Boolean = false;
+	
+	/**
+	 * 是否在禁用按钮的时候使用去色效果
+	 */
+	protected var _colorless:Boolean = false;
+	
+	/**
+	 * 是否使用阴影效果。阴影效果使用不同深度的阴影自动为按钮添加三态
+	 */	
+	protected var _shadow:Boolean = true;
+	
+	protected var _upState:DisplayObject;
+	
+	/**
+	 * 有时在使用多个按钮的时候，需要按钮保存一些数据以便侦测按钮事件的时候进行判断
+	 */	
+	public var data:*;
 	
 	/**
 	 * 初始化按钮
@@ -74,7 +74,7 @@ public class DisplayObjectButtonBase extends Component
 	override protected function addChildren():void
 	{
 		this.addChild(_upState);
-		if(_shaow)
+		if(_shadow)
 			this.filters = [getShadow(1)];
 		addEventListener(MouseEvent.MOUSE_DOWN, onMouseGoDown);
 		addEventListener(MouseEvent.ROLL_OVER, onMouseOver);
@@ -97,7 +97,7 @@ public class DisplayObjectButtonBase extends Component
 		_over = true;
 		if(_toggle && _selected)
 			return;
-		if(_shaow)
+		if(_shadow)
 			this.filters = [getShadow(2)];
 		addEventListener(MouseEvent.ROLL_OUT, onMouseOut);
 	}
@@ -110,7 +110,7 @@ public class DisplayObjectButtonBase extends Component
 		_over = false;
 		if(!_down)
 		{
-			if(_shaow)
+			if(_shadow)
 				this.filters = [getShadow(1)];
 		}
 		removeEventListener(MouseEvent.ROLL_OUT, onMouseOut);
@@ -122,7 +122,7 @@ public class DisplayObjectButtonBase extends Component
 	protected function onMouseGoDown(event:MouseEvent):void
 	{
 		_down = true;
-		if(_shaow)
+		if(_shadow)
 			this.filters = [getShadow(3)];
 		stage.addEventListener(MouseEvent.MOUSE_UP, onMouseGoUp);
 	}
@@ -137,7 +137,7 @@ public class DisplayObjectButtonBase extends Component
 			_selected = !_selected;
 		}
 		_down = _selected;
-		if(_shaow)
+		if(_shadow)
 			this.filters = [_selected ? getShadow(3) : getShadow(1)];
 		stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseGoUp);
 	}
@@ -151,10 +151,10 @@ public class DisplayObjectButtonBase extends Component
 		_colorless = value;
 	}
 	
-	public function set shaow(value:Boolean):void
+	public function set shadow(value:Boolean):void
 	{
-		_shaow = value;
-		if(!_shaow)
+		_shadow = value;
+		if(!_shadow)
 			this.filters = [];
 	}
 	
@@ -167,7 +167,7 @@ public class DisplayObjectButtonBase extends Component
 		
 		_selected = value;
 		_down = _selected;
-		if(_shaow)
+		if(_shadow)
 			this.filters = [_selected ? getShadow(3) : getShadow(1)];
 	}
 	
@@ -190,10 +190,10 @@ public class DisplayObjectButtonBase extends Component
 		super.enabled = value;
 		if(_colorless)
 		{
-			if(_shaow)
-				this.filters = value ? [getShadow(1)] : [COLORLESS_FILTER, getShadow(1)];
+			if(_shadow)
+				this.filters = value ? [getShadow(1)] : [Style.COLORLESS_FILTER, getShadow(1)];
 			else
-				this.filters = value ? [] : [COLORLESS_FILTER];
+				this.filters = value ? [] : [Style.COLORLESS_FILTER];
 		}
 				
 	}

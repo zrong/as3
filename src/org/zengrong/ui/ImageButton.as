@@ -15,8 +15,6 @@ import flash.events.MouseEvent;
 import flash.filters.ColorMatrixFilter;
 import flash.filters.DropShadowFilter;
 
-import org.zengrong.utils.ColorMatrix;
-
 /**
  * 支持up、over、down三态，同时支持toggle和seleted的图像按钮。
  * @author zrong
@@ -33,7 +31,7 @@ public class ImageButton extends DisplayObjectButtonBase
 	 * @param ypos y坐标
 	 * @param defaultHandler 按钮的默认处理程序，响应click事件
 	 */	
-	public function ImageButton(upStateImage:Bitmap, overStateImage:Bitmap=null, downStateImage:Bitmap=null, parent:DisplayObjectContainer=null, xpos:Number=0, ypos:Number=0, defaultHandler:Function=null)
+	public function ImageButton(upStateImage:BitmapData, overStateImage:BitmapData=null, downStateImage:BitmapData=null, parent:DisplayObjectContainer=null, xpos:Number=0, ypos:Number=0, defaultHandler:Function=null)
 	{
 		updateStateImage(upStateImage, overStateImage, downStateImage);
 		super(parent, xpos, ypos, defaultHandler);
@@ -52,7 +50,7 @@ public class ImageButton extends DisplayObjectButtonBase
 	 * @param overStateImage	over状态的图片
 	 * @param downStateImage	down状态的图片
 	 */	
-	public function setState(upStateImage:Bitmap, overStateImage:Bitmap=null, downStateImage:Bitmap=null):void
+	public function setState(upStateImage:BitmapData, overStateImage:BitmapData=null, downStateImage:BitmapData=null):void
 	{
 		destroy();
 		updateStateImage(upStateImage, overStateImage, downStateImage);
@@ -74,7 +72,7 @@ public class ImageButton extends DisplayObjectButtonBase
 	override protected function addChildren():void
 	{
 		//如果没有提供over和down状态的图片，就启用阴影效果
-		_shaow = (_overBmd == null) && (_downBmd == null);
+		_shadow = (_overBmd == null) && (_downBmd == null);
 		_upState = new Bitmap(_upBmd, PixelSnapping.AUTO, true);
 		_upState.width = this.width;
 		_upState.height = this.height;
@@ -200,15 +198,15 @@ public class ImageButton extends DisplayObjectButtonBase
 	 * @param overStateImage	over状态的图片
 	 * @param downStateImage	down状态的图片
 	 */	
-	private function updateStateImage(upStateImage:Bitmap, overStateImage:Bitmap=null, downStateImage:Bitmap=null):void
+	private function updateStateImage(upStateImage:BitmapData, overStateImage:BitmapData=null, downStateImage:BitmapData=null):void
 	{
 		setSize(upStateImage.width, upStateImage.height); 
 		//trace('imagebutton:', this.width, this.height);
-		_upBmd = upStateImage.bitmapData;
+		_upBmd = upStateImage;
 		if(overStateImage)
-			_overBmd = overStateImage.bitmapData;
+			_overBmd = overStateImage;
 		if(downStateImage)
-			_downBmd = downStateImage.bitmapData;
+			_downBmd = downStateImage;
 	}
 	
 	private function createState($bmd:BitmapData):Bitmap

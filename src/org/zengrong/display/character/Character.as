@@ -7,13 +7,13 @@ package org.zengrong.display.character
 {
 import org.zengrong.text.FTEFactory;
 
-import flash.display.BitmapData;
 import flash.display.Bitmap;
-import flash.display.Sprite;
+import flash.display.BitmapData;
 import flash.display.DisplayObject;
+import flash.display.Sprite;
+import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.geom.Rectangle;
-import flash.geom.Matrix;
 import flash.text.engine.TextLine;
 
 /**
@@ -84,6 +84,11 @@ public class Character extends Sprite
 	 * 是否重复播放，如果为真，那么当播放到最后一帧的时候，会跳转到第一帧。否则就会停止在最后帧
 	 */	
 	public var isRepeat:Boolean = false;
+	
+	/**
+	 * 是否显示中心定位点，这个功能应该仅用于调试
+	 */	
+	public var showCentralPoint:Boolean = false;
 
 	//----------------------------------------
 	// protected变量
@@ -148,6 +153,28 @@ public class Character extends Sprite
 	 * 记录上一次切换帧的时间，根据时间间隔计算这次更新是否应该换帧，单位秒
 	 */
 	protected var _lastChangeFrame:Number = 0;
+	
+	/**
+	 * 中心点的x比例，这个比例是相对于位图的宽度
+	 */
+	protected var _centralRatioX:Number = 0;
+
+	/**
+	 * 中心点的y比例，这个比例相对于位图的高度
+	 */
+	protected var _centralRatioY:Number = 0;
+
+	/**
+	 * 中心点的x偏移值，单位像素
+	 */
+	protected var _centralOffsetX:Number = 0;
+
+	/**
+	 * 中心点的y偏移值，单位像素
+	 */
+	protected var _centralOffsetY:Number = 0;
+	
+	
 
 	//----------------------------------------
 	// init
@@ -182,6 +209,11 @@ public class Character extends Sprite
 		isAutoZ = false;
 		osdLimit = null;
 		type = null;
+		if(_titleDisplay)
+		{
+			if(this.contains(_titleDisplay)) this.removeChild(_titleDisplay);
+			_titleDisplay = null;
+		}
 	}
 
 	//----------------------------------
@@ -191,6 +223,26 @@ public class Character extends Sprite
 	public function get isInit():Boolean
 	{
 		return _init;
+	}
+
+	public function get centralRatioX():Number
+	{
+		return _centralRatioX;
+	}
+
+	public function get centralRatioY():Number
+	{
+		return _centralRatioY;
+	}
+
+	public function get centralOffsetX():Number
+	{
+		return _centralOffsetX;
+	}
+
+	public function get centralOffsetY():Number
+	{
+		return _centralOffsetY;
 	}
 
 	/**
@@ -218,7 +270,7 @@ public class Character extends Sprite
 			return;
 		_flip = $flip;
 		_bmp.scaleX = _flip ? -1 : 1;
-		_bmp.x = _flip ? (.5 * _bmp.width) : (-.5*_bmp.width);
+		setBmpFlipX();
 		//trace(this.name ,_title, '设置翻转, _flip:', _flip, ',bmp.x:', _bmp.x, ',bmp.w:', _bmp.width);
 		moveTitle();
 	}
@@ -291,7 +343,7 @@ public class Character extends Sprite
 	public function updateFrame($elapsed:Number):void
 	{
 		//如果过去的时间大于帧间隔，且当前处于播放状态，就切换帧
-		if(($elapsed - _lastChangeFrame >= _delay) && !_stop && _bmds)
+		if(!_stop && _bmds && ($elapsed - _lastChangeFrame >= _delay))
 		{
 			//trace('Character.update:', $elapsed, _lastChangeFrame);
 			next();
@@ -320,8 +372,9 @@ public class Character extends Sprite
 	
 	/**
 	 * 移除所有帧
+	 * @param $disposeBitmapData 是否销毁列表中的BitmapData
 	 */
-	public function removeAllFrame():void
+	public function removeAllFrame($disposeBitmapData:Boolean=false):void
 	{
 		//_bmds为固定的，说明是从SpriteSheet生成的，这样的_bmds不能销毁，因为其他的角色还需要它
 		//固定的就直接新建一个空bmds替换
@@ -333,7 +386,10 @@ public class Character extends Sprite
 		else
 		{
 			while(_bmds.length>0)
-				_bmds.pop().dispose();
+			{
+				var __bmd:BitmapData = _bmds.pop();
+				if($disposeBitmapData) __bmd.dispose();
+			}
 		}
 	}
 
@@ -347,7 +403,13 @@ public class Character extends Sprite
 		//if(!_bmds || _bmds.length<=1) return;
 		if(++_curFrame >= _bmds.length)
 		{
-			_curFrame = isRepeat ? 0 : _bmds.length - 1;
+			if(isRepeat) _curFrame = 0;
+			else
+			{
+				//如果不是重复状态，就停止播放
+				_curFrame = _bmds.length - 1;
+				_stop = true;
+			}
 		}
 		_bmp.bitmapData = getFrame(_curFrame);
 		return _bmp.bitmapData; 
@@ -364,7 +426,6 @@ public class Character extends Sprite
 		else
 			_curFrame = $frame;
 		_bmp.bitmapData = getFrame(_curFrame);
-		center();
 		return _bmp.bitmapData; 
 	}
 
@@ -385,17 +446,49 @@ public class Character extends Sprite
 	}
 
 	/**
-	 * 确定角色的中心点位置，默认的位置为底边中点
+	 * <p>
+	 * 偏移中心点<br>
+	 * 有时候希望基于像素精确控制偏移值，使用center无法实现<br>
+	 * 可以使用这个方法实现<br>
+	 * </p>
+	 * @param $ox 基于中心点的x偏移值
+	 * @param $oy 基于中心点的y偏移值
 	 */
-	public function center($offsetX:int=0, $offsetY:int=0):void
+	public function offsetCenter($ox:Number=NaN, $oy:Number=NaN):void
 	{
-		_bmp.x = _flip ? (.5*_bmp.width+$offsetX) : (-.5*_bmp.width+$offsetX);
-		_bmp.y = _bmp.height*-1+$offsetY;
+		if(!isNaN($ox)) _centralOffsetX = $ox;
+		if(!isNaN($oy)) _centralOffsetY = $oy;
+		center();
+	}
+
+	/**
+	 * <p>
+	 * 确定角色的中心点位置，需要提供相对于包含的位图的尺寸的比例<br>
+	 * 例如，如果希望将角色基于底部中心对齐（这是大多数角色的默认值），则x传递0.5，y传递-1<br>
+	 * 若希望居中对齐，则x传递0.5，y传递0.5<br>
+	 * 在更新了角色的形象后，需要重新执行center，因为角色形象可能在更新后产生了宽高变化<br>
+	 * 如果不希望改变已经存在的中心点，只希望刷新以体现变化，那么不带参数使用center<br>
+	 * 如果只希望单独改变x或者y的比例，则不希望改变的那个值，传递NaN<br>
+	 * 默认的对齐方式为基于角色形象的左上角0,0点
+	 * </p>
+	 * @param $rx 中心点所处的宽度的比例
+	 * @param ry 中心点所处的高度的比例
+	 */
+	public function center($rx:Number=NaN, $ry:Number=NaN):void
+	{
+		if(!isNaN($rx)) _centralRatioX = $rx;
+		if(!isNaN($ry)) _centralRatioY = $ry;
+		
+		setBmpFlipX();
+		_bmp.y = _centralRatioY*_bmp.height+_centralOffsetY;
 		//trace('Character.', this.name, _title, ' center:', _bmp.x, _bmp.y, ' width:', _bmp.width, ' bmdWidth:', _bmp.bitmapData.width);
 		this.graphics.clear();
-		this.graphics.beginFill(0xFF0000);
-		this.graphics.drawCircle(0,0,3);
-		this.graphics.endFill();
+		if(showCentralPoint)
+		{
+			this.graphics.beginFill(0xFF0000);
+			this.graphics.drawRect(0,0,4,4);
+			this.graphics.endFill();
+		}
 		moveTitle();
 	}
 
@@ -417,6 +510,7 @@ public class Character extends Sprite
 	 */
 	public function hitTest($x:int, $y:int):Boolean
 	{
+		if(!_init) return false;
 		//获取真实的左上角全局坐标
 		var __rx:int = this.x+_bmp.x;
 		var __ry:int = this.y+_bmp.y;
@@ -449,7 +543,7 @@ public class Character extends Sprite
 	}
 
 	//----------------------------------
-	//  公开方法
+	//  私有方法
 	//----------------------------------
 	/**
 	 * 计算角色的世界x位置，如果超出屏幕范围就隐藏自己
@@ -459,6 +553,16 @@ public class Character extends Sprite
 		//trace('计算超限,wx:', this.wx, 'limit:',osdLimit);
 		if(isAutoHide && osdLimit)
 			this.visible = !(this.x+this.width*.5 < osdLimit.x || this.x-this.width*.5 > osdLimit.right);
+	}
+	
+	/**
+	 * 根据flip的值设置_bmp的x值
+	 */	
+	protected function setBmpFlipX():void
+	{
+		var __x:int = _flip ? (_centralRatioX*_bmp.width) : (-1*_centralRatioX*_bmp.width);
+		__x += _centralOffsetX;
+		_bmp.x = __x;
 	}
 
 }

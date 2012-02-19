@@ -1,4 +1,4 @@
-package org.zengrong.flex.controls
+package org.zengrong.flex.components
 {
 	import flash.display.BitmapData;
 	import flash.events.Event;
@@ -275,13 +275,13 @@ package org.zengrong.flex.controls
 
 import flash.events.Event;
 
-import org.zengrong.flex.controls.VideoComponent;
+import org.zengrong.flex.components.VideoComponent;
 
 class StreamClient
 {
 	private var _videoDisplay:VideoComponent;
 	
-	public function StreamClient($video:org.zengrong.flex.controls.VideoComponent)
+	public function StreamClient($video:VideoComponent)
 	{
 		_videoDisplay = $video;
 	} 
