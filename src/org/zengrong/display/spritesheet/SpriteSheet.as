@@ -150,24 +150,24 @@ public class SpriteSheet
 	/**
 	 * 向SpriteSheet中加入一帧
 	 */	
-	public function addFrame($bmd:BitmapData, $sizeRect:Rectangle=null, $originalRect:Rectangle=null):void
+	public function addFrame($bmd:BitmapData, $sizeRect:Rectangle=null, $originalRect:Rectangle=null, $name:String=null):void
 	{
 		if(!_allBmds) _allBmds = new Vector.<BitmapData>;
 		var __index:int = _allBmds.length;
 		_allBmds[__index] = $bmd;
 		if($sizeRect && metadata)
-			metadata.addFrame($sizeRect, $originalRect);
+			metadata.addFrame($sizeRect, $originalRect,$name);
 	}
 	
 	/**
 	 * 向SpriteSheet的对应索引中加入一帧
 	 */
-	public function addFrameAt($index:int, $bmd:BitmapData, $sizeRect:Rectangle=null, $originalRect:Rectangle=null):void
+	public function addFrameAt($index:int, $bmd:BitmapData, $sizeRect:Rectangle=null, $originalRect:Rectangle=null,$name:String=null):void
 	{
 		if(!_allBmds) _allBmds = new Vector.<BitmapData>;
 		_allBmds[$index] = $bmd;
 		if($sizeRect && metadata)
-			metadata.addFrameAt($index, $sizeRect, $originalRect);
+			metadata.addFrameAt($index, $sizeRect, $originalRect, $name);
 	}
 	
 	public function removeFrameAt($index:int):void
@@ -182,7 +182,7 @@ public class SpriteSheet
 	 * @param $sizeRects 与帧列表对应的帧sizeRect列表
 	 * @param $originalRects 与帧列表对应的帧trimRect列表
 	 */
-	public function setFrames($bmds:Vector.<BitmapData>, $sizeRects:Vector.<Rectangle>=null, $originalRects:Vector.<Rectangle>=null):void
+	public function setFrames($bmds:Vector.<BitmapData>, $sizeRects:Vector.<Rectangle>=null, $originalRects:Vector.<Rectangle>=null, $names:Vector.<String>=null):void
 	{
 		while(_allBmds && _allBmds.length>0)
 			_allBmds.pop().dispose();
@@ -193,10 +193,11 @@ public class SpriteSheet
 			metadata.originalFrameRects = new Vector.<Rectangle>;
 			for (var i:int = 0; i < $sizeRects.length; i++) 
 			{
+				var __name:String = $names?$names[i]:null;
 				if($originalRects)
-					metadata.addFrameAt(i, $sizeRects[i], $originalRects[i]);
+					metadata.addFrameAt(i, $sizeRects[i], $originalRects[i], __name);
 				else
-					metadata.addFrameAt(i, $sizeRects[i]);
+					metadata.addFrameAt(i, $sizeRects[i], null, __name);
 			}
 		}
 	}

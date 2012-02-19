@@ -211,31 +211,48 @@ public class SpriteSheetMetadata
 	/**
 	 * 从外部向数组中添加帧的尺寸，一般在循环中执行
 	 */	
-	public function addFrame($sizeRect:Rectangle, $originalRect:Rectangle=null):void
+	public function addFrame($sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null):void
 	{
 //		if(frameRects.length>=frameCount)
 //			return;
 		setup();
-		writeFrame(frameRects.length, $sizeRect, $originalRect);
+		writeFrame(frameRects.length, $sizeRect, $originalRect, $name);
 	}
 	
-	public function addFrameAt($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null):void
+	public function addFrameAt($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null):void
 	{
 		setup();
-		writeFrame($index, $sizeRect, $originalRect);
+		writeFrame($index, $sizeRect, $originalRect, $name);
 	}
 	
 	public function removeFrameAt($index:int):void
 	{
 		frameRects.splice($index,1);
 		originalFrameRects.splice($index,1);
+		if(names && namesIndex)
+		{
+			var __delName:String = names.splice($index, 1)[0] as String;
+			//删除被删除的帧的名称
+			delete namesIndex[__delName];
+			for(var __name:String in namesIndex)
+			{
+				//將所有帧编号大于被删除帧的帧编号减一
+				if(namesIndex[__name] > $index) namesIndex[__name]--;
+			}
+		}
 	}
 	
-	private function writeFrame($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null):void
+	private function writeFrame($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null):void
 	{
 		if(!$originalRect) $originalRect = new Rectangle(0, 0, $sizeRect.width, $sizeRect.height);
 		frameRects[$index] = $sizeRect;
 		originalFrameRects[$index] = $originalRect;
+		trace('增加帧：', $index, $name);
+		if($name && names && namesIndex)
+		{
+			names[$index] = $name;
+			namesIndex[$name] = $index;
+		}
 	}
 	
 	//----------------------------------------
@@ -259,7 +276,7 @@ public class SpriteSheetMetadata
 		var __frame:XML = null;
 		if(hasName)
 		{
-			names = new Vector.<String>(__totalFrame, true);
+			names = new Vector.<String>(__totalFrame);
 			namesIndex = {};
 		}
 		var __frameRect:Rectangle = null;
