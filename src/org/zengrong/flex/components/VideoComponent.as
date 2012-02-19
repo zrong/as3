@@ -1,4 +1,4 @@
-package org.zengrong.flex.controls
+package org.zengrong.flex.components
 {
 	import flash.display.BitmapData;
 	import flash.events.Event;
