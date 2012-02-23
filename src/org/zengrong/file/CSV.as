@@ -17,6 +17,7 @@
 
 package org.zengrong.file
 {
+import org.zengrong.utils.StringUtil;
 	
 	/**
 	 * @author Marco Müller / http://shorty-bmc.com
@@ -267,7 +268,7 @@ package org.zengrong.file
 					 __result.push( __csvData[ i ] );
 				else
 					 __result[ __result.length - 1 ] += __csvData[ i ];
-				__count += StringUtils.count( __csvData[ i ] , fieldEnclosureToken );
+				__count += StringUtil.count( __csvData[ i ] , fieldEnclosureToken );
 			}
 			__result = __result.filter( isNotEmptyRecord )
 			__result.forEach( fieldDetection );
@@ -309,10 +310,10 @@ package org.zengrong.file
 			for( var i : uint = 0; i < tmp.length; i++ )
 			{
 				if( !Boolean( count % 2 ) )
-					 result.push( StringUtils.trim( tmp[ i ] ) );
+					 result.push( StringUtil.trimList( tmp[ i ] ) );
 				else
 					 result[ result.length - 1 ] += fieldSeperator + tmp[ i ];
-				count += StringUtils.count( tmp[ i ] , fieldEnclosureToken );
+				count += StringUtil.count( tmp[ i ] , fieldEnclosureToken );
 			}
 			arr[ index ] = result
 		}
@@ -332,7 +333,7 @@ package org.zengrong.file
 		
 		private function isNotEmptyRecord( element : *, index : int, arr : Array ) : Boolean
 		{
-			return Boolean( StringUtils.trim( element ) );
+			return Boolean( StringUtil.trimList( element ) );
 		}
 		
 		/**
