@@ -29,6 +29,8 @@ import org.zengrong.utils.StringUtil;
 	 */
 	public class CSV
 	{
+		public static const FORMATED_TYPE_OBJECT_ARRAY:String = 'Array';
+		public static const FORMATED_TYPE_DICTIONARY:String = 'Dictionary';
 		/**
 		 * 将字符串作为CSV进行解析 
 		 * @param $str
@@ -64,15 +66,38 @@ import org.zengrong.utils.StringUtil;
 		 * 保存原始的CSV字符串 
 		 */		
 		private var _csvString:String;
-		private var _header 				: Array;
+		private var _header:Array;
 		private var _data:Array;
-		private var _embededHeader 		: Boolean;
-		private var _headerOverwrite 	: Boolean;
 		
-		private var _sortField			: *;
-		private var _sortSequence		: String;
+		/**
+		 * 是使用toObjectArray还是使用toDictionary来解析数据
+		 */
+		private var _formatedType:String;
 		
-		// -> getter
+		private var _formatedData:Object;
+		
+		private var _embededHeader:Boolean;
+		private var _headerOverwrite:Boolean;
+		
+		private var _sortField:*;
+		private var _sortSequence:String;
+		
+		/**
+		 * 保存使用toObjectArray或者toDictionary解析之后的数据格式
+		 */
+		public function get formatedData():Object
+		{
+			if(!_formatedType) return null;
+			return _formatedData;
+		}
+		
+		/**
+		 * @private
+		 */
+		public function set formatedData($value:Object):void
+		{
+			_formatedData = $value;
+		}
 		
 		public function get fieldSeperator() : String
 		{
@@ -340,8 +365,9 @@ import org.zengrong.utils.StringUtil;
 		
 		/**
 		 * 将CSV转换成对象列表
+		 * @param $save 是否将解析后的结果保存在formatedData变量中
 		 */		
-		public function toObjectArray():Array
+		public function toObjectArray($save:Boolean=false):Array
 		{
 			var __objarray:Array = [];
 			var __unit:Object = null;
@@ -354,24 +380,35 @@ import org.zengrong.utils.StringUtil;
 				}
 				__objarray[i] = __unit;
 			}
+			if($save)
+			{
+				_formatedType = FORMATED_TYPE_OBJECT_ARRAY;
+				formatedData = __objarray;
+			}
+			else
+			{
+				_formatedData = null;
+				formatedData = null;
+			}
 			return __objarray;
 		}
 		
 		/**
 		 * 将列表导出成字典格式
 		 * @param $id 提供字典的id使用哪个key
+		 * @param $save 是否将解析后的结果保存在formatedData变量中
 		 */
-		public function toDictionary($id:String=null):Dictionary
+		public function toDictionary($id:String=null, $save:Boolean=false):Dictionary
 		{
 			var __dict:Dictionary = new Dictionary(false);
 			var __unit:Object = null;
 			var __idIndex:int = -1;
-			for(var j:uint=0;j<header.length;j++)
+			for(var k:uint=0;k<header.length;k++)
 			{
 				//如果提供了id，并且在CSV的header中确实有这个id，就使用这个id作为这个字典的索引
-				if($id && $id == header[j])
+				if($id && $id == header[k])
 				{
-					__idIndex = j;
+					__idIndex = k;
 					break;
 				}
 			}
@@ -385,6 +422,16 @@ import org.zengrong.utils.StringUtil;
 				//若有id，使用id作为键名，否则使用数字作为键名
 				if(__idIndex>-1) __dict[data[i][__idIndex]] = __unit;
 				else __dict[i] = __unit;
+			}
+			if($save)
+			{
+				_formatedType = FORMATED_TYPE_DICTIONARY;
+				formatedData = __dict;
+			}
+			else
+			{
+				_formatedData = null;
+				formatedData = null;
 			}
 			return __dict;
 		}
