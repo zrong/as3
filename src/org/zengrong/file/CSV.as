@@ -17,6 +17,8 @@
 
 package org.zengrong.file
 {
+import flash.utils.Dictionary;
+
 import org.zengrong.utils.StringUtil;
 	
 	/**
@@ -353,6 +355,38 @@ import org.zengrong.utils.StringUtil;
 				__objarray[i] = __unit;
 			}
 			return __objarray;
+		}
+		
+		/**
+		 * 将列表导出成字典格式
+		 * @param $id 提供字典的id使用哪个key
+		 */
+		public function toDictionary($id:String=null):Dictionary
+		{
+			var __dict:Dictionary = new Dictionary(false);
+			var __unit:Object = null;
+			var __idIndex:int = -1;
+			for(var j:uint=0;j<header.length;j++)
+			{
+				//如果提供了id，并且在CSV的header中确实有这个id，就使用这个id作为这个字典的索引
+				if($id && $id == header[j])
+				{
+					__idIndex = j;
+					break;
+				}
+			}
+			for(var i:uint=0;i<data.length;i++)
+			{
+				__unit = {};
+				for(var j:uint=0;j<header.length;j++)
+				{
+					__unit[header[j]] = data[i][j];
+				}
+				//若有id，使用id作为键名，否则使用数字作为键名
+				if(__idIndex>-1) __dict[data[i][__idIndex]] = __unit;
+				else __dict[i] = __unit;
+			}
+			return __dict;
 		}
 		
 		/**
