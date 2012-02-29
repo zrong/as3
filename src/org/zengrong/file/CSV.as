@@ -82,6 +82,16 @@ import org.zengrong.utils.StringUtil;
 		private var _sortField:*;
 		private var _sortSequence:String;
 		
+		public function get formatedType():String
+		{
+			return _formatedType;
+		}
+		
+		public function set formatedType($value:String):void
+		{
+			_formatedData = $value;
+		}
+		
 		/**
 		 * 保存使用toObjectArray或者toDictionary解析之后的数据格式
 		 */
