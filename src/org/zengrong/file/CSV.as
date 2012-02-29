@@ -89,7 +89,7 @@ import org.zengrong.utils.StringUtil;
 		
 		public function set formatedType($value:String):void
 		{
-			_formatedData = $value;
+			_formatedType = $value;
 		}
 		
 		/**
