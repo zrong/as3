@@ -46,12 +46,12 @@ public class ByteArrayVariant extends ByteArray
 	{
 		//根据数字占有的位数获取对应位数的移位符
 		//例如$bitPerInt=5，则移位符为0x1F(111111)；若为6，则移位符为0x3F(111111)
-		var __shift:uint = 1<<$bitPerInt-1;
+		var __shift:uint = (1<<$bitPerInt)-1;
 		var __uint:uint = this.readUnsignedVariantInt();
 		var __vector:Vector.<uint> = new Vector.<uint>($len, true);
 		for(var i:int=0;i<$len;i++)
 		{
-			__vector[i] = __uint<<($bitPerInt*(i+1))&__shift;
+			__vector[i] = __uint>>($bitPerInt*i)&__shift;
 		}
 		return __vector;
 	}
