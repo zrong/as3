@@ -239,7 +239,7 @@ public class SpriteSheetMetadata
 		}
 	}
 	
-	private function writeFrame($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null):void
+	protected function writeFrame($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null):void
 	{
 		if(!$originalRect) $originalRect = new Rectangle(0, 0, $sizeRect.width, $sizeRect.height);
 		frameRects[$index] = $sizeRect;

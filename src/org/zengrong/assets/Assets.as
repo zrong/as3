@@ -6,46 +6,30 @@
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.assets
 {
-import org.zengrong.display.spritesheet.SpriteSheet;
-import org.zengrong.net.SpriteSheetLoader;
-import org.zengrong.net.VisualLoader;
-import org.zengrong.events.InfoEvent;
-
 import flash.display.BitmapData;
 import flash.events.Event;
+import flash.events.EventDispatcher;
 import flash.events.IOErrorEvent;
 import flash.events.ProgressEvent;
-import flash.utils.ByteArray;
-import flash.events.EventDispatcher;
 import flash.system.LoaderContext;
+import flash.utils.ByteArray;
+
+import org.zengrong.display.spritesheet.SpriteSheet;
+import org.zengrong.events.InfoEvent;
+import org.zengrong.net.SpriteSheetLoader;
+import org.zengrong.net.VisualLoader;
 
 /**
- * 单例类，负责载入和解析外部资源。这些资源按zrong的习惯一般位于assets文件夹。
+ * 负责载入和解析外部资源。这些资源按zrong的习惯一般位于assets文件夹。
  * @author zrong
  */
+
 [Event(name="complete",type="org.zengrong.events.InfoEvent")]
 [Event(name="info",type="org.zengrong.events.InfoEvent")]
 [Event(name="progress",type="org.zengrong.events.InfoEvent")]
 
 public class Assets extends EventDispatcher
 {
-	
-	/**
-	 * 载入全部完成
-	 */
-	public static const COMPLETE:String = 'complete';
-
-	/**
-	 * 载入过程中的信息，一般是错误信息
-	 */
-	public static const INFO:String = 'info';
-
-	/**
-	 * 载入进度
-	 */
-	public static const PROGRESS:String = 'progress';
-
-	
 	/**
 	 * 设置Assets在载入外部资源的过程中的处理程序，第一个处理程序必须设定。
 	 * @param $done 处理载入全部完毕的处理器，不需要参数
@@ -284,7 +268,7 @@ public class Assets extends EventDispatcher
 	//发送载入进度的vo
 	protected function dispatchProgress($vo:AssetsProgressVO):void
 	{
-		this.dispatchEvent(new InfoEvent(PROGRESS, $vo));
+		this.dispatchEvent(new InfoEvent(InfoEvent.PROGRESS, $vo));
 		if(_fun_loadProgress is Function)
 			_fun_loadProgress.call(null, $vo);
 	}
@@ -330,7 +314,7 @@ public class Assets extends EventDispatcher
 		}
 		else
 		{
-			this.dispatchEvent(new InfoEvent(COMPLETE));
+			this.dispatchEvent(new InfoEvent(InfoEvent.COMPLETE));
 			if(_fun_loadDone is Function) _fun_loadDone.call();
 		}
 	}
@@ -445,7 +429,7 @@ public class Assets extends EventDispatcher
 	
 	protected function info($msg:String):void
 	{
-		this.dispatchEvent(new InfoEvent(INFO, $msg));
+		this.dispatchEvent(new InfoEvent(InfoEvent.INFO, $msg));
 		if(_fun_loadInfo is Function)
 			_fun_loadInfo.call(null, $msg);
 	}
