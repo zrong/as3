@@ -35,10 +35,12 @@ public class AssetsProgressVO
 	public var whole:Boolean;
 
 	/**
-	 * 若值为true，代表这次载入完成；否则代表载入没有完成
-	 * 这个值与whole联用，主要针对载入列表的进度。当whole为true的时候才有意义。当whole为false的时候，这个值始终为false
-	 * 在载入列表进度时间发生时，whole总是为true。对于列表中一个资源的载入，在开始载入和载入成功的时候会各发送一次progress事件。
-	 * 开始载入的时候，done值为false；载入成功的时候，done值为true。
+	 * 若值为true，代表这次载入完成；否则代表载入没有完成。<br>
+	 * 这个值与whole联用，主要针对载入列表的进度。
+	 * 这个值当whole为true的时候才有意义，当whole为false的时候，这个值始终为false。<br>
+	 * 在载入列表进度事件发生的时候，whole总是为true。<br>
+	 * 对于列表中一个资源的载入，在开始载入和载入成功的时候会各发送一次progress事件。
+	 * 开始载入的时候，done值为false；载入成功的时候，done值为true。<br>
 	 */
 	public var done:Boolean;
 	

@@ -2,7 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2011-04-23
-//  最后修改：2012-02-02
+//  最后修改：2012-03-06
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.assets
 {
@@ -15,7 +15,6 @@ import flash.system.LoaderContext;
 import flash.utils.ByteArray;
 
 import org.zengrong.display.spritesheet.SpriteSheet;
-import org.zengrong.events.InfoEvent;
 import org.zengrong.net.SpriteSheetLoader;
 import org.zengrong.net.VisualLoader;
 
@@ -24,9 +23,9 @@ import org.zengrong.net.VisualLoader;
  * @author zrong
  */
 
-[Event(name="complete",type="org.zengrong.events.InfoEvent")]
-[Event(name="info",type="org.zengrong.events.InfoEvent")]
-[Event(name="progress",type="org.zengrong.events.InfoEvent")]
+[Event(name="complete",type="org.zengrong.assets.AssetsEvent")]
+[Event(name="info",type="org.zengrong.events.AssetsEvent")]
+[Event(name="progress",type="org.zengrong.events.AssetsEvent")]
 
 public class Assets extends EventDispatcher
 {
@@ -268,7 +267,7 @@ public class Assets extends EventDispatcher
 	//发送载入进度的vo
 	protected function dispatchProgress($vo:AssetsProgressVO):void
 	{
-		this.dispatchEvent(new InfoEvent(InfoEvent.PROGRESS, $vo));
+		this.dispatchEvent(new AssetsEvent(AssetsEvent.PROGRESS, $vo));
 		if(_fun_loadProgress is Function)
 			_fun_loadProgress.call(null, $vo);
 	}
@@ -314,7 +313,7 @@ public class Assets extends EventDispatcher
 		}
 		else
 		{
-			this.dispatchEvent(new InfoEvent(InfoEvent.COMPLETE));
+			this.dispatchEvent(new AssetsEvent(AssetsEvent.COMPLETE));
 			if(_fun_loadDone is Function) _fun_loadDone.call();
 		}
 	}
@@ -429,7 +428,9 @@ public class Assets extends EventDispatcher
 	
 	protected function info($msg:String):void
 	{
-		this.dispatchEvent(new InfoEvent(InfoEvent.INFO, $msg));
+		var __evt:AssetsEvent = new AssetsEvent(AssetsEvent.INFO);
+		__evt.info = $msg;
+		this.dispatchEvent(__evt);
 		if(_fun_loadInfo is Function)
 			_fun_loadInfo.call(null, $msg);
 	}
