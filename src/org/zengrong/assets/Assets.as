@@ -103,7 +103,9 @@ public class Assets extends EventDispatcher
 	 */	
 	public function get isLoading():Boolean
 	{
-		return _urls && (_urls.length > 0);
+		return (_urls && (_urls.length > 0)) ||
+			_visualLoader.loading ||
+			_ssLoader.loading;
 	}
 	
 	//----------------------------------

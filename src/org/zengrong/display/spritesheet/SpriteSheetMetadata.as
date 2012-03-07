@@ -244,7 +244,7 @@ public class SpriteSheetMetadata
 		if(!$originalRect) $originalRect = new Rectangle(0, 0, $sizeRect.width, $sizeRect.height);
 		frameRects[$index] = $sizeRect;
 		originalFrameRects[$index] = $originalRect;
-		trace('增加帧：', $index, $name);
+		//trace('增加帧：', $index, $name);
 		if($name && names && namesIndex)
 		{
 			names[$index] = $name;
