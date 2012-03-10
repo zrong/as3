@@ -103,8 +103,10 @@ public class ByteArrayVariant extends ByteArray
 	
 	public function writeVariantUTF($str:String):void
 	{
-		var __len:uint = $str.length;
-		this.writeUnsignedInt(__len);
+		//取得字符串的byte长度
+		var __ba:ByteArray = new ByteArray();
+		__ba.writeUTFBytes($str);
+		this.writeUnsignedInt(__ba.length);
 		this.writeUTFBytes($str);
 	}
 	
