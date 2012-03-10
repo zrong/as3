@@ -101,6 +101,13 @@ public class ByteArrayVariant extends ByteArray
 		return this.readUTFBytes(__len);
 	}
 	
+	public function writeVariantUTF($str:String):void
+	{
+		var __len:uint = $str.length;
+		this.writeUnsignedInt(__len);
+		this.writeUTFBytes($str);
+	}
+	
 	/**
 	 * 编码并写入Varint字节
 	 * @private
