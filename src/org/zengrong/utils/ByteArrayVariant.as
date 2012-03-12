@@ -106,7 +106,7 @@ public class ByteArrayVariant extends ByteArray
 		//取得字符串的byte长度
 		var __ba:ByteArray = new ByteArray();
 		__ba.writeUTFBytes($str);
-		this.writeUnsignedInt(__ba.length);
+		this.writeUnsignedVariantInt(__ba.length);
 		this.writeUTFBytes($str);
 	}
 	
