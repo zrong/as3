@@ -135,31 +135,31 @@ public class PacketBuffer
 		{
 			//读取第一个校验码
 			__flag1 = uint(_buf.readByte());
-			trace('__flag1:', __flag1);
+			//trace('__flag1:', __flag1);
 			//判断第一个校验码是否匹配，不匹配就继续读取
 			if ((__flag1 & MASK1) != __flag1) continue;
 			//读取第二个校验码
 			__flag2 = uint(_buf.readByte());
-			trace('__flag2:', __flag2);
+			//trace('__flag2:', __flag2);
 			//判断第二个校验码是否匹配，不匹配就继续读
 			if ((__flag2 & MASK2) != __flag2) continue;
-			trace('前置校验码读取正确,pos:', __pos);
+			//trace('前置校验码读取正确,pos:', __pos);
 			//读取信息主体的长度
 			var __bodyLen:int=_buf.readInt();
 			//暂存信息主体开头所在位置的指针
 			__pos = _buf.position;
-			trace('信息主体长度:', __bodyLen, ',pos:', __pos, '_buf.bytesAvailable:', _buf.bytesAvailable, '_buf.length:', _buf.length);
+			//trace('信息主体长度:', __bodyLen, ',pos:', __pos, '_buf.bytesAvailable:', _buf.bytesAvailable, '_buf.length:', _buf.length);
 			//如果没有将数据包的所有数据接受完全（即当前可用的长度小于当前位置＋消息主体长度＋尾部校验码长度）则等待下一次处理
 			if (_buf.length < __pos + __bodyLen + SUF_MASK_LEN) break;
 			//数据包长度足够，就读取尾部校验码
 			_buf.position = __pos + __bodyLen;
 			__flag1 = _buf.readByte();
 			__flag2 = _buf.readByte();
-			trace('_buf.pos:', _buf.position);
+			//trace('_buf.pos:', _buf.position);
 			//如果后置校验码正确则提取消息体加入队列
 			if ((__flag1 & MASK3) == __flag1 && (__flag2 & MASK4) == __flag2)
 			{
-				trace('校验码正确');
+				//trace('校验码正确');
 				//长度在允许的范围内就析取数据包
 				if (__bodyLen <= MAX_SIZE)
 				{

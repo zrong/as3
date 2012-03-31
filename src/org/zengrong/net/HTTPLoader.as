@@ -2,12 +2,10 @@
 //  zengrong.net
 //  创建者:	zrong(zrongzrong@gmail.com)
 //  创建时间：2010-12-30
-//  最后修改：2011-09-07
+//  最后修改：2012-03-30
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
-
-import org.zengrong.utils.ObjectUtil;
 
 import flash.events.ErrorEvent;
 import flash.events.Event;
@@ -18,7 +16,8 @@ import flash.net.URLLoaderDataFormat;
 import flash.net.URLRequest;
 import flash.net.URLRequestMethod;
 import flash.net.URLVariables;
-import flash.utils.ByteArray;
+
+import org.zengrong.utils.ObjectUtil;
 
 /**
  * 与服务器通信，可以传递多重资料和载入多个文件
@@ -50,28 +49,67 @@ public class HTTPLoader
 	
 	protected var _method:String = 'GET';
 	
-	protected var _loading:Boolean;			//是否正在载入。这个变量保证同一时间只能有一次或者一组载入。
-	protected var _multi:Boolean;			//是否是多文件载入
+	protected var _dataFormat:String = 'text';
+	
+	/**
+	 * 是否正在载入。这个变量保证同一时间只能有一次或者一组载入。
+	 */
+	protected var _loading:Boolean;			
+	
+	/**
+	 * 是否是多文件载入
+	 */	
+	protected var _multi:Boolean;
 	
 	protected var _loader:URLLoader;
-	protected var _submitVar:Object;			//每次提交都需要的
-	protected var _returnVar:Object;			//每次提交的时候需要原样返回的参数。这些参数在服务器返回的时候会原样提供
-	protected var _curSubmitVar:URLVariables;//保存当次提交的变量
-	protected var _curReturnVar:Object;		//保存当次提交需要返回的参数。
-	protected var _curUrl:String;			//保存当次提交的URL
-
-	protected var _urls:Array;				//多文件载入保存每次载入的路径
-	protected var _submitVars:Array;			//如果是多文件载入，这个变量保存每次提交的时候需要返回的参数。所有的多重载入提供的参数都将统一视为需要返回的参数
-	protected var _results:Array;			//保存多文件载入时候返回的值
 	
+	/**
+	 * 每次提交都需要的
+	 */
+	protected var _submitVar:Object;
+	
+	/**
+	 * 每次提交的时候需要原样返回的参数。这些参数在服务器返回的时候会原样提供
+	 */
+	protected var _returnVar:Object;
+	
+	/**
+	 * 保存当次提交的变量
+	 */ 
+	protected var _curSubmitVar:URLVariables;
+	
+	/**
+	 * 保存当次提交需要返回的参数。
+	 */ 
+	protected var _curReturnVar:Object;
+	
+	/**
+	 * 保存当次提交的URL
+	 */
+	protected var _curUrl:String;
 
+	/**
+	 * 多文件载入保存每次载入的路径
+	 */
+	protected var _urls:Array;
+	
+	/**
+	 * 如果是多文件载入，这个变量保存每次提交的时候需要返回的参数。所有的多重载入提供的参数都将统一视为需要返回的参数
+	 */
+	protected var _submitVars:Array;
+	
+	/**
+	 * 保存多文件载入时候返回的值
+	 */
+	protected var _results:Array;
+	
 	//----------------------------------------		
 	// init
 	//----------------------------------------
 	protected function init():void
 	{
 		_loader = new URLLoader();
-		_loader.dataFormat = URLLoaderDataFormat.TEXT;
+		_loader.dataFormat = _dataFormat;
 		_loading = false;
 		_multi = false;
 		addEvent();
@@ -80,14 +118,32 @@ public class HTTPLoader
 	//----------------------------------------
 	// getter/setter
 	//----------------------------------------
+	/**
+	 * 指定使用何种方法提交数据到服务器
+	 * @see flash.net.URLRequestMethod
+	 */
+	public function get method():String
+	{
+		return _method;
+	}
+	
 	public function set method($method:String):void
 	{
 		_method = $method;
 	}
+	
+	/**
+	 * 控制如何接收下载数据
+	 * @see flash.net.URLLoaderDataFormat
+	 */
+	public function get dataFormat($format:String):void
+	{
+		return _dataFormat;
+	}
 
 	public function set dataFormat($format:String):void
 	{
-		_loader.dataFormat = $format;
+		_dataFormat = $format;
 	}
 
 	/**
@@ -111,8 +167,7 @@ public class HTTPLoader
 	 */	
 	public function addReturnVar($key:String, $value:*):void
 	{
-		if(!_returnVar)
-			_returnVar = {};
+		if(!_returnVar) _returnVar = {};
 		_returnVar[$key] = $value;
 		addVariable($key, $value);
 	}
@@ -143,11 +198,17 @@ public class HTTPLoader
 		//如果正在载入，就将要载入的url和值加入队列中，但不执行
 		if(_loading)
 		{
+			//
 			//不能确定单载入是否定义了_urls。第一次单载入的时候，肯定是没有_urls的，但单载入有可能在第一次载入没有完成的时候被连续调用
 			//因此需要初始化_urls，但如果是_multi状态的话，在loading的时候，_urls肯定是有值的
-			if(!_multi && !_urls)
+			if(!_multi && !_urls) 
+			{
 				_urls = [];
+				_results = [];
+			}
 			_urls = _urls.concat($url);
+			//在loading的情况下载入，_multi要设置成true
+			_multi = true;
 			//这个和urls的情况类似，不过要判断$requestVar是否设置
 			if($requestVar)
 			{
@@ -193,8 +254,6 @@ public class HTTPLoader
 		_fun_loadDone = null;
 		_fun_loadError = null;
 	}
-	
-
 
 	//----------------------------------------
 	// private 
@@ -229,6 +288,7 @@ public class HTTPLoader
 		__request.method = _method;
 		if(_curSubmitVar)
 			__request.data = _curSubmitVar; 
+		_loader.dataFormat = _dataFormat;
 		_loader.load(__request);
 	}
 	
@@ -309,17 +369,6 @@ public class HTTPLoader
 			//提交的url地址
 			__result.url = _curUrl;
 			clearVar();
-			//如果在单次载入的时候队列中有值，就再次载入
-			if(_urls && _urls.length>0)
-			{
-				perform(_urls.shift(), (_submitVars && _submitVars.length>0) ? _submitVars.shift() : null);
-				//如果url列表载入完毕，就清空列表和提交变量数组
-				if(_urls.length == 0)
-				{
-					_urls = null;
-					_submitVars = null;
-				}
-			}
 			//此句必须放在最后，因为如果在_fun_loadDone中再次调用load，就会影响_urls的值，导致跳过某些载入
 			_fun_loadDone.call(null, __result);
 		}
@@ -337,7 +386,7 @@ public class HTTPLoader
 			var __result:Object = {};
 			__result.returnData = createReturnData();
 			//真实的返回值
-			__result.resultData = _loader.data;
+			__result.resultData = loaderData;
 			//提交的url地址
 			__result.url = _curUrl;
 			//将返回的值加入数组
