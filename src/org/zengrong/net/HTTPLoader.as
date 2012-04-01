@@ -136,7 +136,7 @@ public class HTTPLoader
 	 * 控制如何接收下载数据
 	 * @see flash.net.URLLoaderDataFormat
 	 */
-	public function get dataFormat($format:String):void
+	public function get dataFormat():String
 	{
 		return _dataFormat;
 	}
