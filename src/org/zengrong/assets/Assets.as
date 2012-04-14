@@ -24,8 +24,8 @@ import org.zengrong.net.VisualLoader;
  */
 
 [Event(name="complete",type="org.zengrong.assets.AssetsEvent")]
-[Event(name="info",type="org.zengrong.events.AssetsEvent")]
-[Event(name="progress",type="org.zengrong.events.AssetsEvent")]
+[Event(name="info",type="org.zengrong.assets.AssetsEvent")]
+[Event(name="progress",type="org.zengrong.assets.AssetsEvent")]
 
 public class Assets extends EventDispatcher
 {
@@ -367,6 +367,7 @@ public class Assets extends EventDispatcher
 	 * */
 	protected function saveAssets():void
 	{
+		//trace('saveAssets:', _curFile.ftype, _curFile.fname);
 		//如果载入的是swf，就获取symbol对象。将symbol的Class存在变量中
 		if(_curFile.ftype == AssetsType.SWF)
 		{
