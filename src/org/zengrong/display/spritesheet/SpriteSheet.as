@@ -307,6 +307,8 @@ public class SpriteSheet
 		if(!_allBmds) parseSheet();
 		if(!metadata.hasName || !metadata.names)
 			throw new ReferenceError('这个SpriteSheet不包含name。');
+		if(metadata.namesIndex[$name] === undefined)
+			throw new ReferenceError('寻找的name【'+$name+'】不在SpriteSheet的索引表中');
 		return _allBmds[metadata.namesIndex[$name]];
 	}
 

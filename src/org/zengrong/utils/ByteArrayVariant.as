@@ -118,11 +118,15 @@ public class ByteArrayVariant extends ByteArray
 	{
       var __bits:int = $value & 0x7f;
 	  var __value:uint = $value >> 7; 
+	  //解决大于int.MAX_VALUE高位始终为1，导致死循环的情况
+	  __value &= 0x01ffffff;
       while(__value)
 	  {
 		  this.writeByte(0x80|__bits)
 		  __bits = __value & 0x7f;
 		  __value >>= 7;
+		  //解决大于int.MAX_VALUE高位始终为1，导致死循环的情况
+		  __value &= 0x01ffffff;
 	  }
 	  this.writeByte(__bits);
 	}
