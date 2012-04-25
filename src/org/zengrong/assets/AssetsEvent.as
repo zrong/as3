@@ -19,16 +19,19 @@ public class AssetsEvent extends Event
 {
 	/**
 	 * 资源载入完成事件
+	 * @eventType complete
 	 */
 	public static const COMPLETE:String = 'complete';
 	
 	/**
 	 * 碰到载入错误等需要发送信息
+	 * @eventType info
 	 */
 	public static const INFO:String = 'info';
 	
 	/**
 	 * 处理事件
+	 * @eventType progress
 	 */
 	public static const PROGRESS:String = 'progress';
 	

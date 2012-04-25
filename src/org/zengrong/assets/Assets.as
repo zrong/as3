@@ -23,8 +23,19 @@ import org.zengrong.net.VisualLoader;
  * @author zrong
  */
 
+/**
+ * @eventType org.zengrong.assets.AssetsEvent.COMPLETE
+ */
 [Event(name="complete",type="org.zengrong.assets.AssetsEvent")]
+
+/**
+ * @eventType org.zengrong.assets.AssetsEvent.INFO
+ */
 [Event(name="info",type="org.zengrong.assets.AssetsEvent")]
+
+/**
+ * @eventType org.zengrong.assets.AssetsEvent.PROGRESS
+ */
 [Event(name="progress",type="org.zengrong.assets.AssetsEvent")]
 
 public class Assets extends EventDispatcher
