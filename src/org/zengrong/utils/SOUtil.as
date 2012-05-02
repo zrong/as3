@@ -2,29 +2,49 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2011-04-01
-//	修改时间：2011-09-02
+//	修改时间：2012-05-02
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.utils
 {
+import flash.media.Sound;
 import flash.net.SharedObject;
+import flash.utils.Dictionary;
+
+import mx.core.Singleton;
+
 /**
- * 读写SO的静态类
+ * 提供SO的快速读写功能
  * @author zrong
  */
 public class SOUtil
 {
-	public static var name:String;
-	private static var _so:SharedObject;
+	public static var list:Dictionary = new Dictionary();
 	
-	private static function get so():SharedObject
+	/**
+	 * 获取一个SOUtil的实例。如果该名称SOUtil存在，直接返回，否则就创建一个SO
+	 * @param $name 要获取的so的名称
+	 */
+	public static function getSOUtil($name:String):SOUtil
 	{
-		if(_so == null)
-		{
-			if(!name)
-				name = 'org.zengrong.util.so';
-			_so = SharedObject.getLocal(name);
-		}
-		return _so;
+		if(list[$name]) return list[$name] as SOUtil;
+		var __soutil:SOUtil = new SOUtil($name, new Singleton);
+		list[$name] = __soutil;
+		return __soutil;
+	}
+	
+	public function SOUtil($name:String, $sig:Singleton)
+	{
+		if(!$sig) throw new TypeError('请使用SOUtil.getSOUtil获得实例。');
+		name = $name;
+		_so = createSO();
+	}
+	
+	public var name:String;
+	private var _so:SharedObject;
+	
+	private function createSO():SharedObject
+	{
+		return SharedObject.getLocal(name);
 	}
 	
 	/**
@@ -32,19 +52,19 @@ public class SOUtil
 	 * @param $data 要保存的数据
 	 * @param $name 数据的键名
 	 */
-	public static function save($data:Object, $name:String=''):void
+	public function save($data:Object, $name:String=''):void
 	{
 		var __name:String;
 		if($name)
 		{
 			__name = $name;
-			so.data[__name] = $data;
-			trace('保存so：', so.flush());
+			_so.data[__name] = $data;
+			//trace('保存so：', so.flush());
 		}
 		else
 		{
 			__name = 'auto_save_' + list().length;
-			so.data[__name] = $data;
+			_so.data[__name] = $data;
 		}
 	}
 	
@@ -52,9 +72,9 @@ public class SOUtil
 	 * 获取$name键名的值
 	 * @param $name
 	 */	
-	public static function get($name:String):Object
+	public function get($name:String):Object
 	{
-		return so.data[$name];
+		return _so.data[$name];
 	}
 	
 	/**
@@ -62,30 +82,31 @@ public class SOUtil
 	 * @param $name
 	 * 
 	 */	
-	public static function del($name:String):void
+	public function del($name:String):void
 	{
-		delete so.data[$name];
+		delete _so.data[$name];
 	}
 	
 	/**
 	 * 清除so
 	 */	
-	public static function clear():void
+	public function clear():void
 	{
-		so.clear();
+		_so.clear();
 	}
 	
 	/**
 	 * 获取so中保存的所有键值对的数组
 	 */	
-	public static function list():Array
+	public function list():Array
 	{
 		var __list:Array = [];
-		for(var __name:String in so.data)
+		for(var __name:String in _so.data)
 		{
-			__list.push({name:__name, value:so.data[__name]});
+			__list.push({name:__name, value:_so.data[__name]});
 		}
 		return __list;
 	}
 }
 }
+class Singleton{};
