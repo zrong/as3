@@ -2,10 +2,11 @@
 //  zengrong.net
 //  创建者:	zrong(zrongzrong@gmail.com)
 //  创建时间：2010-12-30
-//  最后修改：2012-03-30
+//  最后修改：2012-04-27
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
+import org.zengrong.utils.ObjectUtil;
 
 import flash.events.ErrorEvent;
 import flash.events.Event;
@@ -16,14 +17,29 @@ import flash.net.URLLoaderDataFormat;
 import flash.net.URLRequest;
 import flash.net.URLRequestMethod;
 import flash.net.URLVariables;
-
-import org.zengrong.utils.ObjectUtil;
+import flash.utils.clearTimeout;
+import flash.utils.setTimeout;
 
 /**
  * 与服务器通信，可以传递多重资料和载入多个文件
  * */
 public class HTTPLoader
 {
+	/**
+	 * 由于超时没有返回造成的错误
+	 */
+	public static const ERROR_TIMEROUT:String = 'timeout';
+	
+	/**
+	 * 由于IOErrorEvent造成的错误
+	 */
+	public static const ERROR_IO:String = 'ioError';
+	
+	/**
+	 * 由于SecurityEvent造成的错误
+	 */
+	public static const ERROR_SECURITY:String = 'securityError';
+	
 	/**
 	 * 构造函数，提供两个Function参数供Load成功或者失败的时候调用
 	 * @param $done 载入成功的时候调用的Function，必须接受一个Object或Array参数。参数的类型取决于是单载入还是多重载入。Object的结构{returnData:提交的时候要求返回的数据,resultData:载入成功数据,url:载入的URL地址}
@@ -36,6 +52,10 @@ public class HTTPLoader
 		_fun_loadDone = $done;
 		_fun_loadError = $error;
 	}
+	
+	protected var _timeout:uint = 5000;
+	
+	protected var _timeoutid:int = -1;
 	
 	/**
 	 * 载入成功后的回调函数
@@ -118,9 +138,34 @@ public class HTTPLoader
 	//----------------------------------------
 	// getter/setter
 	//----------------------------------------
+	/**
+	 * 当前正在进行的请求的数量
+	 */
+	public function get requestNum():uint
+	{
+		if(!_urls) return 0;
+		return _urls.length;
+	}
+	
 	public function get loading():Boolean
 	{
 		return _loading;
+	}
+	
+	/**
+	 * 默认的超时时间为5秒，过了这个时间就认为返回错误
+	 */
+	public function get timeout():uint
+	{
+		return _timeout;
+	}
+
+	/**
+	 * @private
+	 */
+	public function set timeout(value:uint):void
+	{
+		_timeout = value;
 	}
 	
 	/**
@@ -203,7 +248,6 @@ public class HTTPLoader
 		//如果正在载入，就将要载入的url和值加入队列中，但不执行
 		if(_loading)
 		{
-			//
 			//不能确定单载入是否定义了_urls。第一次单载入的时候，肯定是没有_urls的，但单载入有可能在第一次载入没有完成的时候被连续调用
 			//因此需要初始化_urls，但如果是_multi状态的话，在loading的时候，_urls肯定是有值的
 			if(!_multi && !_urls) 
@@ -295,6 +339,8 @@ public class HTTPLoader
 			__request.data = _curSubmitVar; 
 		_loader.dataFormat = _dataFormat;
 		_loader.load(__request);
+		//开始载入并计算超时
+		_timeoutid = setTimeout(loadTimeout, _timeout);
 	}
 	
 	protected function addEvent():void
@@ -342,16 +388,26 @@ public class HTTPLoader
 		_loading = false;
 		_results = null;
 	}
+	
+	private function createError($errorType:String, $errorMsg:String):Object
+	{
+		var __result:Object = {};
+		__result.returnData = createReturnData();
+		if($errorType == IOErrorEvent.IO_ERROR) __result.type = ERROR_IO;
+		else if($errorType == SecurityErrorEvent.SECURITY_ERROR) __result.type = ERROR_SECURITY;
+		else __result.type = $errorType;
+		__result.message = $errorMsg;
+		return __result;
+	}
 
 	//----------------------------------------
 	// handler
 	//----------------------------------------
 	protected function handler_error(evt:ErrorEvent):void
 	{
+		checkTimeout();
 		//如果载入错误，就立即将错误返回
-		var __result:Object = {};
-		__result.returnData = createReturnData();
-		__result.message = '载入【'+_curUrl+'】失败，错误信息：'+evt.toString();
+		var __result:Object = createError(evt.type, '载入【'+_curUrl+'】失败，错误信息：'+evt.toString());
 		_fun_loadError.call(null, __result);
 		//对于多重载入，即使载入错误，依然要继续载入。但检测的时候，不将返回输入加入数组中。
 		//也就是说最终返回的结果数组，将不包含这次载入错误的数据。
@@ -361,6 +417,7 @@ public class HTTPLoader
 	
 	protected function handler_complete(evt:Event):void
 	{
+		checkTimeout();
 		//如果是多重载入，就是用数组保存
 		if(_multi)
 		{
@@ -378,6 +435,32 @@ public class HTTPLoader
 			//此句必须放在最后，因为如果在_fun_loadDone中再次调用load，就会影响_urls的值，导致跳过某些载入
 			_fun_loadDone.call(null, __result);
 		}
+	}
+	
+	protected function checkTimeout():void
+	{
+		if(_timeoutid>=0) clearTimeout(_timeoutid);
+		_timeoutid = -1;
+	}
+	
+	/**
+	 * 载入超时没有返回之后的处理
+	 */
+	protected function loadTimeout():void
+	{
+		_timeoutid = -1;
+		var __result:Object = createError(ERROR_TIMEROUT, '载入【'+_curUrl+'】超时！');
+		_fun_loadError.call(null, __result);
+		//取消侦听，避免对loader的关闭操作造成IOError
+		removeEvent();
+		//关闭载入
+		_loader.close();
+		//重新开始侦听
+		addEvent();
+		//对于多重载入，即使超时，依然要继续载入。但检测的时候，不将返回输入加入数组中。
+		//也就是说最终返回的结果数组，将不包含这次载入错误的数据。
+		if(_multi) checkMultiLoadDone(false);
+		else clearVar();
 	}
 
 	/**
