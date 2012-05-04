@@ -329,9 +329,8 @@ public class HTTPLoader
 			{
 				_curSubmitVar[__key2] = $var[__key2];
 			}
-			//如果是多重载入，就将本次提交的所有变量值都作为要返回的变量进行保存
-			if(_multi)
-				_curReturnVar = $var;
+			//将本次提交的所有变量值都作为要返回的变量进行保存，以便在返回的时候提供
+			_curReturnVar = $var;
 		}
 		var __request:URLRequest = new URLRequest(_curUrl);
 		__request.method = _method;
