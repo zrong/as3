@@ -59,13 +59,14 @@ public class SOUtil
 		{
 			__name = $name;
 			_so.data[__name] = $data;
-			//trace('保存so：', so.flush());
 		}
 		else
 		{
 			__name = 'auto_save_' + list().length;
 			_so.data[__name] = $data;
 		}
+		_so.flush();
+		//trace('保存so：', so.flush());
 	}
 	
 	/**
