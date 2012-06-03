@@ -65,8 +65,14 @@ public class SOUtil
 			__name = 'auto_save_' + list().length;
 			_so.data[__name] = $data;
 		}
-		_so.flush();
-		//trace('保存so：', so.flush());
+		flush();
+	}
+	
+	public function flush($miniDiskSpace:int=0):String
+	{
+		var __flush:String = _so.flush($miniDiskSpace);
+		trace('保存so：', __flush);
+		return __flush;
 	}
 	
 	/**
