@@ -338,9 +338,9 @@ public class Assets extends EventDispatcher
 	protected function performLoad():void
 	{
 		if(_curFile.url is ByteArray)
-			info('Assets开始执行载入ByteArray:'+_curFile.fname+',ftype:'+_curFile.ftype);
+			info('Assets.performLoad ByteArray:'+_curFile.fname+',ftype:'+_curFile.ftype);
 		else
-			info('Assets开始执行载入:'+_curFile.url);
+			info('Assets.performLoad url:'+_curFile.url);
 		//载入的外部资源是可视化资源
 		if(	AssetsType.isVisual(_curFile.ftype) )
 		{
