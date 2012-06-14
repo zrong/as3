@@ -11,6 +11,19 @@ import flash.utils.getQualifiedClassName;
 public class MathUtil
 {
 	/**
+	 * $center若超过限制值就返回限制值
+	 * @param $min 最小值
+	 * @param $center 中值
+	 * @param $max 最大值
+	 */
+	public static function minMax($min:Number, $center:Number, $max:Number):Number
+	{
+		if($center<$min) return $min;
+		if($center>$max) return $max;
+		return $center;
+	}
+
+	/**
 	 * 获取一个范围内的随机整数 
 	 * @param $max 随机数的最大值
 	 * @param $min 随机数的最小值

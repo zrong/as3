@@ -14,6 +14,84 @@ package org.zengrong.utils
  */
 public class StringUtil
 {
+	
+	/**
+	 * 返回易读的大小格式
+	 * @param $size 字节数
+	 * @param $decimals 每个级别的保留小数。[0,1,2]代表KB不保留小数，MB保留1位小数，GB保留2位小数。如果不提供参数，默认使用[1,2,2]。如果提供的数组数量不够，则后面的级别使用0。
+	 */
+	public static function getHumenSize($size:uint, $decimals:Array=null):String
+	{
+		//保存易读的大小格式
+		var __humanSize:String;
+		var __float:Number;
+		if(!$decimals || $decimals.length==0) $decimals = [1,2,2];
+		//小于1K就使用字节做单位
+		if($size<1024)
+		{
+			__humanSize = $size.toString() + 'Byte';
+		}
+			//小于1M使用KB作单位
+		else if($size<1048576)
+		{
+			//保留一位小数
+			__humanSize = float2String($size/1024, $decimals[0]) + 'KB';
+		}
+		//小于1G使用MB作单位
+		else if($size <1073741824)
+		{
+			//保留两位小数
+			__humanSize = float2String($size/1048576, int($decimals[1])) + 'MB';
+		}
+		//否则使用GB做单位
+		else
+		{
+			//保留两位小数
+			__humanSize = float2String($size/1073741824, int($decimals[2])) + 'MB';
+		}
+		return __humanSize;
+	}
+	
+	/**
+	 * 把一个数字输出成浮点形式的字符串
+	 * @param $num 要处理的数字
+	 * @param $decimals 小数的位数
+	 */
+	public static function float2String($num:Number, $dedimals:uint=1):String
+	{
+		var __float:String = $num.toString();
+		var __floatArr:Array = __float.split('.');
+		if(__floatArr.length>1)
+		{
+			if($dedimals>0)
+			{
+				var __decimal:String = __floatArr[1];
+				if(__decimal.length>$dedimals)
+				{
+					__decimal = __decimal.slice(0, $dedimals);
+				}
+				else
+				{
+					while(__decimal.length<$dedimals)
+						__decimal += '0';
+				}
+				return __floatArr[0] + '.' + __decimal;
+			}
+			else
+			{
+				return __floatArr[0].toString();
+			}
+		}
+		if($dedimals>0)
+		{
+			__float += '.';
+			for(var i:int=0; i<$dedimals;i++)
+			{
+				__float += '0';
+			}
+		}
+		return __float;
+	}
 
 	/**
 	 * 使用$value数组中的键值替换指定字符串内的“{key}”标记。key的值来自于$key数组
