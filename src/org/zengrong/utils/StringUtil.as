@@ -27,27 +27,27 @@ public class StringUtil
 		var __float:Number;
 		if(!$decimals || $decimals.length==0) $decimals = [1,2,2];
 		//小于1K就使用字节做单位
-		if($size<1024)
+		if($size<ByteSize.KB)
 		{
 			__humanSize = $size.toString() + 'Byte';
 		}
 			//小于1M使用KB作单位
-		else if($size<1048576)
+		else if($size<ByteSize.MB)
 		{
 			//保留一位小数
-			__humanSize = float2String($size/1024, $decimals[0]) + 'KB';
+			__humanSize = float2String($size/ByteSize.KB, $decimals[0]) + 'KB';
 		}
 		//小于1G使用MB作单位
-		else if($size <1073741824)
+		else if($size <ByteSize.GB)
 		{
 			//保留两位小数
-			__humanSize = float2String($size/1048576, int($decimals[1])) + 'MB';
+			__humanSize = float2String($size/ByteSize.MB, int($decimals[1])) + 'MB';
 		}
 		//否则使用GB做单位
 		else
 		{
 			//保留两位小数
-			__humanSize = float2String($size/1073741824, int($decimals[2])) + 'MB';
+			__humanSize = float2String($size/ByteSize.GB, int($decimals[2])) + 'MB';
 		}
 		return __humanSize;
 	}

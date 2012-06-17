@@ -119,6 +119,26 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 	
 	protected var _barFadeEffect:Fade;
 	
+	protected var _horizontalBarOffset:int=0;
+
+	/**
+	 * 横向滚动条的位置偏移，仅针对y轴
+	 */
+	[Bindable]
+	public function get horizontalBarOffset():int
+	{
+		return _horizontalBarOffset;
+	}
+
+	/**
+	 * @private
+	 */
+	public function set horizontalBarOffset($value:int):void
+	{
+		_horizontalBarOffset = $value;
+	}
+
+	
 	protected var _horizontalBar:DisplayObject;
 	
 	/**
@@ -140,6 +160,26 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 		_horizontalBar = $value;
 		addTargetToFadeEffect(_horizontalBar);
 	}
+	
+	protected var _verticalBarOffset:int = 0;
+
+	/**
+	 * 纵向滚动条的偏移值，仅针对x轴
+	 */
+	[Bindable]
+	public function get verticalBarOffset():int
+	{
+		return _verticalBarOffset;
+	}
+
+	/**
+	 * @private
+	 */
+	public function set verticalBarOffset($value:int):void
+	{
+		_verticalBarOffset = $value;
+	}
+
 	
 	protected var _verticalBar:DisplayObject;
 
@@ -744,14 +784,14 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 	{
 		if(canScrollVertically && _verticalBar)
 		{
-			_verticalBar.x = viewport.width - _verticalBar.width;
+			_verticalBar.x = viewport.width - _verticalBar.width + _verticalBarOffset;
 			_verticalBar.alpha = 1;
 //			trace('verticalBar.x:', _verticalBar.x);
 			this.addChild(_verticalBar);
 		}
 		if(canScrollHorizontally && _horizontalBar)
 		{
-			_horizontalBar.y = viewport.height - _horizontalBar.height;
+			_horizontalBar.y = viewport.height - _horizontalBar.height + _horizontalBarOffset;
 			_horizontalBar.alpha = 1;
 			//trace('horizontalBar.y:', _horizontalBar.y, viewport.height, this.height);
 			this.addChild(_horizontalBar);
@@ -780,11 +820,11 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 	{
 		if(_verticalBar)
 		{
-			_verticalBar.y = viewport.verticalScrollPosition/(maxVerticalScrollPosition)*(viewport.height-_verticalBar.height);
+			_verticalBar.y = viewport.verticalScrollPosition/(maxVerticalScrollPosition)*(viewport.height-_verticalBar.height+horizontalBarOffset);
 		}
 		if(_horizontalBar)
 		{
-			_horizontalBar.x = viewport.horizontalScrollPosition/(maxHorizontalScrollPosition)*(viewport.width-_horizontalBar.width);
+			_horizontalBar.x = viewport.horizontalScrollPosition/(maxHorizontalScrollPosition)*(viewport.width-_horizontalBar.width+verticalBarOffset);
 		}
 	}
 
