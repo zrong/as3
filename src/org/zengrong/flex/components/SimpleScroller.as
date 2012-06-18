@@ -5,6 +5,7 @@ import flash.display.Shape;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.geom.Point;
+import flash.geom.Rectangle;
 import flash.system.Capabilities;
 
 import mx.core.IVisualElement;
@@ -305,6 +306,24 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 		{
 			var __index:int = _barFadeEffect.targets.indexOf($target);
 			if(__index>=0) _barFadeEffect.targets.splice(__index, 1);
+		}
+	}
+	
+	/**
+	 * 把Viewport的子显示对象移动到滚动条顶部
+	 */
+	public function moveChild2Top($child:DisplayObject):void
+	{
+		if(viewportUI && $child && viewportUI.contains($child))
+		{
+			var __rect:Rectangle = $child.getBounds(viewportUI);
+			//trace('max:', maxVerticalScrollPosition, ',rect:', __rect.y);
+			var __maxV:int = maxVerticalScrollPosition;
+			if(__maxV>0 && __rect.y>__maxV)
+			{
+				__rect.y = __maxV;
+			}
+			viewport.verticalScrollPosition = __rect.y;
 		}
 	}
 	
