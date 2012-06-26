@@ -14,7 +14,6 @@ package org.zengrong.utils
  */
 public class StringUtil
 {
-	
 	/**
 	 * 返回易读的大小格式
 	 * @param $size 字节数

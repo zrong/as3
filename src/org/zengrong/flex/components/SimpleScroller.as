@@ -329,10 +329,7 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 	
 	public function move2Top():void
 	{
-		if(canScrollVertically)
-		{
-			viewport.verticalScrollPosition= 0;
-		}
+		if(viewport) viewport.verticalScrollPosition= 0;
 	}
 	
 	public function move2Bottom():void
@@ -345,10 +342,7 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 	
 	public function move2Left():void
 	{
-		if(canScrollHorizontally)
-		{
-			viewport.horizontalScrollPosition = 0;
-		}
+		if(viewport) viewport.horizontalScrollPosition = 0;
 	}
 	
 	public function move2Right():void
@@ -358,6 +352,45 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 			viewport.horizontalScrollPosition = maxHorizontalScrollPosition;
 		}
 	}
+	
+	protected var _backgroundColor:uint = 0xFFFFFF;
+
+	/**
+	 * 滚动区域的背景颜色
+	 */
+	[Bindable]
+	public function get backgroundColor():uint
+	{
+		return _backgroundColor;
+	}
+
+	public function set backgroundColor($value:uint):void
+	{
+		_backgroundColor = $value;
+		drawBG();
+	}
+
+	
+	protected var _backgroundAlpha:Number = 0;
+
+	/**
+	 * 滚动区域的背景Alpha
+	 */
+	[Bindable]
+	public function get backgroundAlpha():Number
+	{
+		return _backgroundAlpha;
+	}
+
+	/**
+	 * @private
+	 */
+	public function set backgroundAlpha($value:Number):void
+	{
+		_backgroundAlpha = $value;
+		drawBG();
+	}
+
 
 	/**
 	 * 实现Scroller的背景，一般是透明的矩形，需要这个矩形来让Scroller响应鼠标事件
@@ -367,7 +400,7 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 		this.graphics.clear();
 		if(_width>0 && _height>0)
 		{
-			this.graphics.beginFill(0xFFFFFF, 0);
+			this.graphics.beginFill(backgroundColor, backgroundAlpha);
 			this.graphics.drawRect(0,0,_width, _height);
 			this.graphics.endFill();
 			//trace('绘制......:', _width, _height);
@@ -534,10 +567,10 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 	 */
 	private function viewport_resizeHandler(event:Event):void
 	{
-		//trace('---viewport_resize:', viewport.width, viewport.height,
-		//	',contentHeight:', viewport.contentHeight, 
-		//	',verticalScrollPos:', viewport.verticalScrollPosition);
-		//trace('---viewport_resize:', viewport.verticalScrollPosition);
+//		trace('---viewport_resize:', viewport.width, viewport.height,
+//			',contentHeight:', viewport.contentHeight, 
+//			',verticalScrollPos:', viewport.verticalScrollPosition);
+//		trace('---viewport_resize:', viewport.verticalScrollPosition);
 		viewport.addEventListener(FlexEvent.UPDATE_COMPLETE, 
 			handleSizeChangeOnUpdateComplete);
 	}
@@ -571,14 +604,22 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 	 */
 	private function viewport_propertyChangeHandler(event:PropertyChangeEvent):void
 	{
-		//trace('----viewport_propertyChangeHeight:',event.property, event.oldValue, event.newValue, viewport.contentWidth, viewport.contentHeight, viewport.width, viewport.height);
+//		trace('----viewport_propertyChangeHeight:',event.property, event.oldValue, event.newValue, viewport.contentWidth, viewport.contentHeight, viewport.width, viewport.height);
 //		trace('scrollRect:', viewportUI.scrollRect);
 //		trace('layout:', viewportUI.layout);
-//		switch(event.property) 
-//		{
-//			case "contentWidth": 
-//			case "contentHeight": 
-//		}
+		switch(event.property) 
+		{
+			//如果内容的宽度和高度降低导致无法滚动，就将内容的滚动到0
+			//如果内容的滚动值大于最大滚动值，就还原到最大滚动值
+			case "contentWidth": 
+				if(viewport.contentWidth<viewport.width) move2Left();
+				else if(viewport.horizontalScrollPosition > maxHorizontalScrollPosition) move2Right();
+				break;
+			case "contentHeight":
+				if(viewport.contentHeight<viewport.height) move2Top();
+				else if(viewport.verticalScrollPosition > maxVerticalScrollPosition) move2Bottom();
+				break;
+		}
 	}
 	
 	/**

@@ -109,5 +109,18 @@ public class ObjectUtil
 				$obj is Number ||
 				$obj is uint;
 	}
+	
+	/**
+	 * 判断一个对象是否不包含任何内容
+	 */
+	public static function isEmpty($obj:Object):Boolean
+	{
+		if(!$obj) return true;
+		for(var __key:String in $obj)
+		{
+			return false;
+		}
+		return true;
+	}
 }
 }
