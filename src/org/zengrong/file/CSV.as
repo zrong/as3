@@ -1,5 +1,6 @@
 ﻿/**
  *   This file is a part of csvlib, written by Marco Müller / http://short-bmc.com
+ *   zrong(zengrong.net) 进行大幅修改，加入大量新的方法和功能
  *
  *   The csvlib is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -23,7 +24,7 @@ import org.zengrong.utils.StringUtil;
 	
 	/**
 	 * @author Marco Müller / http://shorty-bmc.com
-	 * @author zrong(zrongzrong@gmail.com) 2012-02-21 修改
+	 * @author zrong(zengrong.net) 2012-06-28 修改
 	 * @see http://rfc.net/rfc4180.html RFC4180
 	 * @see http://csvlib.googlecode.com csvlib
 	 */
@@ -31,6 +32,12 @@ import org.zengrong.utils.StringUtil;
 	{
 		public static const FORMATED_TYPE_OBJECT_ARRAY:String = 'Array';
 		public static const FORMATED_TYPE_DICTIONARY:String = 'Dictionary';
+		
+		/**
+		 * 设置转换ValueObject的函数名称
+		 */
+		public static var FACTORY_NAME:Array = ['toVO', 'toValueObject'];
+		
 		/**
 		 * 将字符串作为CSV进行解析 
 		 * @param $str
@@ -376,17 +383,23 @@ import org.zengrong.utils.StringUtil;
 		/**
 		 * 将CSV转换成对象列表
 		 * @param $save 是否将解析后的结果保存在formatedData变量中
+		 * @param $voClass 提供一个VOClass，此方法会将保存在数组中的类型转换为voClass类型。<br>
+		 * 该类若提供了一个工厂静态方法，则会使用这个方法来进行VO转换。工厂方法的名称在FACTORY_NAME中定义
 		 */		
-		public function toObjectArray($save:Boolean=false):Array
+		public function toObjectArray($save:Boolean=false, $voClass:Class=null):Array
 		{
 			var __objarray:Array = [];
-			var __unit:Object = null;
+			var __unit:*= null;
 			for(var i:uint=0;i<data.length;i++)
 			{
-				__unit = {};
-				for(var j:uint=0;j<header.length;j++)
+				if($voClass is Class)
 				{
-					__unit[header[j]] = data[i][j];
+					__unit = toVO($voClass, header, data[i]);
+				}
+				else
+				{
+					__unit = {};
+					writeObject(__unit, header, data[i]);
 				}
 				__objarray[i] = __unit;
 			}
@@ -407,11 +420,13 @@ import org.zengrong.utils.StringUtil;
 		 * 将列表导出成字典格式
 		 * @param $id 提供字典的id使用哪个key
 		 * @param $save 是否将解析后的结果保存在formatedData变量中
+		 * @param $voClass 提供一个VOClass，此方法会将保存在数组中的类型转换为voClass类型。<br>
+		 * 该类若提供了一个工厂静态方法，则会使用这个方法来进行VO转换。工厂方法的名称在FACTORY_NAME中定义
 		 */
-		public function toDictionary($id:String=null, $save:Boolean=false):Dictionary
+		public function toDictionary($id:String=null, $save:Boolean=false, $voClass:Class=null):Dictionary
 		{
 			var __dict:Dictionary = new Dictionary(false);
-			var __unit:Object = null;
+			var __unit:* = null;
 			var __idIndex:int = -1;
 			for(var k:uint=0;k<header.length;k++)
 			{
@@ -424,10 +439,14 @@ import org.zengrong.utils.StringUtil;
 			}
 			for(var i:uint=0;i<data.length;i++)
 			{
-				__unit = {};
-				for(var j:uint=0;j<header.length;j++)
+				if($voClass is Class)
 				{
-					__unit[header[j]] = data[i][j];
+					__unit = toVO($voClass, header, data[i]);
+				}
+				else
+				{
+					__unit = {};
+					writeObject(__unit, header, data[i]);
 				}
 				//若有id，使用id作为键名，否则使用数字作为键名
 				if(__idIndex>-1) __dict[data[i][__idIndex]] = __unit;
@@ -444,6 +463,46 @@ import org.zengrong.utils.StringUtil;
 				formatedData = null;
 			}
 			return __dict;
+		}
+		
+		/**
+		 * 根据提供的类建立该类的值对象
+		 */
+		public function toVO($voClass:Class, $header:Array, $value:Array):*
+		{
+			var __factoryIndex:int = -1;
+			for (var i:int = 0; i < FACTORY_NAME.length; i++) 
+			{
+				if($voClass.hasOwnProperty(FACTORY_NAME[i]))
+				{
+					__factoryIndex = i;
+					break;
+				}
+			}
+			var __vo:* = null;
+			//如果找不到工厂方法，下面的循环会根据属性来设置值
+			if(__factoryIndex < 0)
+			{
+				__vo = new $voClass;
+				writeObject(__vo, header, $value);
+				return __vo;
+			}
+			//如果找到了工厂方法，先将CSV转成Object
+			__vo = {};
+			writeObject(__vo, header, $value);
+			//使用工厂方法返回
+			return ($voClass[FACTORY_NAME[__factoryIndex]] as Function).call(null, __vo);
+		}
+		
+		/**
+		 * 提供header和值数组，将它们转换成键值对写入object中
+		 */
+		private function writeObject($obj:Object, $header:Array, $value:Array):void
+		{
+			for (var j:int = 0; j < $header.length; j++) 
+			{
+				$obj[$header[j]] = $value[j];
+			}
 		}
 		
 		/**

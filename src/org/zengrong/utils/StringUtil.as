@@ -2,6 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong
 //  创建时间：2010-12-30
+//  修改时间：2012-06-28
 //	此类中的部分方法来自于Flex框架的mx.utils.StringUtil，具体到方法中将有详细标注
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.utils
@@ -14,6 +15,38 @@ package org.zengrong.utils
  */
 public class StringUtil
 {
+	/**
+	 * 将一个由分隔符分个的字符串转换成多维数组
+	 * @param $str 要转换的字符串
+	 * @param $sep 字符串分隔符数组，按纬度排序
+	 * @example 将字符串转换成2维数组，一维分隔符为;，二维分隔符为:。
+	 * <list version="3.0">
+	 * var __str:String = "15:10;511:100:75:85";
+	 * trace(StringUtil.toMultiArray(__str, [';',':']).length);
+	 * </list>
+	 */
+	public static function toMultiArray($str:String, $sep:Array):Array
+	{
+		var __arr:Array = [];
+		while($sep.length>0)
+		{
+			var __sep:String = $sep.shift();
+			if(__arr.length == 0)
+			{
+				__arr = $str.split(__sep);
+			}
+			else
+			{
+				for (var j:int = 0; j < __arr.length; j++) 
+				{
+					__arr[j] = String(__arr[j]).split(__sep);
+				}
+				
+			}
+		}
+		return __arr;
+	}
+	
 	/**
 	 * 返回易读的大小格式
 	 * @param $size 字节数
