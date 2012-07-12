@@ -265,6 +265,22 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 	{
 		_lockHorizontalScroll = $value;
 	}
+	
+	private var _enableScroll:Boolean=true;
+
+	/**
+	 * 是否允许滚动。如果该值为false，不进行滚动
+	 */
+	public function get enableScroll():Boolean
+	{
+		return _enableScroll;
+	}
+
+	public function set enableScroll($value:Boolean):void
+	{
+		_enableScroll = $value;
+	}
+	
 
 	/**
 	 * 当前是否超域
@@ -733,6 +749,12 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 	 */	
 	private function performDrag($dragX:Number, $dragY:Number):void
 	{
+		if(!enableScroll)
+		{
+			_touchScrollHelper.stopScrollWatch();
+			_touchScrollHelper.endTouchScroll();
+			return;
+		}
 		// dragX和dragY是全局坐标系中的增量值。
 		//为了使用它们改变滚动条位置，我们必须转换他们到滚动条的坐标系。
 		//下面进行转换

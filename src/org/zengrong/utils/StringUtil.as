@@ -27,6 +27,7 @@ public class StringUtil
 	 */
 	public static function toMultiArray($str:String, $sep:Array):Array
 	{
+		if(!$str || !$sep || $sep.length==0) return null;
 		var __arr:Array = [];
 		while($sep.length>0)
 		{
