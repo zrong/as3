@@ -60,6 +60,11 @@ public class AssetsType
 	public static const JPG:String = 'jpg';
 	
 	/**
+	 * 指示载入类型为JPEG-XR图片的常量
+	 */
+	public static const JPEG_XR:String = 'wdp';
+	
+	/**
 	 * 指示载入类型为gif静态图片的常量。
 	 * */
 	public static const GIF:String = 'gif';
