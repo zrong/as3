@@ -273,12 +273,50 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 	 */
 	public function get enableScroll():Boolean
 	{
+		if(!_enableHorizonalScroll && !_enableVerticalScroll) return false;
 		return _enableScroll;
 	}
 
 	public function set enableScroll($value:Boolean):void
 	{
 		_enableScroll = $value;
+	}
+	
+	private var _enableHorizonalScroll:Boolean=true;
+
+	/**
+	 * 是否允许横向滚动，如果该值为false，不进行横向滚动
+	 */
+	public function get enableHorizonalScroll():Boolean
+	{
+		return _enableHorizonalScroll;
+	}
+
+	/**
+	 * @private
+	 */
+	public function set enableHorizonalScroll($value:Boolean):void
+	{
+		_enableHorizonalScroll = $value;
+	}
+
+	
+	private var _enableVerticalScroll:Boolean=true;
+
+	/**
+	 * 是否允许纵向滚动，如果该值为false，不进行纵向滚动
+	 */
+	public function get enableVerticalScroll():Boolean
+	{
+		return _enableVerticalScroll;
+	}
+
+	/**
+	 * @private
+	 */
+	public function set enableVerticalScroll($value:Boolean):void
+	{
+		_enableVerticalScroll = $value;
 	}
 	
 
@@ -472,6 +510,7 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 	
 	protected function get canScrollHorizontally():Boolean
 	{
+		if(!enableHorizonalScroll) return false;
 		if(viewport)
 		{
 			return viewport.contentWidth > viewport.width;
@@ -481,6 +520,7 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 	
 	protected function get canScrollVertically():Boolean
 	{
+		if(!enableVerticalScroll) return false;
 		if(viewport)
 		{
 			return viewport.contentHeight > viewport.height;
