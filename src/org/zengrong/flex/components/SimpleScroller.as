@@ -586,6 +586,8 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 			viewport.clipAndEnableScrolling = true;
 			this.addChild(viewportUI);
 			viewport.addEventListener(PropertyChangeEvent.PROPERTY_CHANGE, viewport_propertyChangeHandler);
+			viewport.addEventListener("scaleYChanged", viewport_scaleChange);
+			viewport.addEventListener("scaleXChanged", viewport_scaleChange);
 			viewport.addEventListener(Event.RESIZE, viewport_resizeHandler);
 		}
 	}
@@ -600,6 +602,8 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 			viewport.clipAndEnableScrolling = false;
 			viewport.removeEventListener(PropertyChangeEvent.PROPERTY_CHANGE, viewport_propertyChangeHandler);
 			viewport.removeEventListener(Event.RESIZE, viewport_resizeHandler);
+			viewport.removeEventListener("scaleXChanged", viewport_scaleChange);
+			viewport.removeEventListener("scaleYChanged", viewport_scaleChange);
 			if(this.contains(viewportUI)) this.removeChild(viewportUI);
 			_viewport = null;
 		}
@@ -629,6 +633,15 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 //		trace('---viewport_resize:', viewport.verticalScrollPosition);
 		viewport.addEventListener(FlexEvent.UPDATE_COMPLETE, 
 			handleSizeChangeOnUpdateComplete);
+	}
+	
+	private function viewport_scaleChange($evt:Event):void
+	{
+//		trace('---viewport_scaleChange:',$evt.type, 
+//			",viewport wh:", viewport.width, viewport.height,
+//			',contentWH:', viewport.contentWidth, viewport.contentHeight, 
+//			',VHScrollPos:', viewport.verticalScrollPosition, viewport.horizontalScrollPosition,
+//			",viewport scrollRect:", viewportUI.scrollRect);
 	}
 	
 	/**

@@ -10,6 +10,14 @@ package org.zengrong.utils
 import flash.utils.getQualifiedClassName;
 public class MathUtil
 {
+	
+	/**
+	 * 计算$x的以$a为底的对数
+	 */
+	public static function logX($x:Number, $a:Number):Number
+	{
+		return Math.log($x)/Math.log($a);
+	}
 	/**
 	 * $center若超过限制值就返回限制值
 	 * @param $min 最小值
