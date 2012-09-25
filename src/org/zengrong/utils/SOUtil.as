@@ -79,7 +79,7 @@ public class SOUtil
 	 * 获取$name键名的值
 	 * @param $name
 	 */	
-	public function get($name:String):Object
+	public function get($name:String):*
 	{
 		return _so.data[$name];
 	}

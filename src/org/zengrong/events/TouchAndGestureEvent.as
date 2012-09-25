@@ -21,7 +21,31 @@ public class TouchAndGestureEvent extends Event
 	public static const GESTURE_THROW:String = 'gestureThrow';
 	
 	/**
-	 * 按下并移动
+	 * 开始检测手势，当按下的时候发送此事件
+	 * @eventType gestureCheckStarting
+	 */	
+	public static const GESTURE_CHECK_STARTING:String = 'gestureCheckStarting';
+	
+	/**
+	 * 开始检测手势，当超过了移动误差值之后发送此事件。此事件一定在GESTURE_STARTING_CHECK之后发送
+	 * @eventType gestureCheckStart
+	 */	
+	public static const GESTURE_CHECK_START:String = "gestureCheckStart";
+	
+	/**
+	 * 停止检测手势
+	 * @eventType gestureCheckStop
+	 */
+	public static const GESTURE_CHECK_STOP:String = 'gestureCheckStop';
+	
+	/**
+	 * 放开触摸的时候发送此事件
+	 * @eventType touchLeave
+	 */
+	public static const TOUCH_LEAVE:String = "touchLeave";
+	
+	/**
+	 * 触摸并移动
 	 * @eventType touchMove
 	 */
 	public static const TOUCH_MOVE:String = 'touchMove';
