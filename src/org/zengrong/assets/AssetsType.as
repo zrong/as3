@@ -16,26 +16,31 @@ public class AssetsType
 	// 指示各种资源文件的扩展名或者类型值
 	//========================================
 	/**
+	 * 指示载入的类型为通用文件包的常量。专用格式。
+	 */
+	public static const FILE_PACK:String = "fip";
+	
+	/**
 	 * 指示载入的类型为纯文本包的常量。专用格式。
-	 * @see org.zengrong.FileHead
+	 * @see org.zengrong.HeadVO
 	 */
 	public static const TXT_PACK:String = 'txp';
 
 	/**
 	 * 指示载入的类型为spriteSheet包的常量。专用格式。
-	 * @see org.zengrong.FileHead
+	 * @see org.zengrong.HeadVO
 	 */
 	public static const SPRITE_SHEET_PACK:String = 'ssp';
 
 	/**
 	 * 指示载入的类型为图像文件包的常量。专用格式。
-	 * @see org.zengrong.FileHead
+	 * @see org.zengrong.HeadVO
 	 */
 	public static const IMAGE_PACK:String = 'imp';
 
 	/**
 	 * 指示载入的类型为spriteSheet图片的常量。专用格式。
-	 * @see org.zengrong.FileHead
+	 * @see org.zengrong.HeadVO
 	 * */
 	public static const SPRITE_SHEET:String = 'ss';
 	
@@ -81,6 +86,7 @@ public class AssetsType
 	{
 		return $type == AssetsType.PNG || 
 				$type == AssetsType.JPG || 
+				$type == AssetsType.JPEG_XR || 
 				$type == AssetsType.GIF;
 	}
 	
@@ -107,6 +113,7 @@ public class AssetsType
 	{
 		return 	$type == TXT_PACK ||
 				$type == IMAGE_PACK ||
+				$type == FILE_PACK ||
 				$type == SPRITE_SHEET_PACK;
 	}
 }

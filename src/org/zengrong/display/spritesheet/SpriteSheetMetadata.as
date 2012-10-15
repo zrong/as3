@@ -429,6 +429,8 @@ public class SpriteSheetMetadata
 	/**
 	 * 返回Metadata的XML格式字符串，并加上XML头
 	 * @param $isSimple 是否简单数据
+	 * @param $includeName
+	 * @param $lineEnding 换行符的值。这里调用了XML.toXMLString转换XML字符串，而XML.toXMLString默认使用\n作为换行符。所以这里使用自定义换行符意义不大，反而可能会造成换行符混乱。
 	 */	
 	public function toXMLString($isSimple:Boolean=false, $includeName:Boolean=true, $lineEnding:String='\n'):String
 	{
