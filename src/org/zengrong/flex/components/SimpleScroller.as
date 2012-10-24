@@ -953,11 +953,11 @@ public class SimpleScroller extends UIComponent implements IVisualElementContain
 	 */
 	protected function updateScrollBarPos():void
 	{
-		if(_verticalBar)
+		if(_verticalBar && viewport)
 		{
 			_verticalBar.y = viewport.verticalScrollPosition/(maxVerticalScrollPosition)*(viewport.height-_verticalBar.height+horizontalBarOffset);
 		}
-		if(_horizontalBar)
+		if(_horizontalBar && viewport)
 		{
 			_horizontalBar.x = viewport.horizontalScrollPosition/(maxHorizontalScrollPosition)*(viewport.width-_horizontalBar.width+verticalBarOffset);
 		}
