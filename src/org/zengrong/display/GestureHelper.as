@@ -129,12 +129,16 @@ public class GestureHelper extends EventDispatcher
 	
 	public function get stageMouseX():int
 	{
-		return _target.stage.mouseX;
+		if(_target && _target.stage)
+			return _target.stage.mouseX;
+		return 0;
 	}
 	
 	public function get stageMouseY():int
 	{
-		return _target.stage.mouseY;
+		if(_target && _target.stage)
+			return _target.stage.mouseY;
+		return 0;
 	}
 	
 	private function initEventHandler():void
@@ -181,6 +185,8 @@ public class GestureHelper extends EventDispatcher
 	 */
 	public function startCheck():void
 	{
+		//如果不存在target，或者target不在舞台中，就不检测
+		if(!_target || !_target.stage) return;
 		//开始检测前，先停止检测
 		stopCheck();
 		//trace('准备检测手势');
