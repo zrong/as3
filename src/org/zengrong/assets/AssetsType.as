@@ -16,6 +16,11 @@ public class AssetsType
 	// 指示各种资源文件的扩展名或者类型值
 	//========================================
 	/**
+	 * 指示所有的SpriteSheetConvert转换的类型
+	 */
+	public static const SPRITE_SHEET_FILE:String = "ssf";
+	
+	/**
 	 * 指示载入的类型为通用文件包的常量。专用格式。
 	 */
 	public static const FILE_PACK:String = "fip";
