@@ -226,6 +226,29 @@ public class SpriteSheetMetadata
 	{
 		frameRects.splice($index,1);
 		originalFrameRects.splice($index,1);
+		//如果存在label，也要从label中移除这个帧
+		if(hasLabel && labelsFrame)
+		{
+			var __framesIndices:Array;
+			//从Label中删除帧编号
+			for each(__framesIndices in labelsFrame)
+			{
+				var __frameIndexInLabel:int = __framesIndices.indexOf($index);
+				if(__frameIndexInLabel != -1)
+				{
+					__framesIndices.splice(__frameIndexInLabel, 1);
+					break;
+				}
+			}
+			//将label中所有大于被删除帧编号的帧编号减1
+			for each(__framesIndices in labelsFrame)
+			{
+				for (var i:int = 0; i < __framesIndices.length; i++) 
+				{
+					if(__framesIndices[i] > $index) __framesIndices[i]--;
+				}
+			}
+		}
 		if(names && namesIndex)
 		{
 			var __delName:String = names.splice($index, 1)[0] as String;
