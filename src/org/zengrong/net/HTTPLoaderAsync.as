@@ -2,6 +2,7 @@
 //  zengrong.net
 //  创建者:	zrong(zrongzrong@gmail.com)
 //  创建时间：2012-04-17
+//  最后修改：2012-12-04
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
@@ -132,7 +133,6 @@ public class HTTPLoaderAsync
 }
 }
 import flash.net.URLLoader;
-import flash.net.URLLoaderDataFormat;
 import flash.net.URLRequest;
 
 class MyLoader extends URLLoader

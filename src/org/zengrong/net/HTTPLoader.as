@@ -2,23 +2,21 @@
 //  zengrong.net
 //  创建者:	zrong(zrongzrong@gmail.com)
 //  创建时间：2010-12-30
-//  最后修改：2012-04-27
+//  最后修改：2012-12-04
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
-import org.zengrong.utils.ObjectUtil;
-
 import flash.events.ErrorEvent;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.SecurityErrorEvent;
 import flash.net.URLLoader;
-import flash.net.URLLoaderDataFormat;
 import flash.net.URLRequest;
-import flash.net.URLRequestMethod;
 import flash.net.URLVariables;
 import flash.utils.clearTimeout;
 import flash.utils.setTimeout;
+
+import org.zengrong.utils.ObjectUtil;
 
 /**
  * 与服务器通信，可以传递多重资料和载入多个文件
@@ -42,8 +40,10 @@ public class HTTPLoader
 	
 	/**
 	 * 构造函数，提供两个Function参数供Load成功或者失败的时候调用
-	 * @param $done 载入成功的时候调用的Function，必须接受一个Object或Array参数。参数的类型取决于是单载入还是多重载入。Object的结构{returnData:提交的时候要求返回的数据,resultData:载入成功数据,url:载入的URL地址}
-	 * @param $error 载入错误的时候调用的Function，必须接受一个Object参数。Object结构为：{returnData:提交的时候要求返回的数据,message:错误信息}
+	 * @param $done 载入成功的时候调用的Function，必须接受一个HTTPLoaderDoneVO或Vector.<HTTPLoaderDoneVO>参数。参数的类型取决于是单载入还是多重载入。
+	 * @param $error 载入错误的时候调用的Function，必须接受一个HTTPLoaderErrorVO参数。
+	 * @see org.zengrong.net.HTTPLoaderDoneVO
+	 * @see org.zengrong.net.HTTPLoaderErroVO
 	 * 
 	 */	
 	public function HTTPLoader($done:Function, $error:Function)
@@ -89,7 +89,7 @@ public class HTTPLoader
 	protected var _submitVar:Object;
 	
 	/**
-	 * 每次提交的时候需要原样返回的参数。这些参数在服务器返回的时候会原样提供
+	 * 每次提交的时候需要原样返回的参数。这些参数在服务器返回的时候会原样提供给调用者
 	 */
 	protected var _returnVar:Object;
 	
@@ -121,7 +121,7 @@ public class HTTPLoader
 	/**
 	 * 保存多文件载入时候返回的值
 	 */
-	protected var _results:Array;
+	protected var _results:Vector.<HTTPLoaderDoneVO>;
 	
 	//----------------------------------------		
 	// init
@@ -253,7 +253,7 @@ public class HTTPLoader
 			if(!_multi && !_urls) 
 			{
 				_urls = [];
-				_results = [];
+				_results = new Vector.<HTTPLoaderDoneVO>;
 			}
 			_urls = _urls.concat($url);
 			//在loading的情况下载入，_multi要设置成true
@@ -279,7 +279,7 @@ public class HTTPLoader
 		{
 			_loading = true;
 			_multi = true;
-			_results = [];
+			_results = new Vector.<HTTPLoaderDoneVO>;
 			//保存提供的数组参数
 			_urls = $url as Array;
 			_submitVars = $requestVar as Array;
@@ -388,9 +388,9 @@ public class HTTPLoader
 		_results = null;
 	}
 	
-	private function createError($errorType:String, $errorMsg:String):Object
+	private function createError($errorType:String, $errorMsg:String):HTTPLoaderErrorVO
 	{
-		var __result:Object = {};
+		var __result:HTTPLoaderErrorVO = new HTTPLoaderErrorVO()
 		__result.returnData = createReturnData();
 		if($errorType == IOErrorEvent.IO_ERROR) __result.type = ERROR_IO;
 		else if($errorType == SecurityErrorEvent.SECURITY_ERROR) __result.type = ERROR_SECURITY;
@@ -406,7 +406,7 @@ public class HTTPLoader
 	{
 		checkTimeout();
 		//如果载入错误，就立即将错误返回
-		var __result:Object = createError(evt.type, '载入【'+_curUrl+'】失败，错误信息：'+evt.toString());
+		var __result:HTTPLoaderErrorVO = createError(evt.type, '载入【'+_curUrl+'】失败，错误信息：'+evt.toString());
 		_fun_loadError.call(null, __result);
 		//对于多重载入，即使载入错误，依然要继续载入。但检测的时候，不将返回输入加入数组中。
 		//也就是说最终返回的结果数组，将不包含这次载入错误的数据。
@@ -425,7 +425,7 @@ public class HTTPLoader
 		//如果是单次载入，就直接返回result的值
 		else
 		{
-			var __result:Object = {};
+			var __result:HTTPLoaderDoneVO = new HTTPLoaderDoneVO();
 			__result.returnData = createReturnData();
 			__result.resultData = loaderData;
 			//提交的url地址
@@ -471,7 +471,7 @@ public class HTTPLoader
 		if($addResult)
 		{
 			//__result是一次提交返回的值
-			var __result:Object = {};
+			var __result:HTTPLoaderDoneVO = new HTTPLoaderDoneVO();
 			__result.returnData = createReturnData();
 			//真实的返回值
 			__result.resultData = loaderData;
@@ -492,7 +492,7 @@ public class HTTPLoader
 		else
 		{
 			//call必须最后调用，以避免call中再调用load导致不可预见的错误。所以要将_results进行复制，然后清空变量。
-			var __resultArr:Array = _results.concat();
+			var __resultArr:Vector.<HTTPLoaderDoneVO> = _results.concat();
 			clearVar();
 			_urls = null;
 			_submitVars = null;

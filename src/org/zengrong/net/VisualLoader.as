@@ -6,15 +6,18 @@
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.net
 {
-import org.zengrong.assets.AssetsType;
-
-import flash.display.*;
-import flash.events.*;
-import flash.net.*;
+import flash.display.Bitmap;
+import flash.display.BitmapData;
+import flash.display.Loader;
+import flash.events.Event;
+import flash.events.EventDispatcher;
+import flash.events.IOErrorEvent;
+import flash.events.ProgressEvent;
+import flash.net.URLRequest;
 import flash.system.LoaderContext;
-import flash.system.SecurityDomain;
-import flash.system.ApplicationDomain;
 import flash.utils.ByteArray;
+
+import org.zengrong.assets.AssetsType;
 
 [Event(name="complete",type="flash.events.Event")]
 [Event(name="ioError",type="flash.events.IOErrorEvent")]
