@@ -68,7 +68,7 @@ public class OSType
 	public static const TOUCH_5PLUS:String = "iPod";
 	public static const IPAD_1:String = "iPad1";		// iPad1 is 1,1
 	public static const IPAD_2:String = "iPad2";		// wifi:2,1 gsm:2,2 cdma:2,3
-	public static const IPAD_3:String = "iPad3";		// (guessing)
+	public static const IPAD_3:String = "iPad3";		// wifi:3,1
 	public static const IPAD_4PLUS:String = "iPad";
 	
 	public static const IOS_DEVICES:Array = 

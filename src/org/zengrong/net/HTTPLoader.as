@@ -121,18 +121,23 @@ public class HTTPLoader
 	/**
 	 * 保存多文件载入时候返回的值
 	 */
-	protected var _results:Vector.<HTTPLoaderDoneVO>;
+	protected var _results:Array;
 	
 	//----------------------------------------		
 	// init
 	//----------------------------------------
 	protected function init():void
 	{
-		_loader = new URLLoader();
-		_loader.dataFormat = _dataFormat;
+		initLoader();
+		addEvent();
 		_loading = false;
 		_multi = false;
-		addEvent();
+	}
+	
+	protected function initLoader():void
+	{
+		_loader = new URLLoader();
+		_loader.dataFormat = _dataFormat;
 	}
 
 	//----------------------------------------
@@ -253,7 +258,7 @@ public class HTTPLoader
 			if(!_multi && !_urls) 
 			{
 				_urls = [];
-				_results = new Vector.<HTTPLoaderDoneVO>;
+				_results = [];
 			}
 			_urls = _urls.concat($url);
 			//在loading的情况下载入，_multi要设置成true
@@ -279,7 +284,7 @@ public class HTTPLoader
 		{
 			_loading = true;
 			_multi = true;
-			_results = new Vector.<HTTPLoaderDoneVO>;
+			_results = [];
 			//保存提供的数组参数
 			_urls = $url as Array;
 			_submitVars = $requestVar as Array;
@@ -454,6 +459,8 @@ public class HTTPLoader
 		removeEvent();
 		//关闭载入
 		_loader.close();
+		//重置Loader
+		initLoader();
 		//重新开始侦听
 		addEvent();
 		//对于多重载入，即使超时，依然要继续载入。但检测的时候，不将返回输入加入数组中。
@@ -492,7 +499,7 @@ public class HTTPLoader
 		else
 		{
 			//call必须最后调用，以避免call中再调用load导致不可预见的错误。所以要将_results进行复制，然后清空变量。
-			var __resultArr:Vector.<HTTPLoaderDoneVO> = _results.concat();
+			var __resultArr:Array = _results.concat();
 			clearVar();
 			_urls = null;
 			_submitVars = null;
