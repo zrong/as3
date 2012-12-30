@@ -40,7 +40,7 @@ public class HTTPLoader
 	
 	/**
 	 * 构造函数，提供两个Function参数供Load成功或者失败的时候调用
-	 * @param $done 载入成功的时候调用的Function，必须接受一个HTTPLoaderDoneVO或Vector.<HTTPLoaderDoneVO>参数。参数的类型取决于是单载入还是多重载入。
+	 * @param $done 载入成功的时候调用的Function，必须接受一个HTTPLoaderDoneVO或Array参数。参数的类型取决于是单载入还是多重载入。
 	 * @param $error 载入错误的时候调用的Function，必须接受一个HTTPLoaderErrorVO参数。
 	 * @see org.zengrong.net.HTTPLoaderDoneVO
 	 * @see org.zengrong.net.HTTPLoaderErroVO
