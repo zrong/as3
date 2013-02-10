@@ -48,6 +48,8 @@ package com.bit101.components
 		protected var _selectedColor:uint = Style.LIST_SELECTED;
 		protected var _rolloverColor:uint = Style.LIST_ROLLOVER;
 		protected var _alternateRows:Boolean = false;
+		protected var _labelField:String = "label";
+		
 		
 		/**
 		 * Constructor
@@ -105,6 +107,7 @@ package com.bit101.components
 			while(_itemHolder.numChildren > 0)
 			{
 				item = ListItem(_itemHolder.getChildAt(0));
+				item.labelField = labelField;
 				item.removeEventListener(MouseEvent.CLICK, onSelect);
 				_itemHolder.removeChildAt(0);
 			}
@@ -133,6 +136,7 @@ package com.bit101.components
             for(var i:int = 0; i < numItems; i++)
             {
                 var item:ListItem = _itemHolder.getChildAt(i) as ListItem;
+				item.labelField = labelField;
 				if(offset + i < _items.length)
 				{
 	                item.data = _items[offset + i];
@@ -328,6 +332,16 @@ package com.bit101.components
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
+		
+		public function get labelField():String
+		{
+			return _labelField;
+		}
+		
+		public function set labelField($value:String):void
+		{
+			_labelField = $value;
+		}
 		
 		/**
 		 * Sets / gets the index of the selected list item.

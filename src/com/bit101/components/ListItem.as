@@ -41,6 +41,7 @@ package com.bit101.components
 		protected var _rolloverColor:uint = 0xeeeeee;
 		protected var _selected:Boolean;
 		protected var _mouseOver:Boolean = false;
+		protected var _labelField:String = "label";
 		
 		/**
 		 * Constructor
@@ -108,9 +109,9 @@ package com.bit101.components
 			{
                 _label.text = _data as String;
 			}
-			else if(_data.hasOwnProperty("label") && _data.label is String)
+			else if(_data.hasOwnProperty(_labelField) && _data[_labelField] is String)
 			{
-				_label.text = _data.label;
+				_label.text = _data[_labelField];
 			}
 			else
             {
@@ -150,6 +151,15 @@ package com.bit101.components
 		///////////////////////////////////
 		// getter/setters
 		///////////////////////////////////
+		public function get labelField():String
+		{
+			return _labelField;
+		}
+		
+		public function set labelField($value:String):void
+		{
+			_labelField = $value;
+		}
 		
 		/**
 		 * Sets/gets the string that appears in this item.

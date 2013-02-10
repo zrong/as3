@@ -15,10 +15,5 @@ public class HTTPLoaderDoneVO extends HTTPLoaderVO
 	 * 调用成功后HTTP服务器返回的数据
 	 */
 	public var resultData:Object;
-	
-	/**
-	 * 提交的地址
-	 */
-	public var url:String;
 }
 }
