@@ -12,12 +12,13 @@ import flash.events.StatusEvent;
 import flash.media.Camera;
 import flash.media.Microphone;
 import flash.media.SoundCodec;
-import flash.utils.setTimeout;
 import flash.system.Capabilities;
 import flash.utils.getDefinitionByName;
-import org.zengrong.utils.checkVersion;
+import flash.utils.setTimeout;
 
 import mx.core.Singleton;
+
+import org.zengrong.utils.checkVersion;
 
 /**
  * 检测摄像头和麦克风
