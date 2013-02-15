@@ -10,6 +10,13 @@ package org.zengrong.utils
 {
 public class TimeUtil
 {
+	public static const YEAR:uint = 0x0020;
+	public static const MONTH:uint = 0x0010;
+	public static const DATE:uint = 0x0008;
+	
+	public static const HOUR:uint = 0x0004;
+	public static const MINUTE:uint = 0x0002;
+	public static const SECOND:uint = 0x0001;
 	/**
 	 * 基准日期。可用于所有需要基准日起的方法。例如：getTimestamp 
 	 */	
@@ -20,7 +27,7 @@ public class TimeUtil
 	 * @param $separator 分隔符
 	 * @param $dateOrSecond 若传递一个date，则格式化它；若传递一个正整数，则将其当作秒进行格式化；若传递0或负数，返回0；否则使用当前时间格式化。
 	 */
-	public static function getFormatedTime($separator:String=':', $dateOrSecond:*=null):String
+	public static function getFormatedTime($separator:String=':', $dateOrSecond:*=null, $flags:uint=0x7):String
 	 {
 		var __curHour:int = 0;
 		var __curMinutes:int = 0;
@@ -52,7 +59,14 @@ public class TimeUtil
 		__curMinutesString = __curMinutes<10 ? ("0" + __curMinutesString) : __curMinutesString;			
 		__curSecondsString = __curSeconds<10 ? ("0" + __curSecondsString) : __curSecondsString;
 		
-		return __curHourString + $separator +__curMinutesString + $separator +__curSecondsString;
+		var __result:String = "";
+		if($flags & TimeUtil.SECOND)
+			__result = __curSecondsString;
+		if($flags & TimeUtil.MINUTE)
+			__result = __result ? (__curMinutesString + $separator + __result) : (__curMinutesString);
+		if($flags & TimeUtil.HOUR)
+			__result = __result ? (__curHourString + $separator + __result) : (__curHourString);
+		return  __result;
 	}
 	
 	public static function getFormatedMinAndSecond($sec:int):String
