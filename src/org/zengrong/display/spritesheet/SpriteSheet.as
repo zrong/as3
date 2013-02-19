@@ -134,7 +134,7 @@ public class SpriteSheet
 		}
 		return null;
 	}
-
+	
 	/**
 	 * 仅销毁bitmapDataSheet。在parseSheet之后，就可以执行这个方法释放内存。
 	 */
@@ -153,8 +153,7 @@ public class SpriteSheet
 	public function addFrame($bmd:BitmapData, $sizeRect:Rectangle=null, $originalRect:Rectangle=null, $name:String=null):void
 	{
 		if(!_allBmds) _allBmds = new Vector.<BitmapData>;
-		var __index:int = _allBmds.length;
-		_allBmds[__index] = $bmd;
+		_allBmds[_allBmds.length] = $bmd;
 		if($sizeRect && metadata)
 			metadata.addFrame($sizeRect, $originalRect,$name);
 	}
@@ -165,7 +164,7 @@ public class SpriteSheet
 	public function addFrameAt($index:int, $bmd:BitmapData, $sizeRect:Rectangle=null, $originalRect:Rectangle=null,$name:String=null):void
 	{
 		if(!_allBmds) _allBmds = new Vector.<BitmapData>;
-		_allBmds[$index] = $bmd;
+		_allBmds.splice($index, 0, $bmd);
 		if($sizeRect && metadata)
 			metadata.addFrameAt($index, $sizeRect, $originalRect, $name);
 	}

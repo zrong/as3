@@ -265,12 +265,12 @@ public class SpriteSheetMetadata
 	protected function writeFrame($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null):void
 	{
 		if(!$originalRect) $originalRect = new Rectangle(0, 0, $sizeRect.width, $sizeRect.height);
-		frameRects[$index] = $sizeRect;
-		originalFrameRects[$index] = $originalRect;
+		frameRects.splice($index, 0, $sizeRect);
+		originalFrameRects.splice($index, 0, $originalRect);
 		//trace('增加帧：', $index, $name);
 		if($name && names && namesIndex)
 		{
-			names[$index] = $name;
+			names.splice($index, 0, $name);
 			namesIndex[$name] = $index;
 		}
 	}
