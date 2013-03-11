@@ -55,27 +55,71 @@ public class OSType
 	 */
 	public static const IPOD:String = "iPod";
 	
+	//更詳細內容：http://helpx.adobe.com/cn/flash-player/release-note/fp_116_air_36_release_notes.html
+	
 	public static const IPHONE_1G:String = "iPhone1,1";	// first gen is 1,1
 	public static const IPHONE_3G:String = "iPhone1";	// second gen is 1,2
 	public static const IPHONE_3GS:String = "iPhone2";	// third gen is 2,1
-	public static const IPHONE_4:String = "iPhone3";		// normal:3,1 verizon:3,3
-	public static const IPHONE_4S:String = "iPhone4";	// 4S is 4,1
+	public static const IPHONE_4:String = "iPhone3,1";
+	public static const IPHONE_4CDMA:String = "iPhone3,2";
+	public static const IPHONE_4VERIZON:String = "iPhone3,3";
+	
+	public static const IPHONE_4S:String = "iPhone4,1";
+	public static const IPHONE_5:String = "iPhone5,1";
 	public static const IPHONE_5PLUS:String = "iPhone";
+	
 	public static const TOUCH_1G:String = "iPod1,1";
 	public static const TOUCH_2G:String = "iPod2,1";
 	public static const TOUCH_3G:String = "iPod3,1";
-	public static const TOUCH_4G:String = "iPod4,1";
+	public static const TOUCH_4G:String = "iPod4,1";	//iPod Touch 4
+	public static const TOUCH_5G:String = "iPod5,1";	//iPod Touch 5
+	
 	public static const TOUCH_5PLUS:String = "iPod";
-	public static const IPAD_1:String = "iPad1";		// iPad1 is 1,1
-	public static const IPAD_2:String = "iPad2";		// wifi:2,1 gsm:2,2 cdma:2,3
+	
+	public static const IPAD_1:String = "iPad1,1";
+	
+	public static const IPAD_2:String = "iPad2";	// wifi:2,1 gsm:2,2 cdma:2,3
+	public static const IPAD_2WIFI:String = "iPad2,1";		
+	public static const IPAD_2GSM:String = "iPad2,2";		
+	
+	/**
+	 * 带 Retina 显示屏 (A5) 的 iPad (CDMA)
+	 */
+	public static const IPAD_2CDMA:String = "iPad2,3";	
+	/**
+	 * 带 Retina 显示屏 (A5) 的 iPad (CDMAS)
+	 */
+	public static const IPAD_2CDMAS:String = "iPad2,4";	
+	/**
+	 * iPad Mini (Wifi)
+	 */
+	public static const IPAD_MINI:String = "iPad2,5";	
+	
 	public static const IPAD_3:String = "iPad3";		// wifi:3,1
+	/**
+	 * 带 Retina 显示屏 (A5) 的 iPad (Wifi)	iPad3,1
+	 */
+	public static const IPAD_3WIFI:String = "iPad3,1";	
+	/**
+	 * 带 Retina 显示屏 (A5) 的 iPad (CDMA)	iPad3,2
+	 */
+	public static const IPAD_3CDMA:String = "iPad3,2";	
+	/**
+	 * 带 Retina 显示屏 (A5) 的 iPad (GSM)	iPad3,3
+	 */
+	public static const IPAD_3GSM:String = "iPad3,3";	
+	/**
+	 * 带 Retina 显示屏 (A6X) 的 iPad (Wifi)	iPad3,4
+	 */
+	public static const IPAD_3WIFIA6X:String = "iPad3,4";	
 	public static const IPAD_4PLUS:String = "iPad";
 	
 	public static const IOS_DEVICES:Array = 
 		[
 			IPHONE_1G, IPHONE_3G, IPHONE_3GS,
-			IPHONE_4, IPHONE_4S, IPHONE_5PLUS, IPAD_1, IPAD_2, IPAD_3, IPAD_4PLUS,
-			TOUCH_1G, TOUCH_2G, TOUCH_3G, TOUCH_4G, TOUCH_5PLUS
+			IPHONE_4, IPHONE_4CDMA, IPHONE_4VERIZON, IPHONE_4S, IPHONE_5, IPHONE_5PLUS, 
+			TOUCH_1G, TOUCH_2G, TOUCH_3G, TOUCH_4G, TOUCH_5G, TOUCH_5PLUS,
+			IPAD_1, IPAD_2, IPAD_3, IPAD_4PLUS
 		];
 	
 	/**
