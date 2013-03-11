@@ -48,6 +48,8 @@ public class HTTPLoaderAsync
 	
 	protected var _dataFormat:String = 'text';
 	
+	public var debug:Boolean;
+	
 	private function init():void
 	{
 		
@@ -81,6 +83,15 @@ public class HTTPLoaderAsync
 		__loader.url = $url;
 		__loader.dataFormat = _dataFormat;
 		__loader.load(__request);
+		if(debug)
+		{
+			var __tracetxt:String  = "";
+			if(__request.data)
+			{
+				__tracetxt = "?"+__request.data.toString();
+			}
+			trace($url + __tracetxt);
+		}
 	}
 	
 	/**
