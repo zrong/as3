@@ -22,9 +22,9 @@ import flash.system.LoaderContext;
 import org.zengrong.assets.AssetsType;
 import org.zengrong.display.spritesheet.MaskType;
 import org.zengrong.display.spritesheet.SpriteSheet;
-import org.zengrong.display.spritesheet.SpriteSheetType;
 import org.zengrong.display.spritesheet.SpriteSheetMetadata;
 import org.zengrong.display.spritesheet.SpriteSheetMetadataType;
+import org.zengrong.display.spritesheet.SpriteSheetType;
 
 [Event(name="complete",type="flash.events.Event")]
 [Event(name="ioError",type="flash.events.IOErrorEvent")]
@@ -192,13 +192,13 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 		{
 			if(_decodeJSON is Function)
 			{
-				_metadata = new SpriteSheetMetadata();
+				_metadata = createSpriteSheetMetadata();
 				_metadata.decodeFromObject(_decodeJSON.call(null, _urlLoader.data));
 			}
 		}
 		else
 		{
-			_metadata = new SpriteSheetMetadata();
+			_metadata = createSpriteSheetMetadata();
 			_metadata.decodeFromXML(new XML(_urlLoader.data));
 		}
 		//载入图像文件
@@ -234,7 +234,7 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 		//对于标准的图像文件，需要获取metadata信息，如果有，就开始载入图像文件
 		if($metadata)
 		{
-			_metadata = new SpriteSheetMetadata();
+			_metadata = createSpriteSheetMetadata();
 			if(_metaType == SpriteSheetMetadataType.XML)
 				_metadata.decodeFromXML($metadata);
 			else if(_metaType == SpriteSheetMetadataType.JSON)
@@ -272,6 +272,14 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	protected function isLoadMetadata($loader:*):Boolean
 	{
 		return $loader == _urlLoader && _urlLoader.dataFormat == URLLoaderDataFormat.TEXT;
+	}
+	
+	/**
+	 * 创建一个SpriteSheetMetadata对象，子类可以覆盖这个方法，以实现扩展的SpriteSheetMetadata
+	 */
+	protected function createSpriteSheetMetadata():SpriteSheetMetadata
+	{
+		return new SpriteSheetMetadata();
 	}
 }
 }
