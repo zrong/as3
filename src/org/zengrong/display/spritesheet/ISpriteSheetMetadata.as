@@ -118,13 +118,76 @@ public interface ISpriteSheetMetadata
 	function set originalFrameRects($value:Vector.<Rectangle>):void;
 	
 	/**
+	 * Sheet的帧数
+	 */	
+	function get totalFrame():int;
+	
+	/**
+	 * 返回自身的副本（深复制）
+	 */
+	function clone():ISpriteSheetMetadata;
+	
+	/**
+	 * 根据设置的属性初始化一些值
+	 * 
+	 * @param $force 是否强制初始化。值为true则不判断原来是否存在该变量，强行覆盖
+	 */	
+	function setup($force:Boolean=false):void;
+	
+	/**
+	 * 销毁整个对象
+	 */	
+	function destroy():void;
+	
+	/**
 	 * 将传递的数据解析成元数据对象，保存在自身当中，同时返回
 	 */
 	function parse($value:*):ISpriteSheetMetadata;
 	
 	/**
 	 * 将自身数据字符串化
+	 * @param $isSimple 是否简单数据
+	 * @param $includeName
+	 * @param $lineEnding 换行符的值
 	 */
-	function stringify():String;
+	function stringify($isSimple:Boolean=false, $includeName:Boolean=true, $lineEnding:String='\n'):String;
+	
+	/**
+	 * 增加一个Label
+	 * @param $labelName 要增加的Label的名称
+	 * @param $labelFrame 要增加的Label的帧索引
+	 */	
+	function addLabel($labelName:String, $labelFrame:Array):void;
+	
+	/**
+	 * 设置Label的属性
+	 * 
+	 * @param $hasLabel	是否使用了Label
+	 * @param $labels	Label的对象，每个键名为label名称，每个键值是数组，保存帧的索引号，格式为:[1,2,3]
+	 */	
+	function setLabels($hasLabel:Boolean, $labels:Object=null):void;
+	
+	/**
+	 * 从外部向数组中添加帧的尺寸，一般在循环中执行
+	 */	
+	function addFrame($sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null):void;
+	
+	/**
+	 * 从外部向数组中添加帧的尺寸，指定帧索引
+	 */
+	function addFrameAt($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null):void;
+	
+	/**
+	 * 从指定的索引移除帧
+	 */
+	function removeFrameAt($index:int):void;
+	
+	/**
+	 * 返回帧索引对应的帧名称。如果选择了不保存名称，或者没有名称，或者该帧没有对应名称，就返回null
+	 * 
+	 * @param $includeName 是否包含名称
+	 * @param $index 帧索引
+	 */	
+	 function getFrameName($includeName:Boolean, $index:int):String;
 }
 }
