@@ -4,6 +4,7 @@ import flash.geom.Rectangle;
 
 /**
  * SpriteSheetMetadata的包装器的基类
+ * 
  * @author zrong (http://zengrong.net)
  * 创建日期：2013-4-6
  */
@@ -14,7 +15,7 @@ public class SpriteSheetMetadataWrapper implements ISpriteSheetMetadata
 		_metadata = $meta;
 	}
 	
-	private var _metadata:ISpriteSheetMetadata;
+	protected var _metadata:ISpriteSheetMetadata;
 	
 	public function get type():String
 	{
@@ -96,7 +97,7 @@ public class SpriteSheetMetadataWrapper implements ISpriteSheetMetadata
 		_metadata.namesIndex = $value;
 	}
 	
-	public function get frameRects():*
+	public function get frameRects():Vector.<Rectangle>
 	{
 		return _metadata.frameRects;
 	}
@@ -106,7 +107,7 @@ public class SpriteSheetMetadataWrapper implements ISpriteSheetMetadata
 		_metadata.frameRects = $value;
 	}
 	
-	public function get originalFrameRects():*
+	public function get originalFrameRects():Vector.<Rectangle>
 	{
 		return _metadata.originalFrameRects;
 	}
@@ -177,7 +178,10 @@ public class SpriteSheetMetadataWrapper implements ISpriteSheetMetadata
 		return null;
 	}
 	
-	public function stringify($isSimple:Boolean=false, $includeName:Boolean=true, $lineEnding:String='\n'):String
+	/**
+	 * @inheritDoc
+	 */
+	public function objectify($isSimple:Boolean=false, $includeName:Boolean=true):*
 	{
 		return null;
 	}

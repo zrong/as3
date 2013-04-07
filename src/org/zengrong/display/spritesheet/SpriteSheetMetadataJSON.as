@@ -5,7 +5,7 @@ import flash.geom.Rectangle;
 import org.zengrong.utils.ObjectUtil;
 
 /**
- * SpriteSheetMetadat的XML格式包装器
+ * SpriteSheetMetadata的JSON格式包装器
  * @author zrong (http://zengrong.net)
  * 创建日期：2013-4-6
  */
@@ -20,8 +20,10 @@ public class SpriteSheetMetadataJSON extends SpriteSheetMetadataWrapper
 	 * 从普通Object文件解析Metadata数据，Object必须由Sprite Sheet Editor生成的JSON格式Metadata解析而来。
 	 * 
 	 * @param $value 由Sprite Sheet Editor生成的JSON文件解析成的Object
+	 * 
+	 * @inheritDoc
 	 */	
-	public function parse($value:*):ISpriteSheetMetadata
+	override public function parse($value:*):ISpriteSheetMetadata
 	{
 		var __obj:Object = $value;
 		var i:int=0;
@@ -72,11 +74,9 @@ public class SpriteSheetMetadataJSON extends SpriteSheetMetadataWrapper
 	}
 	
 	/**
-	 * JSON不需要换行符
-	 * 
 	 * @inheritDoc
 	 */
-	public function stringify($isSimple:Boolean=false, $includeName:Boolean=true, $lineEnding:String='\n'):String
+	override public function objectify($isSimple:Boolean=false, $includeName:Boolean=true):*
 	{
 		return JSON.stringify(toObject($isSimple, $includeName));
 	}

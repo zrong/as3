@@ -224,7 +224,7 @@ public class SpriteSheetMetadata implements ISpriteSheetMetadata
 	/**
 	 * @inheritDoc
 	 */
-	public function clone():SpriteSheetMetadata
+	public function clone():ISpriteSheetMetadata
 	{
 		var __meta:SpriteSheetMetadata = new SpriteSheetMetadata();
 		__meta.type = type;
@@ -412,21 +412,23 @@ public class SpriteSheetMetadata implements ISpriteSheetMetadata
 		return null;
 	}
 	
-	//----------------------------------------
-	// decode
-	//----------------------------------------
-	
 	/**
-	 * 从字节数组解析普通Object文件解析Metadata数据，ByteArray是从SS格式中提取的
-	 * @param $ba 从SS格式中提取的Metadata数据
-	 */	
-	public function decodeFromByteArray($ba:ByteArray):void
+	 * SpriteSheetMetadata并不实现具体的解析方法，解析应该由包装器来实现
+	 * @see SpirteSheetMetadataWrapper
+	 */
+	public function parse($value:*):ISpriteSheetMetadata
 	{
+		return null;
 	}
 	
-	//----------------------------------------
-	// encode
-	//----------------------------------------
+	/**
+	 * SpriteSheetMetadata并不实现具体的对象化方法，而是由包装器的子类来实现
+	 * @see SpirteSheetMetadataWrapper
+	 */
+	public function objectify($isSimple:Boolean=false, $includeName:Boolean=true):*
+	{
+		return null;
+	}
 
 	
 	public function toString():String

@@ -7,7 +7,7 @@ import flash.geom.Rectangle;
  * @author zrong (http://zengrong.net)
  * 创建日期：2013-4-6
  */
-public class SpriteSheetMetadataTXT extends SpriteSheetMetadataWrapper
+public class SpriteSheetMetadataTXT extends SpriteSheetMetadataStringWraper
 {
 	public function SpriteSheetMetadataTXT($meta:ISpriteSheetMetadata)
 	{
@@ -20,7 +20,7 @@ public class SpriteSheetMetadataTXT extends SpriteSheetMetadataWrapper
 	 * 
 	 * @param $value 由Sprite Sheet Editor生成的TXT文件
 	 */	
-	public function parse($value:*):ISpriteSheetMetadata
+	override public function parse($value:*):ISpriteSheetMetadata
 	{
 		return null;
 	}
@@ -28,25 +28,25 @@ public class SpriteSheetMetadataTXT extends SpriteSheetMetadataWrapper
 	/**
 	 * @inheritDoc
 	 */
-	public function stringify($isSimple:Boolean=false, $includeName:Boolean=true, $lineEnding:String='\n'):String
+	override public function objectify($isSimple:Boolean=false, $includeName:Boolean=true):*
 	{
-		var __str:String = getTextLine('frames',null,$lineEnding);
+		var __str:String = getTextLine('frames',null);
 		var __name:String = null;
 		for(var i:int=0;i<totalFrame;i++)
 		{
 			__name = getFrameName($includeName, i);
-			__str += getRectTxt(frameRects[i], originalFrameRects[i], __name, $lineEnding);
+			__str += getRectTxt(frameRects[i], originalFrameRects[i], __name);
 		}
 		//如果需要附加信息，要在帧信息前面加上frames字样
 		if(!$isSimple)
-			__str += getAddTXT($includeName, $lineEnding);
+			__str += getAddTXT($includeName);
 		return __str;
 	}
 	
 	/**
 	 * 返回Frame的Rect的纯文本格式
 	 */	
-	public function getRectTxt($sizeRect:Rectangle, $originRect:Rectangle, $name:String = null, $lineEnding:String="\n"):String
+	public function getRectTxt($sizeRect:Rectangle, $originRect:Rectangle, $name:String = null):String
 	{
 		var __str:String = $name?($name+'='):'';
 		return __str + 
@@ -58,27 +58,27 @@ public class SpriteSheetMetadataTXT extends SpriteSheetMetadataWrapper
 			$originRect.y+','+
 			$originRect.width+','+
 			$originRect.height+
-			$lineEnding;
+			lineEnding;
 	}
 	
 	/**
 	 * 获取TXT格式的附加信息
 	 */	
-	public function getAddTXT($includeName:Boolean, $lineEnding:String="\n"):String
+	public function getAddTXT($includeName:Boolean):String
 	{
 		var __str:String = '';
-		__str += getTextLine('sheepType', type, $lineEnding);
-		__str += getTextLine('hasLabel',hasLabel, $lineEnding);
-		__str += getTextLine('maskType',maskType, $lineEnding);
-		__str += getTextLine('hasName',$includeName, $lineEnding);
-		__str += getTextLine('totalFrame',totalFrame, $lineEnding);
+		__str += getTextLine('sheepType', type);
+		__str += getTextLine('hasLabel',hasLabel);
+		__str += getTextLine('maskType',maskType);
+		__str += getTextLine('hasName',$includeName);
+		__str += getTextLine('totalFrame',totalFrame);
 		if(hasLabel)
 		{
-			__str += getTextLine('labels',null, $lineEnding);
-			__str += getTextLine('count', labels.length, $lineEnding);
+			__str += getTextLine('labels',null);
+			__str += getTextLine('count', labels.length);
 			for(var __key:String in labelsFrame)
 			{
-				__str += getTextLine(__key, labelsFrame[__key].toString(), $lineEnding);
+				__str += getTextLine(__key, labelsFrame[__key].toString());
 			}
 		}
 		return __str;
@@ -89,12 +89,12 @@ public class SpriteSheetMetadataTXT extends SpriteSheetMetadataWrapper
 	 * @param $key	键名
 	 * @param $value	键值
 	 */	
-	private function getTextLine($key:String, $value:*=null, $lineEnding:String="\n"):String
+	private function getTextLine($key:String, $value:*=null):String
 	{
 		var __str:String = $key;
 		if($value != null)
 			__str += '=' + $value.toString();
-		return __str + $lineEnding;
+		return __str + lineEnding;
 	}
 	
 }

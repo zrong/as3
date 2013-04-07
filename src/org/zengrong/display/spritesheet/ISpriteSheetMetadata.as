@@ -97,7 +97,7 @@ public interface ISpriteSheetMetadata
 	 * 而在还原到程序中的时候，还是必须使用原来的Rect大小的（因为要考虑到动作的外延范围）。
 	 * 这个Vector中保存的始终都是在程序使用时候的Rect。
 	 */	
-	function get frameRects:Vector.<Rectangle>;
+	function get frameRects():Vector.<Rectangle>;
 	
 	/**
 	 * @private
@@ -110,7 +110,7 @@ public interface ISpriteSheetMetadata
 	 * 那么originalFrameRect则为(-10,-10,70,70)
 	 * 如果frameRect没有经过修剪，则这个rect的w和h值与frameRect中的对应元素相等，但x和y为0
 	 */
-	function get originalFrameRects:Vector.<Rectangle>;
+	function get originalFrameRects():Vector.<Rectangle>;
 	
 	/**
 	 * @private
@@ -145,12 +145,13 @@ public interface ISpriteSheetMetadata
 	function parse($value:*):ISpriteSheetMetadata;
 	
 	/**
-	 * 将自身数据字符串化
+	 * 将自身数据对象化
+	 * 
 	 * @param $isSimple 是否简单数据
-	 * @param $includeName
-	 * @param $lineEnding 换行符的值
+	 * @param $includeName 是否包含name
+	 * @return 返回的可能是任何类型的数据
 	 */
-	function stringify($isSimple:Boolean=false, $includeName:Boolean=true, $lineEnding:String='\n'):String;
+	function objectify($isSimple:Boolean=false, $includeName:Boolean=true):*;
 	
 	/**
 	 * 增加一个Label

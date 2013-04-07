@@ -16,7 +16,7 @@ import flash.geom.Rectangle;
  */
 public class SpriteSheet
 {
-	public function SpriteSheet($bmd:BitmapData=null, $meta:SpriteSheetMetadata=null)
+	public function SpriteSheet($bmd:BitmapData=null, $meta:ISpriteSheetMetadata=null)
 	{
 		bitmapData = $bmd;
 		metadata = $meta;
@@ -30,7 +30,7 @@ public class SpriteSheet
 	/**
 	 * Sheet的元数据
 	 */	
-	public var metadata:SpriteSheetMetadata;
+	public var metadata:ISpriteSheetMetadata;
 	
 	/**
 	 * 保存所有BMD的数组

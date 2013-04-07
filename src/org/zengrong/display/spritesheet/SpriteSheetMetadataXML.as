@@ -7,7 +7,7 @@ import flash.geom.Rectangle;
  * @author zrong (http://zengrong.net)
  * 创建日期：2013-4-6
  */
-public class SpriteSheetMetadataXML extends SpriteSheetMetadataWrapper
+public class SpriteSheetMetadataXML extends SpriteSheetMetadataStringWraper
 {
 	public function SpriteSheetMetadataXML($meta:ISpriteSheetMetadata)
 	{
@@ -15,11 +15,20 @@ public class SpriteSheetMetadataXML extends SpriteSheetMetadataWrapper
 	}
 	
 	/**
+	 * XML格式的换行符
+	 * 将XML文本化的方法，是调用XML.toXMLString转换XML字符串，而XML.toXMLString默认使用\n作为换行符。所以这里使用自定义换行符意义不大，反而可能会造成换行符混乱。
+	 */
+	override public function get lineEnding():String
+	{
+		return super.lineEnding;
+	}
+
+	/**
 	 * 从XML文件解析Metadata数据，XML文件必须由Sprite Sheet Editor生成。
 	 * 
 	 * @param $xml 由Sprite Sheet Editor生成的XML文件，或者自行生成且符合Sprite Sheet Editor格式的XML文件。
 	 */	
-	public function parse($value:*):ISpriteSheetMetadata
+	override public function parse($value:*):ISpriteSheetMetadata
 	{
 		var __xml:XML = $value;
 		var i:int=0;
@@ -77,13 +86,11 @@ public class SpriteSheetMetadataXML extends SpriteSheetMetadataWrapper
 	}
 	
 	/**
-	 * @param $lineEnding 这里调用了XML.toXMLString转换XML字符串，而XML.toXMLString默认使用\n作为换行符。所以这里使用自定义换行符意义不大，反而可能会造成换行符混乱。
-	 * 
 	 * @inheritDoc
 	 */
-	public function stringify($isSimple:Boolean=false, $includeName:Boolean=true, $lineEnding:String='\n'):String
+	override public function objectify($isSimple:Boolean=false, $includeName:Boolean=true):*
 	{
-		return '<?xml version="1.0" encoding="UTF-8"?>' + $lineEnding + toXML($isSimple,$includeName).toXMLString();
+		return '<?xml version="1.0" encoding="UTF-8"?>' + lineEnding + toXML($isSimple,$includeName).toXMLString();
 	}
 	
 	private function toXML($isSimple:Boolean, $includeName:Boolean):XML
