@@ -6,7 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.display.spritesheet
 {
-import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.utils.ByteArray;
 

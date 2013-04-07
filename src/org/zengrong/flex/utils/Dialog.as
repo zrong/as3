@@ -3,7 +3,6 @@ package org.zengrong.flex.utils
 	import flash.display.Sprite;
 	
 	import mx.controls.Alert;
-	import mx.core.Application;
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
 	
