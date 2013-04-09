@@ -22,6 +22,22 @@ public class SpriteSheetMetadataXML extends SpriteSheetMetadataStringWraper
 	{
 		return super.lineEnding;
 	}
+	
+	
+	private var _header:String = '<?xml version="1.0" encoding="UTF-8"?>\n';
+	
+	/**
+	 * 设置XML的Header内容
+	 */
+	public function get header():String
+	{
+		return _header;
+	}
+	
+	public function set header($value:String):void
+	{
+		_header = $value;
+	}
 
 	/**
 	 * 从XML文件解析Metadata数据，XML文件必须由Sprite Sheet Editor生成。
@@ -90,7 +106,7 @@ public class SpriteSheetMetadataXML extends SpriteSheetMetadataStringWraper
 	 */
 	override public function objectify($isSimple:Boolean=false, $includeName:Boolean=true):*
 	{
-		return '<?xml version="1.0" encoding="UTF-8"?>' + lineEnding + toXML($isSimple,$includeName).toXMLString();
+		return _header + toXML($isSimple,$includeName).toXMLString();
 	}
 	
 	private function toXML($isSimple:Boolean, $includeName:Boolean):XML
