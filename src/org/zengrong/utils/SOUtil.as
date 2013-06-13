@@ -10,8 +10,6 @@ import flash.media.Sound;
 import flash.net.SharedObject;
 import flash.utils.Dictionary;
 
-import mx.core.Singleton;
-
 /**
  * 提供SO的快速读写功能
  * @author zrong

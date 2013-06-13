@@ -186,5 +186,9 @@ public class SpriteSheetMetadataWrapper implements ISpriteSheetMetadata
 		return null;
 	}
 	
+	public function toString():String
+	{
+		return String(objectify(true, true));
+	}
 }
 }

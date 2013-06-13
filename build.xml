@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Compile Debug and Package the AIR Flex 4 Project -->
+<!-- Author : zrong -->
+<!-- Blog: zengrong.net -->
+<!-- E-mail : zrongzrong@gmail.com -->
+<!-- Creation : 2012-10-29 -->
+<!-- Modification : 2013-06-13 -->
+<project name="swcGenerator" default="packswc">
+	<property file="build.properties" />
+	<property name="swf.name" value="${MAIN_NAME}.swc"/>
+	<property name="swf.file" value="${BIN_DIR}/${swf.name}"/>
+	<echo>swf.file:${swf.file}</echo>
+	<echo>swf.name:${swf.name}</echo>
+	<echo>FLEX_HOME:${FLEX_HOME}</echo>
+
+	<target name="clearswc">
+		<delete file="${swf.file}"/>
+	</target>
+
+	<target name="packswc" depends="clearswc" description="Build SWC library">
+		<condition property="var.debug" value="${var.debug}" else="false">
+			<isset property="var.debug" />
+		</condition>
+		<condition property="var.optimize" value="${var.optimize}" else="true">
+			<isset property="var.optimize" />
+		</condition>
+		<condition property="var.swfversion" value="${var.swfversion}" else="14">
+			<isset property="var.swfversion" />
+		</condition>
+        <fileset dir="${SRC_DIR}" casesensitive="yes" id="classfiles">
+            <include name="**/*.as"/>
+        </fileset>
+        <pathconvert property="classlist" refid="classfiles" pathsep=" " dirsep=".">
+            <regexpmapper from=".*src.(.*)\.as" to="\1"/>
+        </pathconvert>
+		<echo>Base dir:${basedir}</echo>
+		<echo>Building swf file ${swf.file}...</echo>
+		<echo>debug:${var.debug} optimize:${var.optimize} swfversion:${var.swfversion}</echo>
+		<java jar="${FLEX_HOME}/lib/compc.jar" fork="true" failonerror="true" dir="${FLEX_FRAMEWORKS}">
+			<arg line='-source-path ${SRC_DIR}'/>
+			<arg line='-include-classes ${classlist}'/>
+			<arg line='-output ${swf.file}'/>
+            <arg line='-swf-version ${var.swfversion}'/>
+			<arg value="-library-path+=${LIB_DIR}"/>
+			<arg value="-load-config+=air-config.xml"/>
+            <arg line='-external-library-path+="${FLEX_FRAMEWORKS}/libs/framework.swc"'/>
+			<arg line='-external-library-path+="${FLEX_FRAMEWORKS}/libs/spark.swc"'/>
+			<arg line='-external-library-path+="${FLEX_FRAMEWORKS}/libs/mx/mx.swc"'/>
+			<arg line='-external-library-path+="${FLEX_FRAMEWORKS}/libs/air/airglobal.swc"'/>
+			<arg value="-debug=${var.debug}"/>
+			<arg value="-optimize=${var.optimize}"/>
+			<arg value="-compress=true" />
+			<arg value="-strict=false" />
+			<arg value="-mobile=false" />
+		</java>
+	</target>
+</project>

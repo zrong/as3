@@ -190,5 +190,11 @@ public interface ISpriteSheetMetadata
 	 * @param $index 帧索引
 	 */	
 	 function getFrameName($includeName:Boolean, $index:int):String;
+	 
+	 /**
+	  * 直接调用objectify方法，传递的参数均为true
+	  * @return
+	  */
+	 function toString():String;
 }
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  zengrong.net
-//  创建者:	zrong(zrongzrong@gmail.com)
+//  创建者: zrong(zrongzrong@gmail.com)
 //  创建时间：2011-8-15
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -13,7 +13,7 @@ import flash.geom.Rectangle;
 /**
  * 提供位图相关的计算工具
  * @author zrong
- * 
+ * Modification: 2013-06-13 增加getBitmapDataMask方法和getBitmapDataWithMask方法
  */
 public class BitmapUtil
 {
@@ -26,6 +26,55 @@ public class BitmapUtil
 			r:$argb >> 16 & 0xFF,
 			g:$argb >> 8 & 0xFF,
 			b:$argb & 0xFF	};
+	}
+	
+	/**
+	 * 绘制Mask，返回Mask后的位图（黑白+渐变）
+	 * @param	$bitmapData
+	 * @return
+	 */
+	public static function getBitmapDataMask($bitmapData:BitmapData):BitmapData
+	{
+		var __bmd:BitmapData = new BitmapData($bitmapData.width, $bitmapData.height, false, 0xFF000000);
+		var __sourceRect:Rectangle = __bmd.rect.clone();
+		var __point:Point = new Point(0, 0);
+		//为mask填充一个背景色
+		__bmd.fillRect(__sourceRect, 0xFF000000);
+		//分别填充红绿蓝通道，这样生成出的透明的部分才是白色
+		__bmd.copyChannel($bitmapData, __sourceRect, __point, 8, 1);
+		__bmd.copyChannel($bitmapData, __sourceRect, __point, 8, 2);
+		__bmd.copyChannel($bitmapData, __sourceRect, __point, 8, 4);
+		return __bmd;
+	}
+	
+	/**
+	 * 根据方向返回带有Mask的位图，位图内容和Mask位图并排
+	 * @param	$bitmapData 要处理的原始图
+	 * @param	$horizonal 横向还是纵向放置Mask
+	 * @param	$transparent 原始图是否透明
+	 * @param	$bgcolor 原始图背景色
+	 * @return
+	 */
+	public static function getBitmapDataWithMask($bitmapData:BitmapData, $horizonal:Boolean, $transparent:Boolean, $bgcolor:uint):BitmapData
+	{
+		var __maskBmd:BitmapData = getBitmapDataMask($bitmapData);
+		var __sourceRect:Rectangle = $bitmapData.rect.clone();
+		var __point:Point = new Point(0,0);
+		//新建一个带有Mask大小的位图
+		var __saveBmd:BitmapData = null;
+		if($horizonal)
+		{
+			__saveBmd = new BitmapData($bitmapData.width*2, $bitmapData.height, $transparent, $bgcolor);
+			__point.x = $bitmapData.width;
+		}
+		else
+		{
+			__saveBmd = new BitmapData($bitmapData.width, $bitmapData.height*2, $transparent, $bgcolor);
+			__point.y = $bitmapData.height;
+		}
+		__saveBmd.copyPixels($bitmapData, __sourceRect, new Point(0, 0), null, null, true);
+		__saveBmd.copyPixels(__maskBmd, __sourceRect, __point, null, null, true);
+		return __saveBmd;
 	}
 	
 	/**

@@ -30,7 +30,7 @@ package gnu.as3.gettext
      * matches the keys of the string.
      * @return The formatted string.
      */
-    public function sprintf(string:String, values:* = undefined):String
+    public function sprintf(string:String, values:* = null):String
     {
         regexpValues = values;
         var stringOut:String = string.replace(tokenPattern, repFunc);
