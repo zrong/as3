@@ -149,9 +149,10 @@ public interface ISpriteSheetMetadata
 	 * 
 	 * @param $isSimple 是否简单数据
 	 * @param $includeName 是否包含name
+	 * @param ...$args 其他参数
 	 * @return 返回的可能是任何类型的数据
 	 */
-	function objectify($isSimple:Boolean=false, $includeName:Boolean=true):*;
+	function objectify($isSimple:Boolean=false, $includeName:Boolean=true, ...$args):*;
 	
 	/**
 	 * 增加一个Label

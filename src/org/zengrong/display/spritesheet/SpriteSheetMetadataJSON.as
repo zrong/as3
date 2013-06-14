@@ -76,7 +76,7 @@ public class SpriteSheetMetadataJSON extends SpriteSheetMetadataWrapper
 	/**
 	 * @inheritDoc
 	 */
-	override public function objectify($isSimple:Boolean=false, $includeName:Boolean=true):*
+	override public function objectify($isSimple:Boolean=false, $includeName:Boolean=true, ...$args):*
 	{
 		return JSON.stringify(toObject($isSimple, $includeName));
 	}

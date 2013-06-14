@@ -54,9 +54,14 @@ public class SpriteSheetMetadataStarling extends SpriteSheetMetadataStringWraper
 	/**
 	 * @inheritDoc
 	 */
-	override public function objectify($isSimple:Boolean=false, $includeName:Boolean=true):*
+	override public function objectify($isSimple:Boolean=false, $includeName:Boolean=true, ...$args):*
 	{
-		return header + toXML($isSimple,$includeName).toXMLString();
+		var __xml:XML = toXML($isSimple, $includeName);
+		if($args.length > 0 && ($args[0] is String))
+		{
+			__xml.@imagePath = String($args[0]);
+		}
+		return header + __xml.toXMLString();
 	}
 	
 	private function toXML($isSimple:Boolean, $includeName:Boolean):XML
@@ -69,38 +74,6 @@ public class SpriteSheetMetadataStarling extends SpriteSheetMetadataStringWraper
 			__name = getFrameName($includeName, i);
 			__xml.appendChild( getRectXML(frameRects[i], originalFrameRects[i], __name) );
 		}
-		if(!$isSimple)
-		{
-			var __addXMLList:XMLList = getAddXML($includeName).children();
-			for(i = 0;i<__addXMLList.length();i++)
-			{
-				__xml.appendChild(__addXMLList[i]);
-			}
-		}
-		return __xml;
-	}
-	
-	/**
-	 * 获取XML格式的附加信息
-	 */	
-	private function getAddXML($includeName:Boolean):XML
-	{
-		var __xml:XML = <metadata />;
-		__xml.sheetType = type;
-		__xml.hasLabel = hasLabel;
-		__xml.maskType = maskType;
-		__xml.hasName = $includeName;
-		__xml.totalFrame =totalFrame;
-		if(hasLabel)
-		{
-			var __labelXML:XML = <labels />;
-			__labelXML.@count = labels.length;
-			for(var __key:String in labelsFrame)
-			{
-				__labelXML[__key] = labelsFrame[__key].toString();
-			}
-			__xml.appendChild(__labelXML);
-		}
 		return __xml;
 	}
 	
@@ -111,14 +84,14 @@ public class SpriteSheetMetadataStarling extends SpriteSheetMetadataStringWraper
 	{
 		var __xml:XML = <SubTexture />;
 		if($name) __xml.@name = $name;
-		__xml.x = $sizeRect.x;
-		__xml.y = $sizeRect.y;
-		__xml.width = $sizeRect.width;
-		__xml.height = $sizeRect.height;
-		__xml.frameX = $originRect.x;
-		__xml.frameY = $originRect.y;
-		__xml.frameWeight = $originRect.width;
-		__xml.frameHeight = $originRect.height;
+		__xml.@x = $sizeRect.x;
+		__xml.@y = $sizeRect.y;
+		__xml.@width = $sizeRect.width;
+		__xml.@height = $sizeRect.height;
+		__xml.@frameX = $originRect.x;
+		__xml.@frameY = $originRect.y;
+		__xml.@frameWeight = $originRect.width;
+		__xml.@frameHeight = $originRect.height;
 		return __xml;
 	}
 }

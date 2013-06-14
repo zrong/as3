@@ -47,6 +47,11 @@ public class SpriteSheetMetadataXML extends SpriteSheetMetadataStringWraper
 	override public function parse($value:*):ISpriteSheetMetadata
 	{
 		var __xml:XML = $value;
+		var __xmlRootName:String = __xml.name();
+		if(__xmlRootName != "metadata")
+		{
+			throw new TypeError('不支持的metadata格式:'+__xmlRootName);
+		}
 		var i:int=0;
 		type = __xml.sheetType.toString();
 		hasLabel = __xml.hasLabel.toString() == 'true';
@@ -104,7 +109,7 @@ public class SpriteSheetMetadataXML extends SpriteSheetMetadataStringWraper
 	/**
 	 * @inheritDoc
 	 */
-	override public function objectify($isSimple:Boolean=false, $includeName:Boolean=true):*
+	override public function objectify($isSimple:Boolean=false, $includeName:Boolean=true, ...$args):*
 	{
 		return _header + toXML($isSimple,$includeName).toXMLString();
 	}

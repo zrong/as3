@@ -425,7 +425,7 @@ public class SpriteSheetMetadata implements ISpriteSheetMetadata
 	 * SpriteSheetMetadata并不实现具体的对象化方法，而是由包装器的子类来实现
 	 * @see SpirteSheetMetadataWrapper
 	 */
-	public function objectify($isSimple:Boolean=false, $includeName:Boolean=true):*
+	public function objectify($isSimple:Boolean=false, $includeName:Boolean=true, ...$args):*
 	{
 		return null;
 	}

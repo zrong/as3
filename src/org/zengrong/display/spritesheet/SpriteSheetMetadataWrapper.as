@@ -181,7 +181,7 @@ public class SpriteSheetMetadataWrapper implements ISpriteSheetMetadata
 	/**
 	 * @inheritDoc
 	 */
-	public function objectify($isSimple:Boolean=false, $includeName:Boolean=true):*
+	public function objectify($isSimple:Boolean=false, $includeName:Boolean=true, ...$args):*
 	{
 		return null;
 	}

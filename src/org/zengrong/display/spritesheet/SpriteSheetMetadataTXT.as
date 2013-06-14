@@ -28,7 +28,7 @@ public class SpriteSheetMetadataTXT extends SpriteSheetMetadataStringWraper
 	/**
 	 * @inheritDoc
 	 */
-	override public function objectify($isSimple:Boolean=false, $includeName:Boolean=true):*
+	override public function objectify($isSimple:Boolean=false, $includeName:Boolean=true, ...$args):*
 	{
 		var __str:String = getTextLine('frames',null);
 		var __name:String = null;
