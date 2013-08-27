@@ -5,7 +5,7 @@
 //  最后更新时间：2010-12-17
 //
 ////////////////////////////////////////////////////////////////////////////////
-package org.zengrong.display
+package org.zengrong.display.bmp
 {
 import flash.display.BitmapData;
 import flash.geom.Point;

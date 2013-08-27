@@ -3,7 +3,7 @@
 //  创建者:	zrong
 //  创建时间：2011-04-11
 ////////////////////////////////////////////////////////////////////////////////
-package org.zengrong.display.spritesheet
+package org.zengrong.display.bmp
 {
 import flash.display.BitmapData;
 /**

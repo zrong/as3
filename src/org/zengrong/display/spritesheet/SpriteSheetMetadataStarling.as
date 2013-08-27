@@ -3,7 +3,7 @@ package org.zengrong.display.spritesheet
 import flash.geom.Rectangle;
 
 /**
- * SpriteSheetMetadat的XML格式包装器
+ * SpriteSheetMetadata的XML格式包装器
  * @author zrong (http://zengrong.net)
  * 创建日期：2013-4-6
  */
