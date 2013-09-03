@@ -8,6 +8,13 @@ package org.zengrong.display.spritesheet
 {
 /**
  * 定义SpriteSheet的类型
+ * <p>
+ * SpriteSheet的类型与SpriteSheetMetadata的类型并不一样。<br>
+ * 前者指明SpriteSheet是否是嵌入metadata，以及使用什么图像格式。<br>
+ * 要了解使用何种元数据还要参考SpriteSheetMetadata。<br>
+ * 例如，SSE默认格式的SpriteSheet文件的类型，sheetType是PNG_IMAGE；而metadataType是一般是SpriteSheetMetadataType.SSE_XML。<br>
+ * 再如，cocos2d格式的SpriteSheet文件类型，sheetType是PNG_IMAGE；而metadataType是SpriteSheetMetadataType.COCOS2D
+ * </p>
  * @author zrong
  */
 public class SpriteSheetType

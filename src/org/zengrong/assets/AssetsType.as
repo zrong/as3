@@ -84,6 +84,22 @@ public class AssetsType
 	 * */
 	public static const GIF_ANI:String = 'gifAnimation';
 	
+	public static const XML:String = 'xml';
+	public static const JSON:String = 'json';
+	public static const TXT:String = 'txt';
+	public static const PLIST:String = 'plist';
+	
+	/**
+	 * 根据文件类型判断文件是否是纯文本格式
+	 */
+	public static function isText($type:String):Boolean
+	{
+		return $type == AssetsType.XML ||
+				$type == AssetsType.JSON ||
+				$type == AssetsType.TXT ||
+				$type == AssetsType.PLIST;
+	}
+	
 	/**
 	 * 根据文件类型判断文件是否是图像文件
 	 */

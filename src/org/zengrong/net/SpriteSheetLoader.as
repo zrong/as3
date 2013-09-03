@@ -148,7 +148,7 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	public function load($url:String, $metadata:*=null, $metaType:String='xml', $loaderContext:LoaderContext=null):void
 	{
 		if(_loading)return;
-		if($metaType == SpriteSheetMetadataType.JSON && !(_decodeJSON is Function))
+		if($metaType == AssetsType.JSON && !(_decodeJSON is Function))
 			throw new TypeError('Metadata为JSON格式的时候，必须提供解析JSON用的方法！');
 		//如果没有提供LoaderContext，就建立一个，并允许检测Policy文件
 		_loaderContext = $loaderContext;
@@ -193,7 +193,7 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	
 	protected function handler_urlLoaded(evt:Event):void
 	{
-		if(_metaType == SpriteSheetMetadataType.JSON)
+		if(_metaType == AssetsType.JSON)
 		{
 			if(_decodeJSON is Function)
 			{
@@ -203,7 +203,7 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 		}
 		else
 		{
-			_metadata = createSpriteSheetMetadata(SpriteSheetMetadataType.XML);
+			_metadata = createSpriteSheetMetadata(AssetsType.XML);
 			_metadata.parse(new XML(_urlLoader.data));
 		}
 		//载入图像文件
@@ -251,7 +251,7 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 		else
 		{
 			//不支持除XML和JSON格式之外的外部Metadata文件
-			if(_metaType != SpriteSheetMetadataType.JSON && _metaType != SpriteSheetMetadataType.XML)
+			if(_metaType != AssetsType.JSON && _metaType != AssetsType.XML)
 				throw TypeError('不支持的metadata格式:'+_metaType);
 			_urlLoader.dataFormat = URLLoaderDataFormat.TEXT;
 			_urlLoader.load(new URLRequest(getMetadataUrl(_url, _metaType)));
@@ -286,9 +286,9 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	 */
 	protected function createSpriteSheetMetadata($type:String):ISpriteSheetMetadata
 	{
-		if($type == SpriteSheetMetadataType.JSON)
+		if($type == AssetsType.JSON)
 			return new SpriteSheetMetadataJSON(new SpriteSheetMetadata());
-		else if($type == SpriteSheetMetadataType.XML)
+		else if($type == AssetsType.XML)
 			return new SpriteSheetMetadataXML(new SpriteSheetMetadata());
 		throw TypeError('不支持的metadata格式:'+$type);
 		return null;

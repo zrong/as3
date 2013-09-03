@@ -1,20 +1,21 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  zengrong.net
-//  创建者:	zrong
-//  创建时间：2011-08-24
+// zengrong.net
+// 创建者:	zrong
+// 创建时间：2011-08-24
+// 修改时间：2013-09-02 将扩展名类型移动到AssetsType中，这里只保留逻辑类型
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.display.spritesheet
 {
+import org.zengrong.assets.AssetsType;
 /**
  * 定义SpriteSheetMetadata的文件类型
  */
 public class SpriteSheetMetadataType
 {
-	public static const XML:String = 'xml';
-	public static const JSON:String = 'json';
+	/**
+	 * SpriteSheetEditor存储的二进制格式
+	 */
 	public static const BINARY:String = 'binary';
-	public static const TXT:String = 'txt';
-	public static const PLIST:String = 'plist';
 	
 	/**
 	 * SpriteSheetEditor的原生格式，存储为XML
@@ -46,19 +47,19 @@ public class SpriteSheetMetadataType
 		switch($typeName)
 		{
 			case SSE_XML:
-				return XML;
+				return AssetsType.XML;
 				break;
 			case SSE_JSON:
-				return JSON;
+				return AssetsType.JSON;
 				break;
 			case SSE_TXT:
-				return TXT;
+				return AssetsType.TXT;
 				break;
 			case STARLING:
-				return XML;
+				return AssetsType.XML;
 				break;
 			case COCOS2D:
-				return PLIST;
+				return AssetsType.PLIST;
 				break;
 		}
 		return null;
