@@ -87,5 +87,29 @@ public class MathUtil
 		//确保返回正确的值
 		return ($items[__middle] != $value) ? -1 : __middle;
 	}
+	
+	/**
+	 * 在不足大小的数字前面补0，并返回字符串
+	 * @param $num 要补0的数字
+	 * @param $count 要补0的位数
+	 * <p>例如，$num为9，count为3，则调用返回003。</p>
+	 */
+	public static function addZeroBeforeInt($num:int, $count:int):String
+	{
+		//编号位数中每一位的十进制最小值，例如10，1000，1000
+		var __ten:Array = [];
+		for(var i:int=1;i<$count;i++)
+		{
+			__ten.push(Math.pow(10, i));
+		}
+		var __numStr:String = $num.toString();
+		for(var j:int=0; j<__ten.length; j++)
+		{
+			//位数不够的数字补0
+			if($num<__ten[j])
+				__numStr = '0' + __numStr;
+		}
+		return __numStr;
+	}
 }
 }

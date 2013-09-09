@@ -42,6 +42,16 @@ public class SpriteSheetMetadataType
 	 */
 	public static const COCOS2D:String = "cocos2d";
 	
+	/**
+	 * 检查$type是不是SSE格式
+	 */
+	public static function isSSEType($type:String):Boolean
+	{
+		return $type == SSE_XML || 
+			$type == SSE_JSON ||
+			$type == SSE_TXT;
+	}
+	
 	public static function getTypeExt($typeName:String):String
 	{
 		switch($typeName)

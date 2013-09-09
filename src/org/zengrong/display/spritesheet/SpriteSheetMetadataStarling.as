@@ -53,10 +53,11 @@ public class SpriteSheetMetadataStarling extends SpriteSheetMetadataStringWraper
 	
 	/**
 	 * @inheritDoc
+	 * Starling格式必须要包含名称，因此$includeName无论传递什么，都会认为是true。
 	 */
 	override public function objectify($isSimple:Boolean=false, $includeName:Boolean=true, ...$args):*
 	{
-		var __xml:XML = toXML($isSimple, $includeName);
+		var __xml:XML = toXML($isSimple, true);
 		if($args.length > 0 && ($args[0] is String))
 		{
 			__xml.@imagePath = String($args[0]);

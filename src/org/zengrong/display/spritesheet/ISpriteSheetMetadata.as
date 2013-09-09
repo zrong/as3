@@ -61,7 +61,7 @@ public interface ISpriteSheetMetadata
 	function set labels($value:Vector.<String>):void;
 	
 	/**
-	 * 每个Label的的帧范围，键名是Label，键值是一个数组，第一个元素为开始帧（0基），第二个元素为该Label总帧数
+	 * 每个Label的的帧范围，键名是Label，键值是一个数组，包含这个label中所有要播放的帧的索引（0基），数组顺序就是播放顺序。
 	 */	
 	function get labelsFrame():Object;
 	

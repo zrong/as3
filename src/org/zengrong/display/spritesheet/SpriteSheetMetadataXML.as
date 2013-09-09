@@ -93,13 +93,14 @@ public class SpriteSheetMetadataXML extends SpriteSheetMetadataStringWraper
 			{
 				labels[i] = XML(__labelsXML[i]).localName().toString();
 				var __labelFrame:Array = __labelsXML[i].toString().split(',');
-				//转换字符串为数字
+				//转换字符串为数字，重新存进数组
 				for(var j:int=0;j<__labelFrame.length;j++)
 				{
 					__labelFrame[j] = int(__labelFrame[j]);
 					//处理第一帧小于0的情况
 					if(j==0 && __labelFrame[j]<0) __labelFrame[0] = 0;
 				}
+				//将label中的所有帧索引的数组以abel名称为键名保存在labelsFrame中
 				labelsFrame[labels[i]] = __labelFrame;
 			}
 		}
