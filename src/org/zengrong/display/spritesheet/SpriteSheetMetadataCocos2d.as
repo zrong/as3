@@ -3,13 +3,13 @@ package org.zengrong.display.spritesheet
 import flash.geom.Rectangle;
 
 /**
- * SpriteSheetMetadata的Starling格式包装器
+ * SpriteSheetMetadata的Cocos2d格式包装器
  * @author zrong (http://zengrong.net)
  * 创建日期：2013-4-6
  */
-public class SpriteSheetMetadataStarling extends SpriteSheetMetadataStringWraper
+public class SpriteSheetMetadataCocos2d extends SpriteSheetMetadataStringWraper
 {
-	public function SpriteSheetMetadataStarling($meta:ISpriteSheetMetadata)
+	public function SpriteSheetMetadataCocos2d($meta:ISpriteSheetMetadata)
 	{
 		super($meta);
 	}
@@ -23,7 +23,7 @@ public class SpriteSheetMetadataStarling extends SpriteSheetMetadataStringWraper
 		return super.lineEnding;
 	}
 	
-	private var _header:String = '<?xml version="1.0" encoding="UTF-8"?>\n';
+	private var _header:String = '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">';
 
 	/**
 	 * 设置XML的Header内容

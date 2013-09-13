@@ -3,7 +3,7 @@ package org.zengrong.display.spritesheet
 import flash.geom.Rectangle;
 
 /**
- * SpriteSheetMetadat的TXT格式包装器
+ * SpriteSheetMetadata的TXT格式包装器，用于SSE生成的TXT格式
  * @author zrong (http://zengrong.net)
  * 创建日期：2013-4-6
  */
