@@ -150,23 +150,23 @@ public class SpriteSheet
 	/**
 	 * 向SpriteSheet中加入一帧
 	 */	
-	public function addFrame($bmd:BitmapData, $sizeRect:Rectangle=null, $originalRect:Rectangle=null, $name:String=null):void
+	public function addFrame($bmd:BitmapData, $sizeRect:Rectangle=null, $originalRect:Rectangle=null, $name:String=null, $anchorPoint:Point=null, $offsetPoint:Point=null):void
 	{
 		if(!_allBmds) _allBmds = new Vector.<BitmapData>;
 		_allBmds[_allBmds.length] = $bmd;
 		if($sizeRect && metadata)
-			metadata.addFrame($sizeRect, $originalRect,$name);
+			metadata.addFrame($sizeRect, $originalRect,$name, $anchorPoint, $offsetPoint);
 	}
 	
 	/**
 	 * 向SpriteSheet的对应索引中加入一帧
 	 */
-	public function addFrameAt($index:int, $bmd:BitmapData, $sizeRect:Rectangle=null, $originalRect:Rectangle=null,$name:String=null):void
+	public function addFrameAt($index:int, $bmd:BitmapData, $sizeRect:Rectangle=null, $originalRect:Rectangle=null,$name:String=null, $anchorPoint:Point=null, $offsetPoint:Point=null):void
 	{
 		if(!_allBmds) _allBmds = new Vector.<BitmapData>;
 		_allBmds.splice($index, 0, $bmd);
 		if($sizeRect && metadata)
-			metadata.addFrameAt($index, $sizeRect, $originalRect, $name);
+			metadata.addFrameAt($index, $sizeRect, $originalRect, $name, $anchorPoint, $offsetPoint);
 	}
 	
 	public function removeFrameAt($index:int):void
@@ -181,22 +181,26 @@ public class SpriteSheet
 	 * @param $sizeRects 与帧列表对应的帧sizeRect列表
 	 * @param $originalRects 与帧列表对应的帧trimRect列表
 	 */
-	public function setFrames($bmds:Vector.<BitmapData>, $sizeRects:Vector.<Rectangle>=null, $originalRects:Vector.<Rectangle>=null, $names:Vector.<String>=null):void
+	public function setFrames($bmds:Vector.<BitmapData>, 
+								  $sizeRects:Vector.<Rectangle>=null, 
+								  $originalRects:Vector.<Rectangle>=null, 
+								  $names:Vector.<String>=null,
+								$anchorPoints:Vector.<Point>=null,
+								$offsetPoints:Vector.<Point>=null):void
 	{
 		while(_allBmds && _allBmds.length>0)
 			_allBmds.pop().dispose();
 		_allBmds = $bmds;
 		if($sizeRects && metadata)
 		{
-			metadata.frameRects = new Vector.<Rectangle>;
-			metadata.originalFrameRects = new Vector.<Rectangle>;
+			metadata.setup(true);
 			for (var i:int = 0; i < $sizeRects.length; i++) 
 			{
 				var __name:String = $names?$names[i]:null;
-				if($originalRects)
-					metadata.addFrameAt(i, $sizeRects[i], $originalRects[i], __name);
-				else
-					metadata.addFrameAt(i, $sizeRects[i], null, __name);
+				var __originRect:Rectangle = $originalRects?$originalRects[i]:null;
+				var __anchorPoint:Point = $anchorPoints?$anchorPoints[i]:null;
+				var __offsetPoint:Point = $offsetPoints?$offsetPoints[i]:null;
+				metadata.addFrameAt(i, $sizeRects[i], __originRect, __name, __anchorPoint, __offsetPoint);
 			}
 		}
 	}

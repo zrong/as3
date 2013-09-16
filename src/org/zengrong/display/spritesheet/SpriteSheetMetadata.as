@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.display.spritesheet
 {
+import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.utils.ByteArray;
 
@@ -204,7 +205,42 @@ public class SpriteSheetMetadata implements ISpriteSheetMetadata
 	{
 		_originalFrameRects = $value;
 	}
+	
+	private var _anchorPoints:Vector.<Point>;
+	
+	/**
+	 * @inheritDoc
+	 */
+	public function get anchorPoints():Vector.<Point>
+	{
+		return _anchorPoints;
+	}
+	
+	/**
+	 * @private
+	 */
+	public function set anchorPoints($value:Vector.<Point>):void
+	{
+		_anchorPoints = $value;
+	}
 
+	private var _offsetPoints:Vector.<Point>;
+	
+	/**
+	 * @inheritDoc
+	 */
+	public function get offsetPoints():Vector.<Point>
+	{
+		return _offsetPoints;
+	}
+	
+	/**
+	 * @private
+	 */
+	public function set offsetPoints($value:Vector.<Point>):void
+	{
+		_offsetPoints = $value;
+	}
 	
 	//----------------------------------------
 	// getter/setter
@@ -231,13 +267,31 @@ public class SpriteSheetMetadata implements ISpriteSheetMetadata
 		__meta.hasLabel = hasLabel;
 		__meta.hasName = hasName;
 		__meta.maskType = maskType;
+		
 		if(frameRects)
 		{
+			var i:int = 0;
 			__meta.frameRects = new Vector.<Rectangle>;
-			for (var i:int = 0; i < frameRects.length; i++) 
+			for (i = 0; i < frameRects.length; i++) 
 			{
 				__meta.frameRects[i] = frameRects[i].clone();
 				__meta.originalFrameRects[i] = originalFrameRects[i].clone();
+			}
+			if(anchorPoints)
+			{
+				__meta.anchorPoints = new Vector.<Point>;
+				for (i = 0; i < anchorPoints.length; i++) 
+				{
+					__meta.anchorPoints[i] = anchorPoints[i].clone();
+				}
+			}
+			if(offsetPoints)
+			{
+				__meta.offsetPoints = new Vector.<Point>;
+				for (i = 0; i < offsetPoints.length; i++) 
+				{
+					__meta.offsetPoints[i] = offsetPoints[i].clone();
+				}
 			}
 		}
 		if(labels)
@@ -265,6 +319,9 @@ public class SpriteSheetMetadata implements ISpriteSheetMetadata
 		names = null;
 		namesIndex = null;
 		frameRects = null;
+		originalFrameRects = null;
+		anchorPoints = null;
+		offsetPoints = null
 	}
 	
 	/**
@@ -276,6 +333,8 @@ public class SpriteSheetMetadata implements ISpriteSheetMetadata
 		{
 			frameRects = new Vector.<Rectangle>;
 			originalFrameRects = new Vector.<Rectangle>;
+			anchorPoints = new Vector.<Point>;
+			offsetPoints = new Vector.<Point>;
 		}
 	}
 	
@@ -323,21 +382,30 @@ public class SpriteSheetMetadata implements ISpriteSheetMetadata
 	/**
 	 * @inheritDoc
 	 */	
-	public function addFrame($sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null):void
+	public function addFrame($sizeRect:Rectangle, 
+							 $originalRect:Rectangle=null, 
+							 $name:String=null, 
+							 $anchorPoint:Point=null, 
+							 $offsetPoint:Point=null):void
 	{
 //		if(frameRects.length>=frameCount)
 //			return;
 		setup();
-		writeFrame(frameRects.length, $sizeRect, $originalRect, $name);
+		writeFrame(frameRects.length, $sizeRect, $originalRect, $name, $anchorPoint, $offsetPoint);
 	}
 	
 	/**
 	 * @inheritDoc
 	 */
-	public function addFrameAt($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null):void
+	public function addFrameAt($index:int, 
+							   $sizeRect:Rectangle, 
+							   $originalRect:Rectangle=null, 
+							   $name:String=null, 
+							   $anchorPoint:Point=null, 
+							   $offsetPoint:Point=null):void
 	{
 		setup();
-		writeFrame($index, $sizeRect, $originalRect, $name);
+		writeFrame($index, $sizeRect, $originalRect, $name, $anchorPoint, $offsetPoint);
 	}
 	
 	/**
@@ -383,11 +451,23 @@ public class SpriteSheetMetadata implements ISpriteSheetMetadata
 		}
 	}
 	
-	protected function writeFrame($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null):void
+	protected function writeFrame($index:int, 
+								  $sizeRect:Rectangle, 
+								  $originalRect:Rectangle=null, 
+								  $name:String=null,
+								  $anchorPoint:Point=null, 
+								  $offsetPoint:Point=null):void
 	{
+		//若没有原始尺寸，使用当前尺寸作为原始尺寸
 		if(!$originalRect) $originalRect = new Rectangle(0, 0, $sizeRect.width, $sizeRect.height);
+		//若没有定义锚点，使用当前尺寸中心作为锚点
+		if(!$anchorPoint) $anchorPoint = new Point(int($sizeRect.width/2), int($sizeRect.height/2));
+		//若没有定义便宜，使用当前尺寸与原始尺寸中心点的距离作为偏移
+		if(!$offsetPoint) $offsetPoint = new Point($anchorPoint.x - int($originalRect.width/2), $anchorPoint.y - int($originalRect.height/2));
 		frameRects.splice($index, 0, $sizeRect);
 		originalFrameRects.splice($index, 0, $originalRect);
+		anchorPoints.splice($index, 0, $anchorPoint);
+		offsetPoints.splice($index, 0, $offsetPoint);
 		//trace('增加帧：', $index, $name);
 		if($name && names && namesIndex)
 		{
@@ -442,6 +522,8 @@ public class SpriteSheetMetadata implements ISpriteSheetMetadata
 				',labels:'+ObjectUtil.array2String(labels)+
 				',labelsFrame:'+ObjectUtil.obj2String(labelsFrame)+
 				',frameRects:'+ObjectUtil.array2String(frameRects)+
+				",anchorPoints:"+ObjectUtil.array2String(anchorPoints)+
+				",offsetPoints:"+ObjectUtil.array2String(offsetPoints)+
 				',names:'+ObjectUtil.array2String(names)+
 				',namesIndex:'+ObjectUtil.obj2String(namesIndex)+
 				'}';

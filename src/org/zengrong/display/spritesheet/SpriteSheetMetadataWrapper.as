@@ -1,6 +1,7 @@
 package org.zengrong.display.spritesheet
 {
 import flash.geom.Rectangle;
+import flash.geom.Point;
 
 /**
  * SpriteSheetMetadata的包装器的基类
@@ -117,6 +118,26 @@ public class SpriteSheetMetadataWrapper implements ISpriteSheetMetadata
 		_metadata.originalFrameRects = $value;
 	}
 	
+	public function get anchorPoints():Vector.<Point>
+	{
+		return _metadata.anchorPoints;
+	}
+	
+	public function set anchorPoints($value:Vector.<Point>):void
+	{
+		_metadata.anchorPoints = $value;
+	}
+	
+	public function get offsetPoints():Vector.<Point>
+	{
+		return _metadata.offsetPoints;
+	}
+	
+	public function set offsetPoints($value:Vector.<Point>):void
+	{
+		_metadata.offsetPoints = $value;
+	}
+	
 	public function get totalFrame():int
 	{
 		return _metadata.totalFrame;
@@ -147,14 +168,14 @@ public class SpriteSheetMetadataWrapper implements ISpriteSheetMetadata
 		_metadata.setLabels($hasLabel, $labels);
 	}
 	
-	public function addFrame($sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null):void
+	public function addFrame($sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null, $anchorPoint:Point=null, $offsetPoint:Point=null):void
 	{
-		_metadata.addFrame($sizeRect, $originalRect, $name);
+		_metadata.addFrame($sizeRect, $originalRect, $name, $anchorPoint, $offsetPoint);
 	}
 	
-	public function addFrameAt($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null):void
+	public function addFrameAt($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null, $anchorPoint:Point=null, $offsetPoint:Point=null):void
 	{
-		_metadata.addFrameAt($index, $sizeRect, $originalRect, $name);
+		_metadata.addFrameAt($index, $sizeRect, $originalRect, $name, $anchorPoint, $offsetPoint);
 	}
 	
 	public function removeFrameAt($index:int):void

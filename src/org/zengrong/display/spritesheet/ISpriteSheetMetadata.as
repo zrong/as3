@@ -1,5 +1,6 @@
 package org.zengrong.display.spritesheet
 {
+import flash.geom.Point;
 import flash.geom.Rectangle;
 
 /**
@@ -118,6 +119,28 @@ public interface ISpriteSheetMetadata
 	function set originalFrameRects($value:Vector.<Rectangle>):void;
 	
 	/**
+	 * 每帧的锚点，如果生成的时候不设置，则默认为每帧的中心点
+	 * 对于没有进行修剪的帧，位于帧的中心点；
+	 * 对于修剪过的帧，则位于修剪过的帧的中心点。
+	 */
+	function get anchorPoints():Vector.<Point>;
+	
+	/**
+	 * @private
+	 */
+	function set anchorPoints($value:Vector.<Point>):void;
+	
+	/**
+	 * 每帧的锚点对应每帧中心点的偏移
+	 */
+	function get offsetPoints():Vector.<Point>;
+	
+	/**
+	 * @private
+	 */
+	function set offsetPoints($value:Vector.<Point>):void;
+	
+	/**
 	 * Sheet的帧数
 	 */	
 	function get totalFrame():int;
@@ -172,12 +195,12 @@ public interface ISpriteSheetMetadata
 	/**
 	 * 从外部向数组中添加帧的尺寸，一般在循环中执行
 	 */	
-	function addFrame($sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null):void;
+	function addFrame($sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null, $anchorPoint:Point=null, $offsetPoint:Point=null):void;
 	
 	/**
 	 * 从外部向数组中添加帧的尺寸，指定帧索引
 	 */
-	function addFrameAt($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null):void;
+	function addFrameAt($index:int, $sizeRect:Rectangle, $originalRect:Rectangle=null, $name:String=null, $anchorPoint:Point=null, $offsetPoint:Point=null):void;
 	
 	/**
 	 * 从指定的索引移除帧
