@@ -80,21 +80,30 @@ public class BitmapUtil
 	/**
 	 * 将位图左上角像素颜色视为空白区域的颜色，切除四周的空白区域
 	 * @param $bmd 待处理的bitmapData。
+	 */
+	public static function trim($bmd:BitmapData):Object
+	{
+		//将左上角像素的颜色视为空白区域的颜色
+		var __blankColor:uint = $bmd.getPixel32(0,0);
+		return trimByColor($bmd, __blankColor);
+	}
+	
+	/**
+	 * 根据提供的空白颜色值，切除四周的空白颜色区域
+	 * @param $bmd 待处理的bitmapData。
 	 * @return 一个普通对象，形如：{rect:Rectangle,bitmapData:BitmapData}。
 	 * 其中，rect为切除空白区域后的Rect（基于原始bitmapData的rect修改），bitmapData则是一个新的切除了空白区域的bitmapData对象
 	 */
-	public static function trim($bmd:BitmapData):Object
+	public static function trimByColor($bmd:BitmapData, $blankColor:uint=0x00000000):Object
 	{
 		var __rect:Rectangle = $bmd.rect.clone();
 		var __y:int = 0;
 		var __x:int = 0;
-		//将左上角像素的颜色视为空白区域的颜色
-		var __blankColor:uint = $bmd.getPixel32(0,0);
 		topOuter: for (__y = 0; __y < $bmd.height; __y++) 
 		{
 			for (__x = 0; __x < $bmd.width; __x++) 
 			{
-				if(__blankColor != $bmd.getPixel32(__x,__y))
+				if($blankColor != $bmd.getPixel32(__x,__y))
 					break topOuter;
 			}
 			__rect.top++;
@@ -104,7 +113,7 @@ public class BitmapUtil
 		{
 			for (__x = 0; __x < $bmd.width; __x++) 
 			{
-				if(__blankColor != $bmd.getPixel32(__x,__y))
+				if($blankColor != $bmd.getPixel32(__x,__y))
 					break bottomOuter;
 			}
 			__rect.bottom--;
@@ -114,7 +123,7 @@ public class BitmapUtil
 		{
 			for(__y=__rect.top;__y<__rect.bottom;__y++)
 			{
-				if(__blankColor != $bmd.getPixel32(__x,__y))
+				if($blankColor != $bmd.getPixel32(__x,__y))
 					break leftOuter;
 			}
 			__rect.left++;
@@ -124,7 +133,7 @@ public class BitmapUtil
 		{
 			for(__y=__rect.top;__y<__rect.bottom;__y++)
 			{
-				if(__blankColor != $bmd.getPixel32(__x,__y))
+				if($blankColor != $bmd.getPixel32(__x,__y))
 					break rightOuter;
 			}
 			__rect.right--;
