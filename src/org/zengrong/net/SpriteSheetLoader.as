@@ -25,7 +25,9 @@ import org.zengrong.display.spritesheet.ISpriteSheetMetadata;
 import org.zengrong.display.spritesheet.MaskType;
 import org.zengrong.display.spritesheet.SpriteSheet;
 import org.zengrong.display.spritesheet.SpriteSheetMetadata;
+import org.zengrong.display.spritesheet.SpriteSheetMetadataFactory;
 import org.zengrong.display.spritesheet.SpriteSheetMetadataJSON;
+import org.zengrong.display.spritesheet.SpriteSheetMetadataStarling;
 import org.zengrong.display.spritesheet.SpriteSheetMetadataType;
 import org.zengrong.display.spritesheet.SpriteSheetMetadataXML;
 
@@ -39,6 +41,27 @@ import org.zengrong.display.spritesheet.SpriteSheetMetadataXML;
  * */
 public class SpriteSheetLoader extends EventDispatcher implements ILoader
 {
+	/**
+	 * 支持解析的类型数组
+	 */
+	public static const SUPPORTED_TYPES:Array = [
+		SpriteSheetMetadataType.SSE_XML,
+		SpriteSheetMetadataType.SSE_JSON,
+		SpriteSheetMetadataType.STARLING,
+		SpriteSheetMetadataType.COCOS2D
+	];
+	/**
+	 * 根据载入的图片的地址，获取同名的metadata文件
+	 */
+	public static function getMetadataUrl($url:String, $type:String):String
+	{
+		var __dotIndex:int = $url.lastIndexOf('.');
+		var __typeExt:String = SpriteSheetMetadataType.getTypeExt($type);
+		if(__dotIndex == -1)
+			return $url + '.'+__typeExt;
+		return $url.slice(0, __dotIndex) + '.'+__typeExt;
+	}
+	
 	/**
 	 * @param $decodeJSON 提供将JSON字符串解析成Object对象的方法
 	 */	
@@ -141,14 +164,16 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	 * 若无此文件，则抛出异常。（使用XML的原因是因为JSON需要增加解析包，会增加最终文件的大小。而XML原生支持）
 	 * 
 	 * @param $url	SpriteSheet文件路径
-	 * @param $metaData	SpriteSheet的Metadata信息，由Sprite Sheet Editor生成，默认是XML格式，可支持XML和JSON（以标准Object方式提供）
+	 * @param $metaData	SpriteSheet的Metadata信息，由Sprite Sheet Editor生成，默认是SSE_XML格式，可支持SSE_XML/SSE_JSON（以标准Object方式提供）/COCOS2D/STARLING
+	 * @param $metaType 元数据的类型
 	 * @see org.zengrong.display.spritesheet.SpriteSheetMetadata
+	 * @see org.zengrong.display.spritesheet.SpriteSheetMetadataType
 	 * @throws TypeError
 	 */	
-	public function load($url:String, $metadata:*=null, $metaType:String='xml', $loaderContext:LoaderContext=null):void
+	public function load($url:String, $metadata:*=null, $metaType:String='ssexml', $loaderContext:LoaderContext=null):void
 	{
 		if(_loading)return;
-		if($metaType == AssetsType.JSON && !(_decodeJSON is Function))
+		if($metaType == SpriteSheetMetadataType.SSE_JSON && !(_decodeJSON is Function))
 			throw new TypeError('Metadata为JSON格式的时候，必须提供解析JSON用的方法！');
 		//如果没有提供LoaderContext，就建立一个，并允许检测Policy文件
 		_loaderContext = $loaderContext;
@@ -193,17 +218,13 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	
 	protected function handler_urlLoaded(evt:Event):void
 	{
-		if(_metaType == AssetsType.JSON)
+		_metadata = SpriteSheetMetadataFactory.create(_metaType);
+		if(_metaType == SpriteSheetMetadataType.SSE_JSON)
 		{
-			if(_decodeJSON is Function)
-			{
-				_metadata = createSpriteSheetMetadata(_metaType);
-				_metadata.parse(_decodeJSON.call(null, _urlLoader.data));
-			}
+			_metadata.parse(_decodeJSON.call(null, _urlLoader.data));
 		}
 		else
 		{
-			_metadata = createSpriteSheetMetadata(AssetsType.XML);
 			_metadata.parse(new XML(_urlLoader.data));
 		}
 		//载入图像文件
@@ -241,7 +262,7 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 		//对于标准的图像文件，需要获取metadata信息，如果有，就开始载入图像文件
 		if($metadata)
 		{
-			_metadata = createSpriteSheetMetadata(_metaType);
+			_metadata = SpriteSheetMetadataFactory.create(_metaType);
 			_metadata.parse($metadata);
 			//如果提供了Metadata，就开始载入图像文件
 			_loader.load(new URLRequest(_url),  _loaderContext);
@@ -250,23 +271,20 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 		//metadata载入成功后，才载入实际的图像
 		else
 		{
-			//不支持除XML和JSON格式之外的外部Metadata文件
-			if(_metaType != AssetsType.JSON && _metaType != AssetsType.XML)
-				throw TypeError('不支持的metadata格式:'+_metaType);
+			var __supported:Boolean = false;
+			//不支持以下格式之外的外部Metadata文件
+			for(var i:int=0;i<SUPPORTED_TYPES.length;i++)
+			{
+				if(SUPPORTED_TYPES[i] == _metaType)
+				{
+					__supported = true;
+					break;
+				}
+			}
+			if(!__supported) throw TypeError('不支持的metadata格式:'+_metaType);
 			_urlLoader.dataFormat = URLLoaderDataFormat.TEXT;
 			_urlLoader.load(new URLRequest(getMetadataUrl(_url, _metaType)));
 		}
-	}
-	
-	/**
-	 * 根据载入的图片的地址，获取同名的metadata文件
-	 */
-	protected function getMetadataUrl($url:String, $type:String):String
-	{
-		var __dotIndex:int = $url.lastIndexOf('.');
-		if(__dotIndex == -1)
-			return $url + '.'+$type;
-		return $url.slice(0, __dotIndex) + '.'+$type;
 	}
 	
 	/**
@@ -275,23 +293,6 @@ public class SpriteSheetLoader extends EventDispatcher implements ILoader
 	protected function isLoadMetadata($loader:*):Boolean
 	{
 		return $loader == _urlLoader && _urlLoader.dataFormat == URLLoaderDataFormat.TEXT;
-	}
-	
-	/**
-	 * 根据metadata类型创建一个ISpriteSheetMetadata对象。仅支持JSON和XML格式的Metadata。
-	 * 
-	 * @param $type Metadata的类型
-	 * @see SpriteSheetMetadataType
-	 * @throws TypeError $type为不支持的类型的时候，会抛出异常
-	 */
-	protected function createSpriteSheetMetadata($type:String):ISpriteSheetMetadata
-	{
-		if($type == AssetsType.JSON)
-			return new SpriteSheetMetadataJSON(new SpriteSheetMetadata());
-		else if($type == AssetsType.XML)
-			return new SpriteSheetMetadataXML(new SpriteSheetMetadata());
-		throw TypeError('不支持的metadata格式:'+$type);
-		return null;
 	}
 }
 }

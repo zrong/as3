@@ -31,5 +31,13 @@ public class SpriteSheetMetadataStringWraper extends SpriteSheetMetadataWrapper
 	{
 		_lineEnding = $value;
 	}
+	
+	/**
+	 * 是否是一个合法的格式，在解析的时候调用
+	 */
+	public function isLegalFormat($value:*):Boolean
+	{
+		return false;
+	}
 }
 }

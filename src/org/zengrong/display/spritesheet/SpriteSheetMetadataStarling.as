@@ -38,6 +38,12 @@ public class SpriteSheetMetadataStarling extends SpriteSheetMetadataStringWraper
 		_header = $value;
 	}
 
+	override public function isLegalFormat($value:*):Boolean
+	{
+		var __xml:XML = $value;
+		var __xmlRootName:String = __xml.localName();
+		return __xmlRootName == "TextureAtlas";
+	}
 
 	/**
 	 * 从Starling 的XML文件解析Metadata数据
@@ -48,7 +54,58 @@ public class SpriteSheetMetadataStarling extends SpriteSheetMetadataStringWraper
 	override public function parse($value:*):ISpriteSheetMetadata
 	{
 		var __xml:XML = $value;
-		return null;
+		if(!isLegalFormat(__xml))
+		{
+			throw new TypeError('不支持的metadata格式:'+__xml.localName());
+		}
+		var i:int=0;
+		type = SpriteSheetType.PNG_IMAGE;
+		hasLabel = false;
+		hasName = true;
+		maskType = MaskType.NO_MASK;
+		setup(true);
+		var __frames:XMLList = __xml.SubTexture;
+		var __totalFrame:int = __frames.length();
+		var __frame:XML = null;
+		if(hasName)
+		{
+			names = new Vector.<String>(__totalFrame);
+			namesIndex = {};
+		}
+		var __frameRect:Rectangle = null;
+		var __originalRect:Rectangle = null;
+		for(i=0;i<__totalFrame;i++)
+		{
+			__frame = __frames[i];
+			__frameRect = new Rectangle(
+				int(__frame.@x.toString()), 
+				int(__frame.@y.toString()), 
+				int(__frame.@width.toString()), 
+				int(__frame.@height.toString()) );
+			if(__frame.hasOwnProperty("@frameX") && 
+				__frame.hasOwnProperty("@frameY") &&
+				__frame.hasOwnProperty("@frameWidth") &&
+				__frame.hasOwnProperty("@frameHeight") )
+			{
+				__originalRect = new Rectangle(
+					int(__frame.@frameX.toString()),
+					int(__frame.@frameY.toString()),
+					int(__frame.@frameWidth.toString()),
+					int(__frame.@frameHeight.toString()) );
+			}
+			else
+			{
+				__originalRect = null;
+			}
+			//如果没有提供原始Frame的值，就交给writeFrame自动计算
+			addFrameAt(i, __frameRect, __originalRect);
+			if(hasName)
+			{
+				names[i] = __frame.@name.toString();
+				namesIndex[names[i]] = i;
+			}
+		}
+		return _metadata;
 	}
 	
 	/**

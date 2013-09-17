@@ -38,6 +38,13 @@ public class SpriteSheetMetadataXML extends SpriteSheetMetadataStringWraper
 	{
 		_header = $value;
 	}
+	
+	override public function isLegalFormat($value:*):Boolean
+	{
+		var __xml:XML = $value;
+		var __xmlRootName:String = __xml.localName();
+		return __xmlRootName == "metadata";
+	}
 
 	/**
 	 * 从XML文件解析Metadata数据，XML文件必须由Sprite Sheet Editor生成。
@@ -47,11 +54,11 @@ public class SpriteSheetMetadataXML extends SpriteSheetMetadataStringWraper
 	override public function parse($value:*):ISpriteSheetMetadata
 	{
 		var __xml:XML = $value;
-		var __xmlRootName:String = __xml.name();
-		if(__xmlRootName != "metadata")
+		if(!isLegalFormat($value))
 		{
-			throw new TypeError('不支持的metadata格式:'+__xmlRootName);
+			throw new TypeError('不支持的metadata格式:'+__xml.localName());
 		}
+		
 		var i:int=0;
 		type = __xml.sheetType.toString();
 		hasLabel = __xml.hasLabel.toString() == 'true';

@@ -38,16 +38,26 @@ public class SpriteSheetMetadataCocos2d extends SpriteSheetMetadataStringWraper
 		_header = $value;
 	}
 
-
+	override public function isLegalFormat($value:*):Boolean
+	{
+		var __xml:XML = $value;
+		var __xmlRootName:String = __xml.localName();
+		return __xmlRootName == "plist";
+	}
+	
 	/**
-	 * 从Starling 的XML文件解析Metadata数据
+	 * 从Cocos2d 的Plist文件解析Metadata数据
 	 * TODO 等待实现
 	 * 
-	 * @param $xml Starling格式的SpriteSheet XML文件
+	 * @param $xml cocos2d 格式的plist文件
 	 */	
 	override public function parse($value:*):ISpriteSheetMetadata
 	{
 		var __xml:XML = $value;
+		if(!isLegalFormat(__xml))
+		{
+			throw new TypeError('不支持的metadata格式:'+__xml.localName());
+		}
 		return null;
 	}
 	
