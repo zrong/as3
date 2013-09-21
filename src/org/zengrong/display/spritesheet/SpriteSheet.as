@@ -74,17 +74,37 @@ public class SpriteSheet
 		//帧位图块，将这个块在循环中绘制到大图上
 		var __frameBMD:BitmapData = null;
 		//如何在帧位图块中取需要绘制的范围
-		var __drawRect:Rectangle = new Rectangle();
+		var __drawRect:Rectangle;
+		var __topLeft:Point = null;
 		for (var i:int = 0; i < _allBmds.length; i++) 
 		{
+			//默认认为__frameBMD是剪切过的，这种情况就不需要偏移，xy均为0
+			__drawRect = new Rectangle(0,0,metadata.frameRects[i].width, metadata.frameRects[i].height);
 			__frameBMD = _allBmds[i];
 			bitmapData.lock();
-			//计算修剪帧尺寸与原始帧尺寸的偏移，绘制在大图上的像素并不包含剪切过的空白像素
-			//当然，如果帧没有被执行过“修剪空白操作”，那么originalFrame的x和y应该为0，w和h应该与frame相同
+			
+			//若高度或者宽度与原始尺寸不同，则说明剪切过空白；
+			//需要把__frameBMD还原成没有剪切的状态。因为SpriteSheet中应该总是保存没有剪切的位图
+			//这样便于取用
+			if(__frameBMD.width != metadata.originalFrameRects[i].width ||
+				__frameBMD.height != metadata.originalFrameRects[i].height)
+			{
+				var __newFrameBMD:BitmapData = new BitmapData(
+					metadata.originalFrameRects[i].width, 
+					metadata.originalFrameRects[i].height,
+					__frameBMD.transparent, 
+					0x00000000);
+				//重新绘制一个没有修剪的位图，并保存到数组中
+				__newFrameBMD.copyPixels(__frameBMD,__drawRect, 
+					new Point(0-metadata.originalFrameRects[i].x, 0-metadata.originalFrameRects[i].y), 
+					null, null, __frameBMD.transparent);
+				__frameBMD = __newFrameBMD;
+				_allBmds[i] = __frameBMD;
+			}
+			
+			//计算修剪帧尺寸与原始帧尺寸的偏移，在大Sheet上绘制修剪过的位图
 			__drawRect.x = 0-metadata.originalFrameRects[i].x;
 			__drawRect.y = 0-metadata.originalFrameRects[i].y;
-			__drawRect.width = metadata.frameRects[i].width;
-			__drawRect.height = metadata.frameRects[i].height;
 			bitmapData.copyPixels(__frameBMD, __drawRect, metadata.frameRects[i].topLeft, null, null, true);
 			//trace('SpriteSheet.drawSheet:', __frameBMD.rect, __drawRect, metadata.originalFrameRects[i]);
 			bitmapData.unlock();
