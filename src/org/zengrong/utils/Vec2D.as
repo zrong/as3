@@ -3,8 +3,9 @@ package org.zengrong.utils
 import flash.geom.Point;
 
 /**
- * 计算坐标位置的功能函数集合。
+ * 2维向量常用功能实现
  * @author zrong
+ * Modification: 2013-09-24
  */
 public class Vec2D
 {
@@ -21,7 +22,7 @@ public class Vec2D
 	//  getter/setter
 	//----------------------------------
 	/**
-	 * 使用勾股定理计算两点间的距离
+	 * 使用勾股定理计算向量长度
 	 * x、y在这里代表直角三角形的两条直角边。
 	 * @return 自身的x、y代表的直角三角形的斜边的长度。
 	 */	
@@ -31,8 +32,8 @@ public class Vec2D
 	}
 	
 	/**
-	 * 使用勾股定理计算两点间的距离，但不开方。
-	 * x、y在这里代表直角三角形的两条直角边。
+	 * 使用勾股定理计算不开方的向量长度。
+	 * @see len()
 	 */
 	public function get len2() : Number
 	{
@@ -40,10 +41,12 @@ public class Vec2D
 	}
 	
 	/**
-	 * 计算直角边与斜边的比值，存入一个新的Vec2D对象并返回。
-	 * 使用这个比值，可以计算出与自己代表的直角三角形的同比直角三角形的斜边上的任意一个坐标点。
-	 * 例如，使用Vec2D.mulN(n)，可以得到根据斜边n的长度计算出来x、y坐标点。
-	 * @return 保存了自己所代表两个直角边比值的Vec2D对象。
+	 * 得到一个新的归一化向量，该向量的长度为1。使用这个归一化向量可以更方便地计算速度、角度和坐标。
+	 * <ol>
+	 * <li>例如，可以计算出与自己代表的直角三角形的同比直角三角形的斜边上的任意一个坐标点。</li>
+	 * <li>再例如，使用Vec2D.mulN(n)，可以得到根据斜边n的长度计算出来x、y坐标点。</li>
+	 * </ol>
+	 * @return 归一化之后的新向量。
 	 */	
 	public function get normalized() : Vec2D
 	{
@@ -63,7 +66,7 @@ public class Vec2D
 	}
 	
 	/**
-	 * 根据提供的point的坐标设置自己的坐标。
+	 * 根据提供的point的坐标设置自己的向量值。
 	 */	
 	public function set point($point:Point) : void
 	{
@@ -80,7 +83,7 @@ public class Vec2D
 	}
 	
 	/**
-	 * 根据自己与0,0点的角度值设置自己的坐标。
+	 * 根据自己与0,0点的角度值设置自己的向量值。
 	 */	
 	public function set angle($angle:Number) : void
 	{
@@ -100,7 +103,7 @@ public class Vec2D
 	}
 	
 	/**
-	 * 根据与0,0点的弧度值设置自己的坐标。
+	 * 根据与0,0点的弧度值设置自己的向量值。
 	 */	
 	public function set radian($radian:Number):void
 	{
@@ -117,7 +120,7 @@ public class Vec2D
 	}
 	
 	/**
-	 * 根据提供的vec2D的值设置自己的坐标。
+	 * 根据提供的vec2D的值设置自己的向量值。
 	 */	
 	public function set vec($vec:Vec2D) : void
 	{
@@ -126,15 +129,23 @@ public class Vec2D
 	}
 	
 	/**
-	 * 将自己的y值取负值，创建一个新的Vec2D对象并返回。
+	 * 返回右法线向量。
 	 */	
-	public function get normal() : Vec2D
+	public function get rightNormals() : Vec2D
 	{
 		return new Vec2D(-this.y, this.x);
 	}
 	
 	/**
-	 * 将自己的x和y值均取负值，创建一个新的Vec2D对象并返回。
+	 * 返回左法线向量。
+	 */
+	public function get leftNormals():Vec2D
+	{
+		return new Vec2D( this.y, -this.x);
+	}
+	
+	/**
+	 * 获取一个反向向量。
 	 */	
 	public function get reverse() : Vec2D
 	{
@@ -165,11 +176,24 @@ public class Vec2D
         return this.x * $vec.y - this.y * $vec.x;
     }
 
+	/**
+	 * 获取与参数向量的点乘( Dot Product ）<br>
+	 * 值如果是正数，那么2个向量的方向是相同的（夹角小于90度）。<br>
+	 * 值如果是负数，那么2个向量的方向是相反的（夹角大于90度）。 
+	 * @param $vec 被点乘的向量
+	 * @return 点乘后的值
+	 */
     public function dot($vec:Vec2D) : Number
     {
         return this.x * $vec.x + this.y * $vec.y;
     }
 	
+	/**
+	 * 获取归一化的点乘。<br>
+	 * 先将两个向量归一化，然后再点乘。
+	 * @see dot()
+	 * @return 点乘后的值
+	 */
 	public function nDot($vec:Vec2D) : Number
 	{
 		var __thisVec:Vec2D = this.normalized;
@@ -177,6 +201,9 @@ public class Vec2D
 		return __thisVec.x * __otherVec.x + __thisVec.y * __otherVec.y;
 	}
 	
+	/**
+	 * 获取向量相对于参数向量的投影
+	 */
 	public function project($vec:Vec2D) : Vec2D
 	{
 		var __dot1:Number = this.dot($vec);
@@ -186,13 +213,13 @@ public class Vec2D
 	}
 	
 	/**
-	 * 更新自己的vec的值，详见normalized。
+	 * 将自身归一化，修改自身。
+	 * @see normalized
 	 */	
 	public function normalize() : void
 	{
 		this.vec = this.normalized;
 	}
-	
 	
 	public function toString() : String
 	{
@@ -200,11 +227,10 @@ public class Vec2D
 	}
 	
 	//----------------------------------
-	//  num四则运算，修改自身
+	//  向量与数字的四则运算，修改自身
 	//----------------------------------
 	/**
-	 * 将当前保存的值与参数相加并保存
-	 * @param $num 要增加的数字 
+	 * 向量加法，修改自身
 	 */	
 	public function addN($x:Number, $y:Number=NaN) : void
 	{
@@ -215,8 +241,7 @@ public class Vec2D
 	}
 	
 	/**
-	 * 将当前保存的值减去参数并保存
-	 * @param $num 要减去的数字
+	 * 向量减法，修改自身
 	 */	
 	public function subN($x:Number, $y:Number=NaN) : void
 	{
@@ -227,8 +252,7 @@ public class Vec2D
 	}
 	
 	/**
-	 * 将当前保存的值乘以一个数字并更新
-	 * @param $num 要相乘的数字
+	 * 向量乘法，修改自身
 	 */	
     public function mulN($x:Number, $y:Number=NaN) : void
     {
@@ -239,8 +263,7 @@ public class Vec2D
     }
 	
 	/**
-	 * 将当前保存的值除以一个数字并更新
-	 * @param $num 要作为除数的数字
+	 * 向量除法，修改自身
 	 */	
 	public function divN($x:Number, $y:Number=NaN) : void
 	{
@@ -251,10 +274,10 @@ public class Vec2D
 	}
 	
 	//----------------------------------
-	//  Num四则运算，返回一个新的Vec2D
+	//  向量与数字四则运算，不修改自身，返回一个新的Vec2D
 	//----------------------------------
 	/**
-	 * 将当前保存的值与参数相加，并返回一个新的Vec2D
+	 * 向量加法，并返回一个新的Vec2D
 	 * @param $num 要增加的数字 
 	 */	
 	public function addNum($x:Number, $y:Number=NaN) : Vec2D
@@ -265,7 +288,7 @@ public class Vec2D
 	}
 	
 	/**
-	 * 将当前保存的值减去参数并返回一个新的Vec2D
+	 * 向量减法，返回一个新的Vec2D
 	 * @param $num 要减去的数字
 	 */		
 	public function subNum($x:Number, $y:Number=NaN) : Vec2D
@@ -276,8 +299,7 @@ public class Vec2D
 	}
 	
 	/**
-	 * 将当前保存的值乘以一个数字并返回一个新的Vec2D
-	 * @param $num 要相乘的数字
+	 * 向量乘法，返回一个新的Vec2D
 	 */	
 	public function mulNum($x:Number, $y:Number=NaN) : Vec2D
 	{
@@ -288,8 +310,7 @@ public class Vec2D
 	}
 	
 	/**
-	 * 将当前保存的值除以一个数字并返回一个新的Vec2D
-	 * @param $num 要作为除数的数字
+	 * 向量除法，返回一个新的Vec2D
 	 */	
 	public function divNum($x:Number, $y:Number=NaN) : Vec2D
 	{
@@ -299,10 +320,10 @@ public class Vec2D
 	}
 	
 	//----------------------------------
-	//  对vec进行处理的四则运算，修改自身
+	//  向量与向量的四则运算，修改自身
 	//----------------------------------
 	/**
-	 * 将当前保存的值与参数相加并保存
+	 * 向量与向量加法，修改自身
 	 * @param $vec 要增加的Vec2D
 	 */	
     public function addV($vec:Vec2D) : void
@@ -312,7 +333,7 @@ public class Vec2D
     }
 
 	/**
-	 * 将当前保存的值减去参数并保存
+	 * 向量与向量减法，修改自身
 	 * @param $vec 要减去的Vec2D
 	 */	
     public function subV($vec:Vec2D) : void
@@ -322,7 +343,7 @@ public class Vec2D
     }
 	
 	/**
-	 * 将当前保存的值乘以参数并更新
+	 * 向量与向量乘法，修改自身
 	 * @param $num 要相乘Vec2D
 	 */	
 	public function mulV($vec:Vec2D) : void
@@ -332,7 +353,7 @@ public class Vec2D
 	}
 	
 	/**
-	 * 将当前保存的值除以参数并更新
+	 * 向量与向量除法，修改自身
 	 * @param $num 要作为除数的Vec2D
 	 */	
 	public function divV($vec:Vec2D) : void
@@ -342,23 +363,40 @@ public class Vec2D
 	}
 	
 	//----------------------------------
-	//  对vec进行处理的四则运算，返回新的Vec2D
+	//  向量与向量的的四则运算，返回新的向量
 	//----------------------------------
+
+	/**
+	 * 向量与向量加法，返回新的向量
+	 * @param $vec 要增加的Vec2D
+	 */	
 	public function addVec($vec:Vec2D) : Vec2D
 	{
 		return new Vec2D(this.x + $vec.x, this.y + $vec.y);
 	}
 	
+	/**
+	 * 向量与向量减法，返回新的向量
+	 * @param $vec 要减去的Vec2D
+	 */	
 	public function subVec($vec:Vec2D) : Vec2D
 	{
 		return new Vec2D(this.x - $vec.x, this.y - $vec.y);
 	}
 	
+	/**
+	 * 向量与向量乘法，返回新的向量
+	 * @param $num 要相乘Vec2D
+	 */	
 	public function mulVec($vec:Vec2D) : Vec2D
 	{
 		return new Vec2D(this.x * $vec.x, this.y * $vec.y);
 	}
 	
+	/**
+	 * 向量与向量除法，返回新的向量
+	 * @param $num 要作为除数的Vec2D
+	 */	
 	public function divVec($vec:Vec2D) : Vec2D
 	{
 		return new Vec2D(this.x / $vec.x, this.y / $vec.y);
