@@ -1,7 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  zengrong.net
-//  创建者:	zrong
-//  创建时间：2011-03-15
+//  @author zrong
+//  Creation: 2011-03-15
+//  Modification: 2013-09-24
 ////////////////////////////////////////////////////////////////////////////////s
 package org.zengrong.utils
 {
@@ -9,9 +10,11 @@ import flash.utils.*;
 
 /**
  * 处理增长和运动的时间
- * com.youxi.display.MoveableSprite使用这个类和Vec2D来处理运动
+ * org.zengrong.display.character.MovableChar 使用这个类和Vec2D来处理运动
  * 因为间隔时间是绝对的，如果帧率降低，那么每帧运动的距离会增大，这样的运动不会因为帧率降低导致运动变慢
- * @author zrong
+ * @author zrong(zengrong.net)
+ * @see org.zengrong.display.character.MovableChar
+ * @see org.zengrong.utils.Vec2D
  * */
 public class TimerUpdate
 {
