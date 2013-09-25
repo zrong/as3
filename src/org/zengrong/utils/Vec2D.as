@@ -248,43 +248,41 @@ public class Vec2D
 	}
 	
 	/**
-	 * 根据向量1的起点、终点坐标、向量2的起点坐标，计算出向量1与向量2（当前向量）的交点坐标。<br>
+	 * 根据向量1的起点坐标、向量2的起点坐标、向量2，计算出向量1（当前向量）与向量2（及其前后延长线）的交点坐标。<br>
 	 * 向量1根据$v1p0与$v1p1计算，向量2已知，向量2的起点坐标已知，计算得到向量1与向量2的交点坐标。
 	 * @param	$v1p0 向量1的起点坐标
-	 * @param	$v1p1 向量1的终点坐标
 	 * @param	$v2p0 向量2的起点坐标
+	 * @param	$vec2 向量2
 	 * @see https://docs.google.com/drawings/d/1rXSO0ocKfu8fKeFaLSFZ1YFyBGMjm0wcv9NtjO3D6kM/pub?w=486&h=350
 	 * @return 代表交点坐标的向量
 	 */
-	public function intersectionPoint($v1p0:Vec2D, $v1p1:Vec2D, $v2p0:Vec2D):Vec2D
+	public function intersectionPoint($v1p0:Vec2D, $v2p0:Vec2D, $vec2:Vec2D):Vec2D
 	{
-		//得到向量1
-		var __vec1:Vec2D = $v1p1.subVec($v1p0);
 		//得到向量3（向量1起点指向向量2起点的向量）
 		var __vec3:Vec2D = $v2p0.subVec($v1p0);
 		//计算交点参数
-		var __intersection:Number = intersect(__vec1, __vec3);
+		var __intersection:Number = intersect($vec2, __vec3);
 		//根据交点参数计算坐标
-		return new Vec2D($v1p0.x+__vec1.x*__intersection, $v1p0.y+__vec1.y*__intersection);
+		return new Vec2D($v1p0.x+x*__intersection, $v1p0.y+y*__intersection);
 	}
 	
 	/**
 	 * 计算两个向量的交点参数。<br>
-	 * 假设要计算向量1和向量2是否相交。$vec1代表向量1，当前向量为向量2(vec2)。$vec3代表从$vec1的起点到向量2起点的向量。那么：<br>
+	 * 假设要计算向量1(vec1,当前向量)和向量2(vec2)是否相交。$vec3代表从vec1的起点到vec2起点的向量。那么：<br>
 	 * <ol>
 	 * <li>当两个垂直点乘的比例正好为1，那么交点就正好在向量2(vec2)的终点上；</li>
-	 * <li>当为0-1之间的值时，那么交点就在向量1($vec1)上；</li>
-	 * <li>当为负数交点就在向量2(vec2)的起点之前；</li>
-	 * <li>当为大于1的数，交点就在向量2(vec2)的终点之后。</li>
+	 * <li>当为0-1之间的值时，那么交点就在向量1上；</li>
+	 * <li>当为负数交点就在向量1的起点之前；</li>
+	 * <li>当为大于1的数，交点就在向量1的终点之后。</li>
 	 * </ol>
 	 * @see https://docs.google.com/drawings/d/1rXSO0ocKfu8fKeFaLSFZ1YFyBGMjm0wcv9NtjO3D6kM/pub?w=486&h=350
-	 * @param	$vec1 第1个向量
-	 * @param	$vec3 $vec1的起点到当前向量(vec2)的起点的向量
+	 * @param	$vec2 向量2
+	 * @param	$vec3 向量1(当前向量)起点到向量2(vec2)起点的向量
 	 * @return 一个交叉点的参数值
 	 */
-	public function intersect($vec1:Vec2D, $vec3:Vec2D):Number
+	public function intersect($vec2:Vec2D, $vec3:Vec2D):Number
 	{
-		return $vec1.prepDot(this) / $vec3.prepDot(this);
+		return this.prepDot($vec2) / $vec3.prepDot($vec2);
 	}
 	
 	/**
