@@ -226,7 +226,7 @@ public class Vec2D
 	/**
 	 * 垂直点乘（prep dot product）
 	 * 垂直点乘就是使用向量的右法线与参数向量进行点乘
-	 * @param	$vec 被点乘的向量
+	 * @param $vec 被点乘的向量
 	 * @see #dot()
 	 * @return 点乘后的值
 	 */
@@ -237,7 +237,8 @@ public class Vec2D
 	}
 	
 	/**
-	 * 获取向量相对于参数向量的投影
+	 * 获取当前向量在参数向量上的投影坐标
+	 * @return 代表投影坐标的向量
 	 */
 	public function project($vec:Vec2D) : Vec2D
 	{
