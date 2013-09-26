@@ -248,6 +248,14 @@ public class Vec2D
 		return $vec.mulNum(__num);
 	}
 	
+	public function project2($vec:Vector2d) : Vector2d
+	{
+		var __dp:Number = this.dot($vec);
+		//get a normalized vector
+		var __n:Vector2d = $vec.normalized;
+		return __n.mulNum(__dp);
+	}
+	
 	/**
 	 * 根据向量1的起点坐标、向量2的起点坐标、向量2，计算出向量1（当前向量）与向量2（及其前后延长线）的交点坐标。<br>
 	 * 向量1根据$v1p0与$v1p1计算，向量2已知，向量2的起点坐标已知，计算得到向量1与向量2的交点坐标。
@@ -264,7 +272,7 @@ public class Vec2D
 		//计算交点参数
 		var __intersection:Number = intersect($vec2, __vec3);
 		//根据交点参数计算坐标
-		return new Vec2D($v1p0.x+x*__intersection, $v1p0.y+y*__intersection);
+		return new Vec2D($v1p0.x+x*__intersection, $v	1p0.y+y*__intersection);
 	}
 	
 	/**
@@ -283,7 +291,24 @@ public class Vec2D
 	 */
 	public function intersect($vec2:Vec2D, $vec3:Vec2D):Number
 	{
-		return this.prepDot($vec2) / $vec3.prepDot($vec2);
+		return $vec3.prepDot($vec2) / this.prepDot($vec2) ;
+	}
+	
+	/**
+	 * 计算当前向量在另一个向量上的反弹向量
+	 * @param	$vec 作为被反弹对象的向量，例如一个墙壁
+	 * @return 反弹后的向量
+	 */
+	public function bounce($vec:Vec2D):Vec2D
+	{
+		//得到当前向量在另一个向量上的投影
+		var __p1:Vec2D = project2($vec.normalized);
+		//等到当前向量在另一个向量的左法线上的投影
+		var __p2:Vec2D = project2($vec.leftNormals.normalized);
+		//对法线投影进行反向，反弹的方向与法线投影的方向相反
+		__p2.reverse();
+		//投影相加，得到反弹的向量
+		return __p1.addVec(__p2);
 	}
 	
 	/**
