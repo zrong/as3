@@ -248,11 +248,11 @@ public class Vec2D
 		return $vec.mulNum(__num);
 	}
 	
-	public function project2($vec:Vector2d) : Vector2d
+	public function project2($vec:Vec2D):Vec2D
 	{
 		var __dp:Number = this.dot($vec);
 		//get a normalized vector
-		var __n:Vector2d = $vec.normalized;
+		var __n:Vec2D = $vec.normalized;
 		return __n.mulNum(__dp);
 	}
 	
@@ -272,7 +272,7 @@ public class Vec2D
 		//计算交点参数
 		var __intersection:Number = intersect($vec2, __vec3);
 		//根据交点参数计算坐标
-		return new Vec2D($v1p0.x+x*__intersection, $v	1p0.y+y*__intersection);
+		return new Vec2D($v1p0.x+x*__intersection, $v1p0.y+y*__intersection);
 	}
 	
 	/**
