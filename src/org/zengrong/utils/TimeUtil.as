@@ -23,9 +23,10 @@ public class TimeUtil
 	public static var baseDate:Date;
 	
 	/**
-	 * 获取当前的时间，并格式化后作为字符串返回
+	 * 获取当前的时间或指定的时间，并格式化后作为字符串返回
 	 * @param $separator 分隔符
 	 * @param $dateOrSecond 若传递一个date，则格式化它；若传递一个正整数，则将其当作秒进行格式化；若传递0或负数，返回0；否则使用当前时间格式化。
+	 * @param $flags 根据传递的值格式化显示时、分、秒。例如 TimeUtil.HOUR|TimeUtil.MINUTE 则显示时、分； TimeUtil.HOUR|TimeUtil.MINUTE|TimeUtil.SECOND 则显示时、分、秒
 	 */
 	public static function getFormatedTime($separator:String=':', $dateOrSecond:*=null, $flags:uint=0x7):String
 	 {
