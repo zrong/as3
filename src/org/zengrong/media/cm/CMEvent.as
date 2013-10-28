@@ -51,16 +51,6 @@ public class CMEvent extends Event
 	public static const NO_MICROPHONE:String = "noMicrophone";
 	
 	/**
-	 * 摄像头可用，这个事件只会在第一次检测摄像头的时候发生一次
-	 */	
-	public static const CAMERA_AVAILABLE:String = "cameraAvailable";
-	
-	/**
-	 * 麦克风可用，这个事件只会在第一次检测麦克风的时候发生一次
-	 */	
-	public static const MICROPHONE_AVAILABLE:String = "microphoneAvailable";
-	
-	/**
 	 * 在摄像头中的图像开始运动时调度
 	 */	
 	public static const ACTIVITY_START:String = 'activityStart';

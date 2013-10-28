@@ -28,13 +28,16 @@ import org.zengrong.utils.checkVersion;
 [Event(name="noCamera",type="org.zengrong.media.cm.CMEvent")]
 [Event(name="multiCamera",type="org.zengrong.media.cm.CMEvent")]
 [Event(name="activityStart",type="org.zengrong.media.cm.CMEvent")]
-[Event(name="activityStop",type="org.zengrong.media.cm.CMEvent")]
+[Event(name = "activityStop", type = "org.zengrong.media.cm.CMEvent")]
+[Event(name = "microphoneMuted", type = "org.zengrong.media.cm.CMEvent")]
+[Event(name = "microphoneUnMuted", type = "org.zengrong.media.cm.CMEvent")]
+[Event(name = "noMicrophone", type = "org.zengrong.media.cm.CMEvent")]
+
 
 public class CM extends EventDispatcher
 {
 	public function CM($sig:Singleton)
 	{
-		trace("建立CM的实例");
 	}		
 	
 	/**
@@ -155,7 +158,7 @@ public class CM extends EventDispatcher
 	 */	
 	public function reset():void
 	{
-		trace('CM重新设置');
+		//trace('reset CM');
 		if(_cam != null)
 		{
 			_cam.removeEventListener(StatusEvent.STATUS, handler_camStatus);
@@ -174,7 +177,7 @@ public class CM extends EventDispatcher
 	 **/
 	public function checkCam():Camera
 	{
-		trace('执行了checkCam！摄像头数量：'+ camAmount);
+		//trace('执行了checkCam！摄像头数量：'+ camAmount);
 		if(camAmount <= 0)
 		{
 			this.dispatchEvent(new CMEvent(CMEvent.NO_CAMERA));	//发布摄像头检测消息
@@ -220,10 +223,9 @@ public class CM extends EventDispatcher
 	 **/
 	private function checkCamStatus($isManual:Boolean):void
 	{
-		trace('//=================org.zengrong.media.cm.CM');
-		trace("执行了checkCamStatus！ manual:"+$isManual);
-		trace("摄像头是否禁用："+_cam.muted);
-		trace("待发布的事件："+getEventType(_cam));
+		trace('//=================org.zengrong.media.cm.CM:checkCamStatus('+$isManual+')');
+		trace("camera is muted: "+_cam.muted);
+		trace("the event waiting for dispatch: "+getEventType(_cam));
 		trace('=============================//');
 		var __vo:CMVO = new CMVO(_cam, camNames, $isManual);
 		this.dispatchEvent(new CMEvent(getEventType(_cam), __vo)); 
@@ -307,7 +309,7 @@ public class CM extends EventDispatcher
 				return CMEvent.MICROPHONE_MUTED;
 			}
 		}
-		throw new RangeError('必须提供Camera或者Microphone类型！');
+		throw new RangeError('Need a Camera or Microphone type!');
 	}
 
 }

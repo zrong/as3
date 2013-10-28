@@ -1,16 +1,11 @@
-////////////////////////////////////////////////////////////////////////////////
-//  zengrong.net
-//  创建者:	zrong
-//  最后更新时间：日期
-////////////////////////////////////////////////////////////////////////////////
 package org.zengrong.media.cm
 {
 import flash.media.Camera;
 import flash.media.Microphone;
 
 /**
- * 包含
- * @author zrong
+ * @author zrong(zengrong.net)
+ * Modification: 2013-10-28
  */
 public class CMVO
 {
