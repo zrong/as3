@@ -65,7 +65,17 @@ public class CM extends EventDispatcher
 	{
 		return _mic;
 	}
-	
+
+    public function get camMuted():Boolean
+    {
+        return _cam ? _cam.muted : true;
+    }
+
+    public function get micMuted():Boolean
+    {
+        return _mic ? _mic.muted : true;
+    }
+
 	/**
 	*	返回摄像头数量
 	*/
@@ -159,16 +169,26 @@ public class CM extends EventDispatcher
 	public function reset():void
 	{
 		//trace('reset CM');
-		if(_cam != null)
-		{
-			_cam.removeEventListener(StatusEvent.STATUS, handler_camStatus);
-			_cam.removeEventListener(ActivityEvent.ACTIVITY, handler_activity);
-		}
-		if(_mic != null)
-			_mic.removeEventListener(StatusEvent.STATUS, handler_micStatus);
-		_cam = null;
-		_mic = null;
+		resetCam();
+        resetMic();
 	}
+
+    private function resetCam():void
+    {
+        if(_cam != null)
+        {
+            _cam.removeEventListener(StatusEvent.STATUS, handler_camStatus);
+            _cam.removeEventListener(ActivityEvent.ACTIVITY, handler_activity);
+        }
+        _cam = null;
+    }
+
+    private function resetMic():void
+    {
+        if(_mic != null)
+            _mic.removeEventListener(StatusEvent.STATUS, handler_micStatus);
+        _mic = null;
+    }
 	
 	
 	/**
@@ -178,6 +198,7 @@ public class CM extends EventDispatcher
 	public function checkCam():Camera
 	{
 		//trace('执行了checkCam！摄像头数量：'+ camAmount);
+        resetCam();
 		if(camAmount <= 0)
 		{
 			this.dispatchEvent(new CMEvent(CMEvent.NO_CAMERA));	//发布摄像头检测消息
@@ -236,6 +257,7 @@ public class CM extends EventDispatcher
 	 **/
 	public function checkMic():Microphone
 	{
+        resetMic();
 		if(micAmount <= 0)
 		{
 			this.dispatchEvent(new CMEvent(CMEvent.NO_MICROPHONE));	//发布摄像头检测消息
@@ -306,7 +328,7 @@ public class CM extends EventDispatcher
 			}
 			else
 			{
-				return CMEvent.MICROPHONE_MUTED;
+				return CMEvent.MICROPHONE_UN_MUTED;
 			}
 		}
 		throw new RangeError('Need a Camera or Microphone type!');
