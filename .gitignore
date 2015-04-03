@@ -1,7 +1,9 @@
 bin/
 *.as3proj
 *.bat
+*.iml
 .actionScriptProperties
 .flexLibProperties
 .project
 .settings/
+.idea/
