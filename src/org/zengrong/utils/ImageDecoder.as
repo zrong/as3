@@ -1,4 +1,4 @@
-package org.zengrong.utils
+﻿package org.zengrong.utils
 {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -26,6 +26,11 @@ package org.zengrong.utils
 															$callBack.call(null, Bitmap(evt.target.content));
 														});
 			_loader.loadBytes($byte);
+		}
+		
+		public static function decodeByteArray($ba:ByteArray, $callBack:Function):void
+		{
+			var decoder:ImageDecoder = new ImageDecoder($ba, $callBack);
 		}
 		
 		//将可视的UIComponent组件转换为ByteArray数组，我就是在UIComponent那里放了一个图片 
